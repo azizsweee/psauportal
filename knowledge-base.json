@@ -1,0 +1,112 @@
+{
+  "university": {
+    "name_ar": "جامعة الأمير سطام بن عبدالعزيز",
+    "name_en": "Prince Sattam bin Abdulaziz University",
+    "abbreviation": "PSAU",
+    "established": "2009",
+    "type": "حكومية / Government",
+    "president": "د. عبدالله بن سعيد القحطاني",
+    "location_ar": "الخرج، المملكة العربية السعودية",
+    "location_en": "Al-Kharj, Saudi Arabia",
+    "website": "https://psau.edu.sa",
+    "vision_ar": "الريادة والتميز في التعليم الجامعي والبحث العلمي وخدمة المجتمع",
+    "vision_en": "Leadership and excellence in university education, scientific research, and community service",
+    "mission_ar": "تقديم تعليم متميز وإنتاج أبحاث مبتكرة وخدمة المجتمع",
+    "mission_en": "Providing distinguished education, producing innovative research, and serving the community"
+  },
+  "colleges": [
+    {"name_ar": "كلية الهندسة", "name_en": "College of Engineering", "campus": "الخرج"},
+    {"name_ar": "كلية علوم الحاسب والمعلومات", "name_en": "College of Computer and Information Sciences", "campus": "الخرج"},
+    {"name_ar": "كلية إدارة الأعمال", "name_en": "College of Business Administration", "campus": "الخرج"},
+    {"name_ar": "كلية العلوم", "name_en": "College of Science", "campus": "الخرج"},
+    {"name_ar": "كلية العلوم الطبية التطبيقية", "name_en": "College of Applied Medical Sciences", "campus": "الخرج"},
+    {"name_ar": "كلية الطب", "name_en": "College of Medicine", "campus": "الخرج"},
+    {"name_ar": "كلية طب الأسنان", "name_en": "College of Dentistry", "campus": "الخرج"},
+    {"name_ar": "كلية الصيدلة", "name_en": "College of Pharmacy", "campus": "الخرج"},
+    {"name_ar": "كلية التربية", "name_en": "College of Education", "campus": "الدلم"},
+    {"name_ar": "كلية الآداب والعلوم", "name_en": "College of Arts and Sciences", "campus": "وادي الدواسر"},
+    {"name_ar": "كلية المجتمع", "name_en": "Community College", "campus": "الخرج"},
+    {"name_ar": "كلية القانون", "name_en": "College of Law", "campus": "الخرج"},
+    {"name_ar": "كلية التمريض", "name_en": "College of Nursing", "campus": "الخرج"}
+  ],
+  "admission": {
+    "requirements_ar": "يشترط حصول الطالب على شهادة الثانوية العامة أو ما يعادلها، وألا يقل عمره عن 17 سنة، واجتياز المقابلة الشخصية إن وجدت، واجتياز الفحص الطبي.",
+    "requirements_en": "Applicant must have a high school diploma or equivalent, be at least 17 years old, pass any required personal interview, and pass the medical examination.",
+    "required_docs_ar": ["شهادة الثانوية العامة", "صورة الهوية الوطنية", "صور شخصية", "شهادة حسن السيرة والسلوك", "نتيجة اختبار القدرات والتحصيلي"],
+    "required_docs_en": ["High school certificate", "National ID copy", "Passport photos", "Good conduct certificate", "Qudurat & Tahsili test results"],
+    "gpa_calculation_ar": "المعدل التراكمي من 5.0، حيث A+ = 5.0، A = 4.75، B+ = 4.5، B = 4.0، C+ = 3.5، C = 3.0، D+ = 2.5، D = 2.0، F = 0.0",
+    "gpa_calculation_en": "GPA is out of 5.0: A+ = 5.0, A = 4.75, B+ = 4.5, B = 4.0, C+ = 3.5, C = 3.0, D+ = 2.5, D = 2.0, F = 0.0",
+    "application_period_ar": "عادةً ما يكون التقديم في الفصل الأول من شهر ذو القعدة، والفصل الثاني من شهر رجب",
+    "application_period_en": "Applications for Semester 1 usually open in Dhul Qadah, Semester 2 in Rajab"
+  },
+  "contact": {
+    "phone": "0115888000",
+    "email": "info@psau.edu.sa",
+    "address_ar": "جامعة الأمير سطام بن عبدالعزيز، الخرج 11942، المملكة العربية السعودية",
+    "address_en": "Prince Sattam bin Abdulaziz University, Al-Kharj 11942, Saudi Arabia",
+    "student_affairs_ar": "عمادة شؤون الطلاب: 0115888500",
+    "student_affairs_en": "Dean of Student Affairs: 0115888500",
+    "registration_ar": "عمادة القبول والتسجيل: 0115888200",
+    "registration_en": "Deanship of Admission and Registration: 0115888200"
+  },
+  "campus": {
+    "main_campus_ar": "الخرج (المقر الرئيسي)",
+    "main_campus_en": "Al-Kharj (Main Campus)",
+    "branches_ar": ["الدلم", "وادي الدواسر", "الأفلاج", "حوطة بني تميم", "السليل"],
+    "branches_en": ["Al-Dalam", "Wadi Al-Dawasir", "Al-Aflaj", "Hotat Bani Tamim", "Al-Salil"],
+    "facilities_ar": ["مكتبة مركزية", "مراكز أبحاث", "مدينة رياضية", "سكن طلابي", "مطاعم وكافيتريات", "عيادات طبية", "مواقف سيارات"],
+    "facilities_en": ["Central library", "Research centers", "Sports complex", "Student housing", "Restaurants and cafeterias", "Medical clinics", "Parking lots"]
+  },
+  "academic_calendar": {
+    "semesters": 2,
+    "summer_session": true,
+    "weeks_per_semester": 16,
+    "language": "العربية والانجليزية",
+    "programs_ar": ["البكالوريوس", "الماجستير", "الدكتوراه", "الدبلوم"],
+    "programs_en": ["Bachelor's", "Master's", "PhD", "Diploma"]
+  },
+  "faq": [
+    {
+      "question_ar": "كيف يمكنني التسجيل في الجامعة؟",
+      "question_en": "How can I register at the university?",
+      "answer_ar": "يمكنك التسجيل عبر بوابة القبول الإلكتروني على موقع الجامعة psau.edu.sa خلال فترة التقديم المعلنة.",
+      "answer_en": "You can apply through the online admission portal at psau.edu.sa during the announced application period."
+    },
+    {
+      "question_ar": "ما هي تخصصات جامعة الأمير سطام؟",
+      "question_en": "What are the majors at PSAU?",
+      "answer_ar": "تضم الجامعة 13 كلية في مختلف التخصصات: الهندسة، علوم الحاسب، إدارة الأعمال، الطب، الصيدلة، طب الأسنان، العلوم الطبية التطبيقية، التمريض، العلوم، الآداب، التربية، القانون، والمجتمع.",
+      "answer_en": "The university has 13 colleges in various fields: Engineering, Computer Science, Business, Medicine, Pharmacy, Dentistry, Applied Medical Sciences, Nursing, Science, Arts, Education, Law, and Community College."
+    },
+    {
+      "question_ar": "كيف أحسب معدلي الجامعي؟",
+      "question_en": "How do I calculate my GPA?",
+      "answer_ar": "المعدل من 5: A+ = 5.0، A = 4.75، B+ = 4.5، B = 4.0، C+ = 3.5، C = 3.0، D+ = 2.5، D = 2.0، F = 0.0. اضرب درجة كل مادة في ساعاتها واجمع ثم اقسم على إجمالي الساعات.",
+      "answer_en": "GPA is out of 5. Multiply each course grade points by its credit hours, sum them, then divide by total hours."
+    },
+    {
+      "question_ar": "ما هو رقم خدمة العملاء في الجامعة؟",
+      "question_en": "What is the customer service number?",
+      "answer_ar": "رقم الجامعة: 0115888000، وعمادة شؤون الطلاب: 0115888500.",
+      "answer_en": "University phone: 0115888000, Student Affairs: 0115888500."
+    },
+    {
+      "question_ar": "أين تقع جامعة الأمير سطام؟",
+      "question_en": "Where is PSAU located?",
+      "answer_ar": "المقر الرئيسي في الخرج، ولها فروع في الدلم، وادي الدواسر، الأفلاج، حوطة بني تميم، والسليل.",
+      "answer_en": "Main campus is in Al-Kharj, with branches in Al-Dalam, Wadi Al-Dawasir, Al-Aflaj, Hotat Bani Tamim, and Al-Salil."
+    },
+    {
+      "question_ar": "متى تبدأ الدراسة في الجامعة؟",
+      "question_en": "When does the academic year start?",
+      "answer_ar": "تبدأ الدراسة في فصلين رئيسيين: الفصل الأول في أغسطس/سبتمبر، والفصل الثاني في يناير/فبراير، مع وجود فصل صيفي اختياري.",
+      "answer_en": "Two main semesters: Fall in August/September, Spring in January/February, with an optional summer session."
+    },
+    {
+      "question_ar": "هل يوجد سكن طلابي في الجامعة؟",
+      "question_en": "Is there student housing?",
+      "answer_ar": "نعم، توفر الجامعة سكناً طلابياً للطلاب والطالبات في الحرم الرئيسي وبعض الفروع.",
+      "answer_en": "Yes, the university provides student housing for male and female students at the main campus and some branches."
+    }
+  ]
+}

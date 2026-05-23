@@ -1,0 +1,13 @@
+{
+  "name": "psau-ai-portal",
+  "version": "3.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "express": "^4.19.2",
+    "nodemailer": "^6.9.13"
+  }
+}

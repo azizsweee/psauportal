@@ -1,0 +1,575 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSAU AI Portal · جامعة الأمير سطام</title>
+    <link rel="stylesheet" href="style.css?v=6">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="dash-body" onload="checkAuth(); initDash();">
+ 
+    <button class="menu-btn" onclick="toggleMenu()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+ 
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand" onclick="switchTab('hub')">
+            <div class="brand-logo">
+                <svg width="38" height="38" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50" cy="50" r="45" fill="url(#sg)" />
+                    <path d="M30 70 L50 30 L70 70 Z" fill="white" />
+                    <path d="M42 70 L50 52 L58 70 Z" fill="#0A3D62" />
+                    <defs><linearGradient id="sg" x1="0" y1="0" x2="100" y2="100"><stop stop-color="#3b82f6" /><stop offset="1" stop-color="#60a5fa" /></linearGradient></defs>
+                </svg>
+            </div>
+            <span class="brand-text">PSAU</span>
+            <span class="brand-sub">AI Portal</span>
+            <span id="userDisp" class="user-pill">...</span>
+        </div>
+        <ul class="nav">
+            <li><a href="#" id="mHub" onclick="switchTab('hub')" class="active">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                البوابة</a></li>
+            <li><a href="#" id="mAI" onclick="switchTab('ai')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a4 4 0 0 1 4 4c0 2-2 4-4 4s-4-2-4-4 2-4 4-4z"/><path d="M2 22v-2a6 6 0 0 1 6-6h8a6 6 0 0 1 6 6v2"/><circle cx="12" cy="22" r="1"/></svg>
+                المساعد AI</a></li>
+            <li><a href="#" id="mTasks" onclick="switchTab('tasks')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                المهام</a></li>
+            <li><a href="#" id="mGpa" onclick="switchTab('gpa')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                المعدل</a></li>
+            <li><a href="#" id="mSchedule" onclick="switchTab('schedule')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                الجدول</a></li>
+            <li><a href="#" id="mCourses" onclick="switchTab('courses')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                المقررات</a></li>
+            <li><a href="#" id="mFeedback" onclick="switchTab('feedback')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                الآراء</a></li>
+            <li><a href="#" id="mSettings" onclick="switchTab('settings')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                الإعدادات</a></li>
+            <li><a href="#" id="mAdminFeedback" onclick="switchTab('adminFeedback')" style="display:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                الشكاوى</a></li>
+            <li><a href="#" id="mAdminStats" onclick="switchTab('adminStats')" style="display:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                <span id="mAdminStatsLabel">الإحصائيات</span></a></li>
+        </ul>
+        <div class="sidebar-bottom">
+            <a href="#" id="mLogout" onclick="logout()" class="logout-link">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                خروج
+            </a>
+        </div>
+    </aside>
+ 
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMenu()"></div>
+    <main class="content" onclick="closeMenu()">
+ 
+        <!-- ===== HUB ===== -->
+        <section id="hub" class="tab animate-in">
+            <div class="hub-header">
+                <h2 id="hubWelcome">مرحباً بك في البوابة الطلابية الذكية</h2>
+                <p id="hubSub">اختر الخدمة التي تريدها من البطاقات أدناه</p>
+            </div>
+            <div class="hub-grid">
+                <div class="hub-card" onclick="switchTab('ai')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M12 2a4 4 0 0 1 4 4c0 2-2 4-4 4s-4-2-4-4 2-4 4-4z"/><path d="M2 22v-2a6 6 0 0 1 6-6h8a6 6 0 0 1 6 6v2"/><circle cx="12" cy="22" r="1"/></svg>
+                    </div>
+                    <h3 id="hubAITitle">المساعد AI</h3>
+                    <p id="hubAIDesc">اسأل عن جامعة الأمير سطام واحصل على إجابات فورية</p>
+                </div>
+                <div class="hub-card" onclick="switchTab('tasks')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    </div>
+                    <h3 id="hubTasksTitle">المهام</h3>
+                    <p id="hubTasksDesc">متابعة الواجبات والاختبارات وتصنيفها</p>
+                </div>
+                <div class="hub-card" onclick="switchTab('gpa')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    </div>
+                    <h3 id="hubGpaTitle">المعدل</h3>
+                    <p id="hubGpaDesc">احتساب المعدل الفصلي والتراكمي</p>
+                </div>
+                <div class="hub-card" onclick="switchTab('schedule')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    </div>
+                    <h3 id="hubSchedTitle">الجدول</h3>
+                    <p id="hubSchedDesc">تنظيم المحاضرات بقوالب عصرية</p>
+                </div>
+                <div class="hub-card" onclick="switchTab('courses')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
+                    <h3 id="hubCoursesTitle">المقررات</h3>
+                    <p id="hubCoursesDesc">مركز ذكي لكل مقرر دراسي</p>
+                </div>
+                <div class="hub-card" onclick="switchTab('feedback')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <h3 id="hubFeedTitle">الآراء</h3>
+                    <p id="hubFeedDesc">شاركنا رأيك وتقييمك</p>
+                </div>
+                <div class="hub-card" onclick="switchTab('settings')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    </div>
+                    <h3 id="hubSetTitle">الإعدادات</h3>
+                    <p id="hubSetDesc">تحديث البيانات أو حذف الحساب</p>
+                </div>
+                <div class="hub-card hub-admin-only" id="hubAdminCard" onclick="switchTab('adminFeedback')" style="display:none">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </div>
+                    <h3 id="hubAdminTitle">الشكاوى والاقتراحات</h3>
+                    <p id="hubAdminDesc">عرض ملاحظات المستخدمين</p>
+                </div>
+                <div class="hub-card hub-admin-only" id="hubAdminStatsCard" onclick="switchTab('adminStats')" style="display:none">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    </div>
+                    <h3 id="hubAdminStatsTitle">الإحصائيات</h3>
+                    <p id="hubAdminStatsDesc">بيانات الموقع والرسومات البيانية</p>
+                </div>
+            </div>
+        </section>
+ 
+        <!-- ===== AI CHAT ===== -->
+        <section id="ai" class="tab hidden animate-in">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleAI">🤖 المساعد الذكي لجامعة الأمير سطام</h2>
+            </div>
+            <div class="ai-container">
+                <div class="ai-sidebar">
+                    <div class="ai-avatar">
+                        <svg width="56" height="56" viewBox="0 0 100 100" fill="none">
+                            <circle cx="50" cy="50" r="45" fill="url(#aiGrad)"/>
+                            <circle cx="50" cy="35" r="15" fill="white" opacity="0.9"/>
+                            <path d="M25 75c0-15 15-25 25-25s25 10 25 25" fill="white" opacity="0.9"/>
+                            <defs><linearGradient id="aiGrad" x1="0" y1="0" x2="100" y2="100"><stop stop-color="#2563eb"/><stop offset="1" stop-color="#1e40af"/></linearGradient></defs>
+                        </svg>
+                    </div>
+                    <h4>PSAU AI Assistant</h4>
+                    <p id="aiDesc">اسأل عن كل ما يخص جامعة الأمير سطام: الكليات، القبول، الجداول، التواصل، وأكثر.</p>
+ 
+                </div>
+                <div class="ai-chat-area">
+                    <div class="chat-header">
+                        <div class="chat-status">
+                            <span class="status-dot"></span>
+                            <span>AI نشط</span>
+                        </div>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai-message">
+                            <div class="msg-bubble">
+                                <span class="msg-sender">🎓 PSAU AI</span>
+                                <p id="welcomeMsg">مرحباً بك في مساعد جامعة الأمير سطام الذكي! أنا هنا للإجابة عن جميع استفساراتك حول الجامعة.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" placeholder="اكتب سؤالك عن الجامعة هنا..." onkeypress="if(event.key==='Enter') sendChat()">
+                        <button class="btn-send" onclick="sendChat()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+ 
+        <!-- ===== TASKS ===== -->
+        <section id="tasks" class="tab hidden animate-in">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleTasks">📝 إدارة المهام</h2>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <h4 id="hAddTask">إضافة مهمة جديدة</h4>
+                <div class="grid-inputs">
+                    <input type="text" id="taskText" placeholder="المهمة أو الواجب...">
+                    <select id="taskPriority">
+                        <option value="urgent" id="pUrgent">🔴 عاجل</option>
+                        <option value="important" id="pImportant">⚠️ هام</option>
+                        <option value="normal" id="pNormal" selected>🔵 اعتيادي</option>
+                    </select>
+                    <select id="taskType">
+                        <option value="daily" id="oDaily">يومية</option>
+                        <option value="weekly" id="oWeekly">أسبوعية</option>
+                        <option value="monthly" id="oMonthly">شهرية</option>
+                        <option value="general" id="oGeneral">عامة</option>
+                    </select>
+                    <button class="btn btn-primary" id="btnAddTask" onclick="addTask()">➕ إضافة</button>
+                </div>
+            </div>
+            <div id="taskStatsBox" class="task-stats hidden">
+                <div class="stat-box task-stat-pending"><span class="stat-num" id="taskStatsPending">0</span><span class="stat-label">قائمة</span></div>
+                <div class="stat-box task-stat-done"><span class="stat-num" id="taskStatsDone">0</span><span class="stat-label">منجزة</span></div>
+            </div>
+            <div class="tasks-container">
+                <div class="task-col"><h4 id="cDaily">📅 اليومية</h4><ul id="list-daily" class="task-list"></ul></div>
+                <div class="task-col"><h4 id="cWeekly">📅 الأسبوعية</h4><ul id="list-weekly" class="task-list"></ul></div>
+                <div class="task-col"><h4 id="cMonthly">📅 الشهرية</h4><ul id="list-monthly" class="task-list"></ul></div>
+                <div class="task-col"><h4 id="cGeneral">📋 عامة</h4><ul id="list-general" class="task-list"></ul></div>
+            </div>
+            <div class="task-col-completed"><h4>✅ المنجزة</h4><ul id="list-completed"></ul></div>
+        </section>
+ 
+        <!-- ===== GPA ===== -->
+        <section id="gpa" class="tab hidden animate-in">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleGpa">📊 حاسبة المعدل</h2>
+            </div>
+            <div class="gpa-toggle">
+                <button class="toggle-btn active" id="gpaSemTab" onclick="toggleGpaMode('semester')">📘 الفصلي</button>
+                <button class="toggle-btn" id="gpaCumTab" onclick="toggleGpaMode('cumulative')">📊 التراكمي</button>
+            </div>
+            <datalist id="gpaCourseList"></datalist>
+            <div id="semesterGpaBox" class="card tech-card">
+                <div class="card-glow"></div>
+                <h3 id="lblSemTitle">حساب المعدل الفصلي</h3>
+                <div id="gpa-rows">
+                    <div class="gpa-row">
+                        <input type="text" placeholder="المقرر" class="course-name" list="gpaCourseList">
+                        <input type="number" class="hours" placeholder="الساعات" min="1" max="6">
+                        <select class="grade">
+                            <option value="5.00">A+ (5.0)</option>
+                            <option value="4.75">A (4.75)</option>
+                            <option value="4.50">B+ (4.5)</option>
+                            <option value="4.00">B (4.0)</option>
+                            <option value="3.50">C+ (3.5)</option>
+                            <option value="3.00">C (3.0)</option>
+                            <option value="2.50">D+ (2.5)</option>
+                            <option value="2.00">D (2.0)</option>
+                            <option value="0.00">F (0.0)</option>
+                        </select>
+                        <button class="btn-icon" onclick="this.parentElement.remove()">✕</button>
+                    </div>
+                </div>
+                <div class="gpa-actions">
+                    <button class="btn btn-secondary" onclick="addGpaRow()">+ إضافة مقرر</button>
+                    <button class="btn btn-outline" onclick="importGpaCourses()">📥 من مقرراتي</button>
+                    <button class="btn btn-primary" onclick="calculateGPA()">💻 احسب الفصلي</button>
+                </div>
+                <div class="result-box hidden" id="gpaResult">
+                    <span id="lblRes">المعدل الفصلي:</span> <strong id="gpaVal">0.00</strong> / 5.0
+                </div>
+            </div>
+            <div id="cumulativeGpaBox" class="card tech-card hidden">
+                <div class="card-glow"></div>
+                <h3 id="lblCumTitle">المعدل التراكمي</h3>
+                <div class="form-group">
+                    <label id="lblPrevGpa">المعدل التراكمي السابق</label>
+                    <input type="number" id="prevGpa" step="0.01" min="0" max="5" placeholder="4.45">
+                </div>
+                <div class="form-group">
+                    <label id="lblPrevHours">الساعات السابقة</label>
+                    <input type="number" id="prevHours" min="1" placeholder="60">
+                </div>
+                <div class="form-group">
+                    <label id="lblCurrGpa">معدل الفصل الحالي</label>
+                    <input type="number" id="currGpa" step="0.01" min="0" max="5" placeholder="4.80">
+                </div>
+                <div class="form-group">
+                    <label id="lblCurrHours">ساعات الفصل الحالي</label>
+                    <input type="number" id="currHours" min="1" placeholder="15">
+                </div>
+                <button class="btn btn-primary" onclick="calculateCumulativeGPA()">💻 احسب التراكمي</button>
+                <div class="result-box hidden" id="gpaCumResult">
+                    <span id="lblCumRes">المعدل التراكمي:</span> <strong id="gpaCumVal">0.00</strong> / 5.0
+                </div>
+            </div>
+        </section>
+ 
+        <!-- ===== SCHEDULE ===== -->
+        <section id="schedule" class="tab hidden animate-in">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleSchedule">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    جدول المحاضرات
+                </h2>
+            </div>
+ 
+            <!-- Add Lecture -->
+            <div class="card tech-card schedule-form-card">
+                <div class="card-glow"></div>
+                <div class="schedule-form-header">
+                    <h4 id="hAddLecture">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        إضافة محاضرة
+                    </h4>
+                </div>
+                <div class="schedule-form-grid">
+                    <div class="form-field">
+                        <label>المادة</label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                            <input type="text" id="schedSub" placeholder="اسم المقرر">
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>اليوم</label>
+                        <div class="day-selector" id="dayScrollSelect">
+                            <button type="button" class="day-btn active" data-day="Sunday">الأحد</button>
+                            <button type="button" class="day-btn" data-day="Monday">الإثنين</button>
+                            <button type="button" class="day-btn" data-day="Tuesday">الثلاثاء</button>
+                            <button type="button" class="day-btn" data-day="Wednesday">الأربعاء</button>
+                            <button type="button" class="day-btn" data-day="Thursday">الخميس</button>
+                        </div>
+                    </div>
+                    <div class="form-field time-field">
+                        <label>وقت المحاضرة</label>
+                        <div class="time-picker-modern">
+                            <div class="time-block">
+                                <span class="time-label">من</span>
+                                <div class="time-input-wrap">
+                                    <input type="time" id="schedFrom" class="time-input-styled" value="08:00">
+                                    <svg class="time-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                </div>
+                            </div>
+                            <span class="time-arrow">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 5 5 12 12 19"/></svg>
+                            </span>
+                            <div class="time-block">
+                                <span class="time-label">إلى</span>
+                                <div class="time-input-wrap">
+                                    <input type="time" id="schedTo" class="time-input-styled" value="09:00">
+                                    <svg class="time-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-save" onclick="addSchedule()">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                                حفظ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+ 
+            <!-- Theme Selector -->
+            <div class="theme-selector-bar">
+                <span id="lblSelectTheme">🎨 القالب:</span>
+                <div class="theme-chips-modern">
+                    <button class="theme-chip-modern active" id="theme-timeline" onclick="changeScheduleTheme('timeline')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="8 7 3 12 8 17"/></svg>
+                        <span id="scheduleTimeline">زمني</span>
+                    </button>
+                    <button class="theme-chip-modern" id="theme-cards" onclick="changeScheduleTheme('cards')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        <span id="scheduleCards">بطاقات</span>
+                    </button>
+                    <button class="theme-chip-modern" id="theme-minimal" onclick="changeScheduleTheme('minimal')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                        <span id="scheduleMinimal">بسيط</span>
+                    </button>
+                </div>
+            </div>
+ 
+            <!-- Schedule Grid -->
+            <div class="schedule-accordion" id="scheduleContainer"></div>
+        </section>
+ 
+        <!-- ===== COURSES ===== -->
+        <section id="courses" class="tab hidden animate-in">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleCourses">📚 المقررات الدراسية</h2>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <h4 id="hAddCourse">تسجيل مقرر جديد</h4>
+                <div class="grid-inputs" style="position:relative;">
+                    <input type="text" id="courseInputName" placeholder="اسم المقرر..." oninput="handleCourseAutocomplete(this.value)">
+                    <button class="btn btn-primary" id="btnAddCourse" onclick="addCourse()">📌 تسجيل</button>
+                    <div class="autocomplete-dropdown hidden" id="autoSuggestBox"></div>
+                </div>
+            </div>
+            <div class="courses-layout">
+                <div class="courses-sidebar">
+                    <h4 id="lblMyCourses">مقرراتي</h4>
+                    <ul class="clean-list" id="myCoursesList"></ul>
+                </div>
+                <div class="course-details" id="courseDetailsPanel">
+                    <div class="empty-state" id="emptyStateCourse">
+                        <span class="empty-icon">📚</span>
+                        <p id="lblSelectCourseHint">اختر مقرراً من القائمة</p>
+                    </div>
+                    <div class="details-content hidden" id="courseDetailsContent">
+                        <div class="details-header">
+                            <h3 id="courseDetailTitle">المادة</h3>
+                            <button class="btn btn-danger-sm" onclick="deleteActiveCourse()">🗑️ حذف</button>
+                        </div>
+                        <div class="details-grid">
+                            <div class="detail-section">
+                                <h4 id="lblCourseTimes">📅 أوقات المحاضرات</h4>
+                                <ul class="clean-list" id="courseTimesList"></ul>
+                            </div>
+                            <div class="detail-section">
+                                <h4 id="lblCourseTasks">📝 المهام</h4>
+                                <ul class="clean-list" id="courseTasksList"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+ 
+        <!-- ===== FEEDBACK ===== -->
+        <section id="feedback" class="tab hidden animate-in">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleFeedback">💬 الآراء والمقترحات</h2>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <h3 id="lblSendOpinion">شاركنا رأيك</h3>
+                <p style="color:var(--text-muted);font-size:13px;margin-bottom:20px;" id="feedbackDesc">نحن نقدر ملاحظاتك لتطوير المنصة</p>
+                <div class="rating-area">
+                    <label id="lblRate">التقييم:</label>
+                    <div class="rating-control">
+                        <input type="range" id="ratingRange" min="1" max="10" value="8" oninput="updateEmoji(this.value)">
+                        <div class="rating-display">
+                            <span id="emojiPic">🙂</span>
+                            <span id="ratingVal">8 / 10</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="lblYourComment">رسالتك</label>
+                    <textarea id="feedbackComment" rows="4" placeholder="اكتب اقتراحك أو ملاحظاتك..."></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="submitFeedback()">📨 إرسال</button>
+            </div>
+        </section>
+ 
+        <!-- ===== ADMIN FEEDBACK (شكاوى واقتراحات فقط) ===== -->
+        <section id="adminFeedback" class="tab hidden animate-in hub-admin-only">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleAdminFeedback">🛡️ الشكاوى والاقتراحات</h2>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <div class="admin-feedback-toolbar">
+                    <span id="adminFeedbackCount"></span>
+                    <button class="btn btn-sm" onclick="loadAdminFeedback()" id="btnRefreshFeed">🔄 تحديث</button>
+                </div>
+                <div id="adminFeedbackList">
+                    <p id="adminFeedbackEmpty" style="color:var(--text-muted);text-align:center;padding:30px;">لا توجد شكاوى أو اقتراحات حتى الآن</p>
+                </div>
+            </div>
+        </section>
+ 
+        <!-- ===== ADMIN STATISTICS (إحصائيات + جدول + رسومات) ===== -->
+        <section id="adminStats" class="tab hidden animate-in hub-admin-only">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleAdminStats">📈 الإحصائيات</h2>
+            </div>
+            <div class="admin-stats-subnav">
+                <button class="toggle-btn active" id="statsTabUsers" onclick="switchStatsSubTab('users')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <span id="statsTabUsersLabel">جدول المستخدمين</span>
+                </button>
+                <button class="toggle-btn" id="statsTabCharts" onclick="switchStatsSubTab('charts')">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    <span id="statsTabChartsLabel">رسومات بيانية</span>
+                </button>
+            </div>
+            <!-- Users Table Sub-tab -->
+            <div id="statsUsersContent">
+                <div class="card tech-card">
+                    <div class="card-glow"></div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                        <h3 style="font-size:15px;">📋 بيانات المستخدمين</h3>
+                        <span id="statsUsersCount" style="font-size:12px;color:var(--text-muted);"></span>
+                    </div>
+                    <div id="adminUsersList">
+                        <p style="text-align:center;color:var(--text-muted);padding:20px;">جاري التحميل...</p>
+                    </div>
+                </div>
+            </div>
+            <!-- Charts Sub-tab -->
+            <div id="statsChartsContent" class="hidden">
+                <div class="card tech-card">
+                    <div class="card-glow"></div>
+                    <h3 style="font-size:15px;margin-bottom:16px;">📊 إحصائيات المنصة</h3>
+                    <div id="adminStats" class="admin-stats-grid"></div>
+                </div>
+                <div class="charts-grid" id="chartsGrid">
+                    <div class="card tech-card chart-card">
+                        <div class="card-glow"></div>
+                        <h4>توزيع الجنس</h4>
+                        <div class="chart-container" id="genderChart"></div>
+                    </div>
+                    <div class="card tech-card chart-card">
+                        <div class="card-glow"></div>
+                        <h4>توزيع الأعمار</h4>
+                        <div class="chart-container" id="ageChart"></div>
+                    </div>
+                    <div class="card tech-card chart-card">
+                        <div class="card-glow"></div>
+                        <h4>توزيع الكليات</h4>
+                        <div class="chart-container" id="collegeChart"></div>
+                    </div>
+                    <div class="card tech-card chart-card">
+                        <div class="card-glow"></div>
+                        <h4>نشاط المستخدمين</h4>
+                        <div class="chart-container" id="activityChart"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+ 
+        <!-- ===== SETTINGS ===== -->
+        <section id="settings" class="tab hidden animate-in">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleSettings">⚙️ الإعدادات</h2>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <h4 id="hUpdate">تحديث الحساب</h4>
+                <div class="form-group">
+                    <label id="lNewUser">اسم مستخدم جديد</label>
+                    <div class="input-wrap">
+                        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <input type="text" id="setNewUser" placeholder="New Username">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="lNewPass">كلمة مرور جديدة</label>
+                    <div class="input-wrap">
+                        <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input type="password" id="setNewPass" placeholder="••••••••">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="updateSettings()">💾 حفظ التحديث</button>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+            </div>
+            <div class="card danger-card">
+                <h4 style="color:#ef4444;">⚠️ منطقة الخطر</h4>
+                <p id="pDeleteDesc" style="color:var(--text-muted);font-size:13px;">حذف الحساب وجميع البيانات نهائياً</p>
+                <button class="btn btn-danger" onclick="deleteAccount()">🗑️ حذف الحساب</button>
+            </div>
+        </section>
+    </main>
+    <script src="app.js?v=6"></script>
+</body>
+</html>
+ 
