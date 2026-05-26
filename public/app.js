@@ -119,14 +119,36 @@ async function registerStudent() {
         document.getElementById('regSubmitArea').classList.add('hidden');
         document.getElementById('regOtpMsg').innerHTML = '📧 ' + (data.msg_ar || 'تم إرسال الرمز');
         document.getElementById('regOtpEmail').value = email;
+        document.getElementById('regHelpLink').style.display = 'block';
         if (data.dev_code) {
             document.getElementById('regOtpInput').value = data.dev_code;
             document.getElementById('regOtpMsg').innerHTML = '⚙️ ' + (data.msg_ar || 'Code: ' + data.dev_code);
+            document.getElementById('regHelpLink').style.display = 'none';
         }
     } else {
         alert(true ? data.err_ar : data.err_en);
     }
     } catch(e) { alert('Register error: ' + e.message); }
+}
+
+async function regHelpResend() {
+    const email = document.getElementById('regOtpEmail').value;
+    const msg = document.getElementById('regOtpMsg');
+    const link = document.getElementById('regHelpLink');
+    if (!email) return;
+    link.style.display = 'none';
+    msg.innerHTML = '🔄 جاري إعادة الإرسال...';
+    const res = await fetch('/api/reg-resend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+    msg.innerHTML = '📧 ' + (data.msg_ar || 'تم');
+    if (data.dev_code) {
+        document.getElementById('regOtpInput').value = data.dev_code;
+        msg.innerHTML = '⚙️ ' + (data.msg_ar || 'الكود: ' + data.dev_code);
+    }
 }
 
 function resendRegOtp() {
@@ -212,6 +234,34 @@ async function adminSendCode() {
     }
     btn.disabled = false;
     setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
+    if (data.dev_code) {
+        document.getElementById('adminHelpLink').style.display = 'none';
+    } else if (res.ok) {
+        document.getElementById('adminHelpLink').style.display = 'block';
+    }
+}
+
+async function adminHelpResend() {
+    const username = document.getElementById('loginUser').value.trim();
+    const msg = document.getElementById('adminOtpMsg');
+    const link = document.getElementById('adminHelpLink');
+    if (!username) return;
+    link.style.display = 'none';
+    msg.innerHTML = '🔄 جاري الإعادة...';
+    msg.style.color = 'var(--text)';
+    const res = await fetch('/api/admin/resend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username })
+    });
+    const data = await res.json();
+    msg.innerHTML = '📧 ' + (data.msg_ar || 'تم');
+    msg.style.color = '#22c55e';
+    if (data.dev_code) {
+        document.getElementById('adminOtpInput').value = data.dev_code;
+        msg.innerHTML = '⚙️ ' + (data.msg_ar || data.dev_code);
+    }
+    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 6000);
 }
 
 async function adminVerifyCode() {

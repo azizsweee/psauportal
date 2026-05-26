@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -49,46 +50,81 @@ function sanitize(str) {
     return str.replace(/<[^>]*>/g, '').replace(/[<>"'']/g, '').trim();
 }
 
-// Email transporter – supports Brevo SMTP via env vars, falls back to mail-config.json
 let transporter = null;
-function initTransporter() {
-    const host = process.env.BREVO_HOST || '';
-    const port = process.env.BREVO_PORT || '587';
-    const user = process.env.BREVO_USER || '';
-    const pass = process.env.BREVO_PASS || '';
 
-    if (host && user && pass) {
-        transporter = nodemailer.createTransport({
-            host, port: parseInt(port), secure: port === '465',
-            auth: { user, pass }
-        });
-        console.log('✅ Brevo SMTP configured: ' + user);
-        return;
-    }
-    try {
-        const cfgPath = path.join(__dirname, 'mail-config.json');
-        if (fs.existsSync(cfgPath)) {
-            const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
-            if (cfg.host && cfg.user && cfg.pass) {
-                transporter = nodemailer.createTransport({
-                    host: cfg.host, port: cfg.port || 587, secure: (cfg.port || 587) === 465,
-                    auth: { user: cfg.user, pass: cfg.pass }
-                });
-                console.log('✅ Brevo SMTP from mail-config.json: ' + cfg.user);
-                return;
-            }
+function initTransporter() {
+    const tryEnv = (prefix) => {
+        const host = process.env[prefix + '_HOST'];
+        const port = process.env[prefix + '_PORT'] || '587';
+        const user = process.env[prefix + '_USER'];
+        const pass = process.env[prefix + '_PASS'];
+        if (host && user && pass) {
+            transporter = nodemailer.createTransport({ host, port: parseInt(port), secure: port === '465', auth: { user, pass } });
+            return { label: prefix + ' env', user };
         }
-    } catch (e) { /* ignore */ }
-    console.log('⚠️ No SMTP configured — OTP logging to console only');
+        return null;
+    };
+
+    let src = tryEnv('BREVO') || tryEnv('SMTP');
+
+    if (!src) {
+        try {
+            const cfgPath = path.join(__dirname, 'mail-config.json');
+            if (fs.existsSync(cfgPath)) {
+                const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+                if (cfg.host && cfg.user && cfg.pass) {
+                    transporter = nodemailer.createTransport({ host: cfg.host, port: cfg.port || 587, secure: (cfg.port || 587) === 465, auth: { user: cfg.user, pass: cfg.pass } });
+                    src = { label: 'mail-config.json', user: cfg.user };
+                }
+            }
+        } catch (e) { /* ignore */ }
+    }
+
+    if (transporter) {
+        console.log('✅ SMTP configured via ' + src.label + ': ' + src.user);
+        transporter.verify().then(ok => {
+            if (ok) console.log('✅ SMTP connection verified successfully');
+        }).catch(e => {
+            console.log('❌ SMTP connection FAILED: ' + e.message);
+            console.log('❌ Emails will NOT be sent. Check your SMTP credentials.');
+            transporter = null;
+        });
+    } else {
+        console.log('⚠️ No SMTP configured — OTP will be shown on screen only');
+    }
 }
 initTransporter();
 
-function sendOrLogEmail(to, subject, text) {
-    if (transporter) {
-        const from = transporter.options?.auth?.user || 'noreply@psau-portal.com';
-        transporter.sendMail({ from, to, subject, text }).catch(e => console.log('Email send error:', e.message));
+function htmlTemplate(title, bodyContent) {
+    return '<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;padding:20px;background:#f5f5f5;margin:0"><div style="max-width:480px;margin:auto;background:white;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><div style="text-align:center;margin-bottom:20px"><h2 style="color:#1a237e;margin:0">' + title + '</h2><p style="color:#666">بوابة طلابية ذكية</p></div><hr style="border:none;border-top:1px solid #eee">' + bodyContent + '<hr style="border:none;border-top:1px solid #eee"><p style="font-size:12px;color:#aaa;text-align:center">PSAU AI Portal &bull; بوابة غير رسمية</p></div></body></html>';
+}
+
+function otpHtml(name, code, minutes) {
+    return htmlTemplate('جامعة الأمير سطام بن عبدالعزيز', '<p style="font-size:16px;color:#333">مرحباً <b>' + name + '</b>،</p><p style="font-size:16px;color:#333">رمز التحقق الخاص بك هو:</p><div style="text-align:center;margin:25px 0;padding:15px;background:#e8eaf6;border-radius:8px;direction:ltr"><span style="font-size:36px;font-weight:bold;color:#1a237e;letter-spacing:8px">' + code + '</span></div><p style="font-size:14px;color:#999">صلاحية هذا الرمز <b>' + minutes + '</b>. إذا لم تطلب هذا، تجاهل الرسالة.</p>');
+}
+
+async function sendMailWithRetry(to, subject, text, html, retries) {
+    if (!transporter) {
+        console.log('[EMAIL DEV] to ' + to + ' | ' + subject + ': ' + text);
+        return false;
     }
-    console.log('[EMAIL to ' + to + '] ' + subject + ': ' + text);
+    retries = retries || 2;
+    for (let attempt = 1; attempt <= retries; attempt++) {
+        try {
+            let from = 'PSAU Portal <' + (transporter.options?.auth?.user || 'noreply@psau-portal.com') + '>';
+            await transporter.sendMail({ from, to, subject, text, html });
+            console.log('[EMAIL sent] to ' + to + ' (attempt ' + attempt + ')');
+            return true;
+        } catch (e) {
+            console.log('[EMAIL ERROR] to ' + to + ' (attempt ' + attempt + '/' + retries + '): ' + e.message);
+            if (attempt < retries) await new Promise(r => setTimeout(r, 2000));
+        }
+    }
+    return false;
+}
+
+function sendOrLogEmail(to, subject, text, html) {
+    return sendMailWithRetry(to, subject, text, html);
 }
 
 // OTP store: { key: { code, expires, username } }
@@ -261,7 +297,7 @@ ${faqList}
 // Temp storage for registration before email verification
 const regTempStore = {};
 
-app.post('/api/register', (req, res) => {
+app.post('/api/register', async (req, res) => {
     const { username, password, age, gender, college, email } = req.body;
     const su = sanitize(username), sp = sanitize(password);
     const se = email ? sanitize(email).trim().toLowerCase() : '';
@@ -294,7 +330,7 @@ app.post('/api/register', (req, res) => {
     otpStore[otpKey] = { code, expires, email: se };
     regTempStore[se] = { username: su, password: sp, age: parseInt(age), gender, college };
 
-    const subject = '📧 رمز التحقق - جامعة الأمير سطام';
+    const subject = 'رمز التحقق - جامعة الأمير سطام بن عبدالعزيز';
     const text = `مرحباً ${su},
 رمز التحقق للتسجيل في بوابة جامعة الأمير سطام بن عبدالعزيز هو:
 ${code}
@@ -302,16 +338,47 @@ ${code}
 إذا لم تطلب هذا، تجاهل الرسالة.
 
 PSAU AI Portal`;
+    const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;padding:20px;background:#f5f5f5"><div style="max-width:480px;margin:auto;background:white;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><div style="text-align:center;margin-bottom:20px"><h2 style="color:#1a237e;margin:0">جامعة الأمير سطام بن عبدالعزيز</h2><p style="color:#666">بوابة طلابية ذكية</p></div><hr style="border:none;border-top:1px solid #eee"><p style="font-size:16px;color:#333">مرحباً <b>${su}</b>،</p><p style="font-size:16px;color:#333">رمز التحقق الخاص بك هو:</p><div style="text-align:center;margin:25px 0;padding:15px;background:#e8eaf6;border-radius:8px;direction:ltr"><span style="font-size:36px;font-weight:bold;color:#1a237e;letter-spacing:8px">${code}</span></div><p style="font-size:14px;color:#999">صلاحية هذا الرمز <b>10 دقائق</b>. إذا لم تطلب هذا، تجاهل الرسالة.</p><hr style="border:none;border-top:1px solid #eee"><p style="font-size:12px;color:#aaa;text-align:center">PSAU AI Portal &bull; بوابة غير رسمية</p></div></body></html>`;
 
-    sendOrLogEmail(se, subject, text);
+    const emailSent = await sendOrLogEmail(se, subject, text, html);
 
     const response = { msg_ar: 'تم إرسال الرمز إلى بريدك', msg_en: 'Code sent to your email', email: se.replace(/(.{3})(.*)(@.*)/, (_, a, b, c) => a + '*'.repeat(b.length) + c) };
     if (!transporter) {
         response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
         response.msg_en = '⚙️ Dev mode — code: ' + code;
         response.dev_code = code;
+    } else if (!emailSent) {
+        response.msg_ar = '❌ فشل إرسال البريد الإلكتروني، حاول مرة أخرى';
+        response.msg_en = '❌ Failed to send email, try again';
     }
     res.json(response);
+});
+
+// Resend OTP for registration (with rate limit bypass for help)
+app.post('/api/reg-resend', async (req, res) => {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ err_ar: 'البريد مطلوب', err_en: 'Email required' });
+    const se = sanitize(email).trim().toLowerCase();
+    const otpKey = 'reg:' + se;
+    const stored = otpStore[otpKey];
+    if (!stored) return res.status(400).json({ err_ar: 'لا يوجد كود معلق لهذا البريد', err_en: 'No pending code for this email' });
+    if (stored.expires < Date.now()) {
+        delete otpStore[otpKey];
+        return res.status(400).json({ err_ar: 'انتهت صلاحية الرمز، سجل مرة أخرى', err_en: 'Code expired, re-register' });
+    }
+    const text = `مرحباً،
+رمز التحقق للتسجيل في بوابة جامعة الأمير سطام هو:
+${stored.code}
+صلاحية هذا الرمز: ${Math.round((stored.expires - Date.now()) / 60000)} دقائق.
+
+PSAU AI Portal`;
+    const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;padding:20px;background:#f5f5f5"><div style="max-width:480px;margin:auto;background:white;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><div style="text-align:center;margin-bottom:20px"><h2 style="color:#1a237e;margin:0">جامعة الأمير سطام بن عبدالعزيز</h2><p style="color:#666">بوابة طلابية ذكية</p></div><hr style="border:none;border-top:1px solid #eee"><p style="font-size:16px;color:#333">رمز التحقق الخاص بك هو:</p><div style="text-align:center;margin:25px 0;padding:15px;background:#e8eaf6;border-radius:8px;direction:ltr"><span style="font-size:36px;font-weight:bold;color:#1a237e;letter-spacing:8px">${stored.code}</span></div><p style="font-size:14px;color:#999">صلاحية هذا الرمز: <b>${Math.round((stored.expires - Date.now()) / 60000)} دقائق</b></p><hr style="border:none;border-top:1px solid #eee"><p style="font-size:12px;color:#aaa;text-align:center">PSAU AI Portal &bull; بوابة غير رسمية</p></div></body></html>`;
+    const sent = await sendOrLogEmail(se, 'رمز التحقق - جامعة الأمير سطام بن عبدالعزيز', text, html);
+    if (sent) {
+        res.json({ msg_ar: 'تم إعادة إرسال الرمز', msg_en: 'Code resent' });
+    } else {
+        res.json({ msg_ar: '⚙️ فشل الإرسال، الكود: ' + stored.code, msg_en: '⚙️ Send failed, code: ' + stored.code, dev_code: stored.code });
+    }
 });
 
 app.post('/api/verify-email', (req, res) => {
@@ -348,7 +415,7 @@ app.post('/api/verify-email', (req, res) => {
 const ADMIN_EMAIL = 'abdulazizsowaankau@gmail.com';
 
 // Admin send OTP code
-app.post('/api/admin/send-code', (req, res) => {
+app.post('/api/admin/send-code', async (req, res) => {
     const { username } = req.body;
     if (sanitize(username) !== ADMIN_USER) {
         return res.status(400).json({ err_ar: 'اسم المستخدم غير صحيح', err_en: 'Invalid admin username' });
@@ -362,23 +429,40 @@ app.post('/api/admin/send-code', (req, res) => {
     const expires = Date.now() + 2 * 60 * 1000; // 2 minutes
     otpStore['admin:login'] = { code, expires };
 
-    const subject = '🛡️ رمز دخول المشرف - PSAU Portal';
-    const text = `رمز دخول لوحة المشرف هو:
-${code}
-صلاحية هذا الرمز: دقيقتان فقط.
-إذا لم تطلب هذا، تجاهل الرسالة.
-
-PSAU AI Portal`;
-
-    sendOrLogEmail(ADMIN_EMAIL, subject, text);
+    const subject = 'رمز دخول المشرف - PSAU Portal';
+    const text = 'رمز دخول لوحة المشرف هو:\n' + code + '\nالصلاحية: دقيقتان.';
+    const html = otpHtml('المشرف', code, 'دقيقتان');
+    const emailSent = await sendOrLogEmail(ADMIN_EMAIL, subject, text, html);
 
     const response = { msg_ar: 'تم إرسال الرمز إلى بريد المشرف', msg_en: 'Code sent to admin email' };
     if (!transporter) {
         response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
         response.msg_en = '⚙️ Dev mode — code: ' + code;
         response.dev_code = code;
+    } else if (!emailSent) {
+        response.msg_ar = '❌ فشل إرسال البريد الإلكتروني، حاول مرة أخرى';
+        response.msg_en = '❌ Failed to send email, try again';
     }
     res.json(response);
+});
+
+// Admin resend OTP
+app.post('/api/admin/resend', async (req, res) => {
+    const { username } = req.body;
+    if (sanitize(username) !== ADMIN_USER) return res.status(400).json({ err_ar: 'اسم المستخدم غير صحيح', err_en: 'Invalid admin' });
+    const stored = otpStore['admin:login'];
+    if (!stored) return res.status(400).json({ err_ar: 'لا يوجد كود معلق', err_en: 'No pending code' });
+    if (stored.expires < Date.now()) {
+        delete otpStore['admin:login'];
+        return res.status(400).json({ err_ar: 'انتهت الصلاحية، اطلب جديداً', err_en: 'Expired, request new' });
+    }
+    const text = 'رمز دخول لوحة المشرف هو: ' + stored.code + '\nالصلاحية: 2 دقيقة.';
+    const sent = await sendOrLogEmail(ADMIN_EMAIL, 'رمز دخول المشرف - PSAU Portal', text, otpHtml('المشرف', stored.code, 'دقيقتان'));
+    if (sent) {
+        res.json({ msg_ar: 'تم إعادة الإرسال', msg_en: 'Resent' });
+    } else {
+        res.json({ msg_ar: '⚙️ الكود: ' + stored.code, msg_en: '⚙️ Code: ' + stored.code, dev_code: stored.code });
+    }
 });
 
 // Admin verify OTP code
@@ -419,7 +503,7 @@ app.post('/api/login', (req, res) => {
     res.json({ username, email: user.email, role: 'student', gender: user.gender, verified: !!user.verified });
 });
 
-app.post('/api/forgot-password', (req, res) => {
+app.post('/api/forgot-password', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ err_ar: 'البريد الإلكتروني مطلوب', err_en: 'Email required' });
     const se = sanitize(email).trim().toLowerCase();
@@ -436,19 +520,13 @@ app.post('/api/forgot-password', (req, res) => {
     const otpKey = 'reset:' + se;
     otpStore[otpKey] = { code, expires, email: se, username: user.username };
 
-    const subject = '🔑 إعادة تعيين كلمة المرور - جامعة الأمير سطام';
-    const text = `مرحباً ${user.username},
-رمز إعادة تعيين كلمة المرور لبريدك ${se} هو:
-${code}
-صلاحية هذا الرمز 10 دقائق.
-إذا لم تطلب هذا، تجاهل الرسالة.
-
-PSAU AI Portal`;
-
-    sendOrLogEmail(se, subject, text);
+    const subject = 'إعادة تعيين كلمة المرور - جامعة الأمير سطام';
+    const text = 'مرحباً ' + user.username + '،\nرمز إعادة تعيين كلمة المرور لبريدك ' + se + ' هو:\n' + code + '\nالصلاحية: 10 دقائق.';
+    const html = otpHtml(user.username, code, '10 دقائق');
+    const emailSent = await sendOrLogEmail(se, subject, text, html);
 
     const response = { msg_ar: 'تم إرسال الرمز إلى بريدك', msg_en: 'Code sent to your email', email: se.replace(/(.{3})(.*)(@.*)/, (_, a, b, c) => a + '*'.repeat(b.length) + c) };
-    if (!transporter) {
+    if (!emailSent) {
         response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
         response.msg_en = '⚙️ Dev mode — code: ' + code;
         response.dev_code = code;
@@ -790,7 +868,7 @@ app.post('/api/settings/update', (req, res) => {
 });
 
 // Send OTP to new email for email change
-app.post('/api/settings/send-new-email-code', (req, res) => {
+app.post('/api/settings/send-new-email-code', async (req, res) => {
     const { username, newEmail } = req.body;
     if (!username || !newEmail) return res.status(400).json({ err_ar: 'أكمل البيانات', err_en: 'Fill all fields' });
     const se = sanitize(newEmail).trim().toLowerCase();
@@ -804,17 +882,12 @@ app.post('/api/settings/send-new-email-code', (req, res) => {
     const expires = Date.now() + 10 * 60 * 1000;
     const otpKey = 'newemail:' + sanitize(username);
     otpStore[otpKey] = { code, expires, newEmail: se };
-    const subject = '✉️ تغيير البريد الإلكتروني - جامعة الأمير سطام';
-    const text = `مرحباً ${sanitize(username)},
-رمز تغيير البريد الإلكتروني إلى ${se} هو:
-${code}
-صلاحية هذا الرمز 10 دقائق.
-إذا لم تطلب هذا، تجاهل الرسالة.
-
-PSAU AI Portal`;
-    sendOrLogEmail(se, subject, text);
+    const subject = 'تغيير البريد الإلكتروني - جامعة الأمير سطام';
+    const text = 'مرحباً ' + sanitize(username) + '،\nرمز تغيير البريد الإلكتروني إلى ' + se + ' هو:\n' + code + '\nالصلاحية: 10 دقائق.';
+    const html = otpHtml(sanitize(username), code, '10 دقائق');
+    const emailSent = await sendOrLogEmail(se, subject, text, html);
     const response = { msg_ar: 'تم إرسال الرمز إلى بريدك الجديد', msg_en: 'Code sent to your new email', email: se.replace(/(.{3})(.*)(@.*)/, (_, a, b, c) => a + '*'.repeat(b.length) + c) };
-    if (!transporter) {
+    if (!emailSent) {
         response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
         response.msg_en = '⚙️ Dev mode — code: ' + code;
         response.dev_code = code;
@@ -860,7 +933,7 @@ app.post('/api/settings/delete', (req, res) => {
 // ====== EMAIL VERIFICATION (OTP) ======
 
 // Request OTP – send 6-digit code to user's email
-app.post('/api/verify-request', (req, res) => {
+app.post('/api/verify-request', async (req, res) => {
     const { username } = req.body;
     if (!username) return res.status(400).json({ err_ar: 'اسم المستخدم مطلوب', err_en: 'Username required' });
     const db = readDB();
@@ -879,18 +952,12 @@ app.post('/api/verify-request', (req, res) => {
     const expires = Date.now() + 10 * 60 * 1000; // 10 minutes
     otpStore[key] = { code, expires, username: user.username, email: user.email };
 
-    const subject = '📧 رمز توثيق حساب جامعة الأمير سطام';
-    const text = `مرحباً ${user.username},
-رمز توثيق حسابك في بوابة جامعة الأمير سطام بن عبدالعزيز هو:
-${code}
-صلاحية هذا الرمز 10 دقائق.
-إذا لم تطلب هذا، تجاهل الرسالة.
-
-PSAU AI Portal`;
-
-    sendOrLogEmail(user.email, subject, text);
+    const subject = 'رمز توثيق حساب جامعة الأمير سطام';
+    const text = 'مرحباً ' + user.username + '،\nرمز توثيق حسابك هو:\n' + code + '\nالصلاحية: 10 دقائق.';
+    const html = otpHtml(user.username, code, '10 دقائق');
+    const emailSent = await sendOrLogEmail(user.email, subject, text, html);
     const response = { msg_ar: 'تم إرسال الرمز إلى بريدك', msg_en: 'Code sent to your email', email: user.email.replace(/(.{3})(.*)(@.*)/, (_,a,b,c) => a + '*'.repeat(b.length) + c) };
-    if (!transporter) {
+    if (!emailSent) {
         response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
         response.msg_en = '⚙️ Dev mode — code: ' + code;
         response.dev_code = code;

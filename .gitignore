@@ -1,6 +1,5 @@
 node_modules/
 database.json
-mail-config.json
 .env
 __pycache__/
 database.db
