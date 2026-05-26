@@ -1,13 +1,13 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>جامعة الأمير سطام بن عبدالعزيز | PSAU AI Portal</title>
-    <link rel="stylesheet" href="style.css?v=5">
+    <link rel="stylesheet" href="style.css?v=7">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body class="login-body">
@@ -37,15 +37,15 @@
                 </div>
             </div>
             <h1 class="psau-logo" id="logoText">جامعة الأمير سطام بن عبدالعزيز</h1>
-            <p class="psau-subtitle" id="subtitleText">البوابة الطلابية الذكية · PSAU AI Portal</p>
+            <p class="psau-subtitle" id="subtitleText">بوابة طلابية غير رسمية - مستقلة عن جامعة الأمير سطام بن عبدالعزيز</p>
         </div>
  
         <div class="contact-bar" style="margin-bottom:18px;">
             <span id="contactLabel" class="contact-name">للتواصل:</span>
             <span class="contact-sep">|</span>
             <span id="contactName" class="contact-name">عبدالعزيز العنزي</span>
-            <span class="contact-sep">|</span>
-            <a class="contact-phone" href="tel:+966502277843" dir="ltr">+966 50 227 7843</a>
+            <span class="contact-sep" style="display:none;">|</span>
+            <a class="contact-phone" href="tel:+966502277843" dir="ltr" style="display:none;">+966 50 227 7843</a>
             <a class="contact-wa" href="https://wa.me/966502277843" target="_blank" title="واتساب">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 <span id="contactWhatsapp">واتساب</span>
@@ -69,17 +69,31 @@
                     <input type="text" id="loginUser" placeholder="Username">
                 </div>
             </div>
-            <div class="form-group">
+            <div class="form-group" id="passGroup">
                 <label id="lblPass">كلمة المرور</label>
                 <div class="input-wrap">
                     <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                     <input type="password" id="loginPass" placeholder="••••••••">
                 </div>
             </div>
+            <!-- Student login button -->
             <button class="btn btn-primary" id="btnLogin" onclick="login()">
                 <span id="loginBtnText">دخول كطالب</span>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
             </button>
+            <!-- Admin OTP area (hidden by default) -->
+            <div id="adminOtpArea" class="hidden" style="border-top:1px solid var(--border);padding-top:14px;margin-top:8px;">
+                <button class="btn btn-primary" id="btnAdminSendCode" onclick="adminSendCode()" style="margin-bottom:10px;width:100%;">📨 إرسال الكود</button>
+                <div class="form-group">
+                    <label>رمز الدخول (6 أرقام)</label>
+                    <div class="input-wrap">
+                        <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <input type="text" id="adminOtpInput" maxlength="6" placeholder="000000" style="text-align:center;letter-spacing:6px;font-size:18px;direction:ltr;">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="adminVerifyCode()" style="width:100%;">🛡️ دخول كمشرف</button>
+                <div id="adminOtpMsg" style="font-size:13px;margin-top:6px;"></div>
+            </div>
             <div class="links" id="loginLinks">
                 <a href="#" id="linkCreate" onclick="toggleCard('registerCard')">إنشاء حساب جديد</a>
                 <span class="link-sep">•</span>
@@ -113,6 +127,13 @@
                     <input type="password" id="regPass" placeholder="••••••••">
                 </div>
             </div>
+            <div class="form-group">
+                <label id="lblRegEmail">البريد الإلكتروني (Gmail)</label>
+                <div class="input-wrap">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                    <input type="email" id="regEmail" placeholder="example@gmail.com" style="direction:ltr;text-align:left;">
+                </div>
+            </div>
                 <div style="display:flex;gap:10px;">
                     <div class="form-group" style="flex:1;">
                         <label id="lblRegAge">العمر</label>
@@ -122,35 +143,50 @@
                         </div>
                     </div>
                     <div class="form-group" style="flex:1;">
-                        <label id="lblRegGender">الجنس</label>
-                        <select id="regGender" class="login-select">
-                            <option value="ذكر">ذكر</option>
-                            <option value="أنثى">أنثى</option>
+                        <label id="lblRegGender">طالب/طالبة</label>
+                        <select id="regGender">
+                            <option value="طالب">طالب</option>
+                            <option value="طالبة">طالبة</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-group">
                     <label id="lblRegCollege">الكلية</label>
                     <select id="regCollege" class="login-select">
-                        <option value="كلية الهندسة وعلوم الحاسب">كلية الهندسة وعلوم الحاسب</option>
+                        <option value="كلية هندسة وعلوم الحاسب">كلية هندسة وعلوم الحاسب</option>
+                        <option value="كلية الهندسة">كلية الهندسة</option>
                         <option value="كلية إدارة الأعمال">كلية إدارة الأعمال</option>
-                        <option value="كلية الطب">كلية الطب</option>
-                        <option value="كلية الصيدلة">كلية الصيدلة</option>
+                        <option value="كلية الطب البشري">كلية الطب البشري</option>
                         <option value="كلية طب الأسنان">كلية طب الأسنان</option>
+                        <option value="كلية الصيدلة">كلية الصيدلة</option>
                         <option value="كلية العلوم الطبية التطبيقية">كلية العلوم الطبية التطبيقية</option>
-                        <option value="كلية التمريض">كلية التمريض</option>
-                        <option value="كلية العلوم">كلية العلوم</option>
-                        <option value="كلية الآداب والعلوم">كلية الآداب والعلوم</option>
+                        <option value="كلية العلوم والدراسات الإنسانية">كلية العلوم والدراسات الإنسانية</option>
                         <option value="كلية التربية">كلية التربية</option>
-                        <option value="كلية القانون">كلية القانون</option>
-                        <option value="كلية المجتمع">كلية المجتمع</option>
+                        <option value="كلية الآداب والعلوم">كلية الآداب والعلوم</option>
+                        <option value="الكلية التطبيقية">الكلية التطبيقية</option>
                         <option value="أخرى">أخرى</option>
                     </select>
                 </div>
+                </div>
+            <div id="regSubmitArea">
             <button class="btn btn-primary" id="btnRegister" onclick="registerStudent()">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
                 إنشاء الحساب
             </button>
+            </div>
+            <div id="regOtpArea" class="hidden" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+                <input type="hidden" id="regOtpEmail">
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;" id="regOtpMsg">...</p>
+                <div class="form-group">
+                    <label>رمز التحقق (6 أرقام)</label>
+                    <input type="text" id="regOtpInput" maxlength="6" placeholder="000000" style="text-align:center;letter-spacing:6px;font-size:18px;direction:ltr;background:var(--surface-2);color:white;border:1px solid var(--border);border-radius:10px;padding:12px;width:100%;">
+                </div>
+                <button class="btn btn-primary" onclick="verifyEmailOtp()" style="width:100%;">✅ توثيق</button>
+                <div style="display:flex;gap:8px;margin-top:10px;">
+                    <button class="btn btn-sm" onclick="resendRegOtp()" style="flex:1;">🔄 إعادة إرسال</button>
+                    <button class="btn btn-sm" onclick="editRegEmail()" style="flex:1;">✏️ تعديل البريد</button>
+                </div>
+            </div>
             </div>
             <div class="links">
                 <a href="#" id="linkBack" onclick="toggleCard('loginCard')">رجوع لتسجيل الدخول</a>
@@ -161,65 +197,34 @@
             <div class="card-glow"></div>
             <h3 id="hForgot">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                نسيت الرمز
+                نسيت كلمة المرور
             </h3>
-            <div id="forgotStep1" class="scroll-card-body">
-                <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">للحصول على رمزك، أدخل اسم المستخدم أولاً:</p>
+            <div id="forgotStep1">
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">أدخل بريدك الإلكتروني المسجل وسنرسل لك رمزاً</p>
                 <div class="form-group">
-                    <label id="lblForgotUser">اسم المستخدم</label>
+                    <label id="lblForgotEmail">البريد الإلكتروني (Gmail)</label>
                     <div class="input-wrap">
-                        <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                        <input type="text" id="forgotUser" placeholder="e.g. khalidal">
+                        <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                        <input type="email" id="forgotEmail" placeholder="example@gmail.com" style="direction:ltr;text-align:left;">
                     </div>
                 </div>
-                <button class="btn btn-primary" onclick="forgotStep1()">🔍 تحقق من الهوية</button>
-                <div id="forgotIdentityForm" class="hidden" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
-                    <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">الآن أجب عن الأسئلة التالية لتأكيد هويتك:</p>
-                    <div class="form-group">
-                        <label id="lblForgotUser2">1. اسم المستخدم</label>
-                        <input type="text" id="forgotUser2" class="forgot-input" placeholder="e.g. khalidal">
-                    </div>
-                    <div class="form-group">
-                        <label id="lblForgotAge2">2. العمر</label>
-                        <input type="number" id="forgotAge" min="15" max="80" placeholder="18" class="forgot-input">
-                    </div>
-                    <div class="form-group">
-                        <label id="lblForgotGender2">3. الجنس</label>
-                        <select id="forgotGender" class="forgot-input">
-                            <option value="">-- اختر --</option>
-                            <option value="ذكر">ذكر</option>
-                            <option value="أنثى">أنثى</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label id="lblForgotCollege2">4. الكلية</label>
-                        <select id="forgotCollege" class="forgot-input">
-                            <option value="">-- اختر --</option>
-                            <option value="كلية الهندسة وعلوم الحاسب">كلية الهندسة وعلوم الحاسب</option>
-                            <option value="كلية إدارة الأعمال">كلية إدارة الأعمال</option>
-                            <option value="كلية الطب">كلية الطب</option>
-                            <option value="كلية الصيدلة">كلية الصيدلة</option>
-                            <option value="كلية طب الأسنان">كلية طب الأسنان</option>
-                            <option value="كلية العلوم الطبية التطبيقية">كلية العلوم الطبية التطبيقية</option>
-                            <option value="كلية التمريض">كلية التمريض</option>
-                            <option value="كلية العلوم">كلية العلوم</option>
-                            <option value="كلية الآداب والعلوم">كلية الآداب والعلوم</option>
-                            <option value="كلية التربية">كلية التربية</option>
-                            <option value="كلية القانون">كلية القانون</option>
-                            <option value="كلية المجتمع">كلية المجتمع</option>
-                            <option value="أخرى">أخرى</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-primary" onclick="forgotVerifyIdentity()">✅ تحقق وأظهر الرمز</button>
-                </div>
-                <div id="forgotIdentityResult" class="hidden" style="margin-top:14px;padding:14px;border-radius:12px;background:rgba(255,255,255,0.04);text-align:center;">
-                    <p style="font-size:18px;font-weight:700;color:#22c55e;margin-bottom:8px;">تم التحقق!</p>
-                    <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;">رمزك هو:</p>
-                    <div style="font-size:22px;font-weight:800;color:white;background:#2563eb;padding:12px;border-radius:10px;letter-spacing:3px;" id="forgotPasswordDisplay">********</div>
-                    <p style="font-size:11px;color:#f59e0b;margin-top:12px;">⚠️ احفظه جيداً ولا تشاركه مع أحد</p>
-                </div>
+                <button class="btn btn-primary" onclick="forgotSendCode()">📨 إرسال رمز التحقق</button>
+                <div id="forgotMsg" style="margin-top:10px;font-size:13px;"></div>
             </div>
-            <div class="links">
+            <div id="forgotStep2" class="hidden" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">أدخل الرمز الذي وصل إلى بريدك وكلمة المرور الجديدة:</p>
+                <div class="form-group">
+                    <label id="lblEnterCode">رمز التحقق (6 أرقام)</label>
+                    <input type="text" id="forgotCode" maxlength="6" placeholder="000000" style="text-align:center;letter-spacing:6px;font-size:18px;direction:ltr;background:var(--surface-2);color:white;border:1px solid var(--border);border-radius:10px;padding:12px;width:100%;">
+                </div>
+                <div class="form-group">
+                    <label id="lblNewPassword">كلمة المرور الجديدة</label>
+                    <input type="password" id="forgotNewPass" placeholder="••••••••" style="background:var(--surface-2);color:white;border:1px solid var(--border);border-radius:10px;padding:12px;width:100%;">
+                </div>
+                <button class="btn btn-primary" onclick="forgotResetPass()">🔑 تغيير كلمة المرور</button>
+                <div id="forgotResetMsg" style="margin-top:10px;font-size:13px;"></div>
+            </div>
+            <div class="links" style="margin-top:14px;">
                 <a href="#" id="linkBackLogin" onclick="toggleCard('loginCard')">رجوع</a>
             </div>
         </div>
@@ -229,25 +234,6 @@
             <span id="lblRights">جامعة الأمير سطام بن عبدالعزيز · PSAU</span>
         </footer>
     </div>
-    <script>
-// Smooth card switching
-const _origToggle = window.toggleCard;
-window.toggleCard = function(id) {
-    document.querySelectorAll(".card").forEach(c => {
-        if (!c.classList.contains("hidden")) {
-            c.style.animation = "none";
-            void c.offsetWidth;
-            c.classList.add("hidden");
-        }
-    });
-    const target = document.getElementById(id);
-    if (target) {
-        target.classList.remove("hidden");
-        target.style.animation = "cardIn 0.45s cubic-bezier(0.16,1,0.3,1) both";
-    }
-};
-</script>
-<script src="app.js?v=5"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>
- 

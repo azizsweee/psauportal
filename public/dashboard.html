@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>PSAU AI Portal · جامعة الأمير سطام</title>
     <link rel="stylesheet" href="style.css?v=6">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -43,9 +43,22 @@
             <li><a href="#" id="mSchedule" onclick="switchTab('schedule')">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 الجدول</a></li>
-            <li><a href="#" id="mCourses" onclick="switchTab('courses')">
+            <li><a href="#" id="mAbsence" onclick="switchTab('absence')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                الغيابات</a></li>
+            <li><a href="#" id="mHourglass" onclick="switchTab('hourglass')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M6 2h12M6 22h12M6 4v2a6 6 0 0 0 6 6M18 4v2a6 6 0 0 1-6 6M6 20v-2a6 6 0 0 1 6-6M18 20v-2a6 6 0 0 0-6-6"/></svg>
+                الساعة الرملية</a></li>
+
+            <li><a href="#" id="mChannels" onclick="switchTab('channels')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2z"/></svg>
+                القنوات</a></li>
+            <li><a href="#" id="mShrouhat" onclick="switchTab('shrouhat')">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+                الشروحات</a></li>
+            <li><a href="#" id="mResources" onclick="switchTab('resources')">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                المقررات</a></li>
+                المصادر</a></li>
             <li><a href="#" id="mFeedback" onclick="switchTab('feedback')">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 الآراء</a></li>
@@ -54,10 +67,13 @@
                 الإعدادات</a></li>
             <li><a href="#" id="mAdminFeedback" onclick="switchTab('adminFeedback')" style="display:none">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                الشكاوى</a></li>
+                الاقتراحات والتقييم</a></li>
             <li><a href="#" id="mAdminStats" onclick="switchTab('adminStats')" style="display:none">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
                 <span id="mAdminStatsLabel">الإحصائيات</span></a></li>
+            <li><a href="#" id="mAdminData" onclick="switchTab('adminData')" style="display:none">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <span id="mAdminDataLabel">البيانات</span></a></li>
         </ul>
         <div class="sidebar-bottom">
             <a href="#" id="mLogout" onclick="logout()" class="logout-link">
@@ -82,7 +98,7 @@
                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M12 2a4 4 0 0 1 4 4c0 2-2 4-4 4s-4-2-4-4 2-4 4-4z"/><path d="M2 22v-2a6 6 0 0 1 6-6h8a6 6 0 0 1 6 6v2"/><circle cx="12" cy="22" r="1"/></svg>
                     </div>
                     <h3 id="hubAITitle">المساعد AI</h3>
-                    <p id="hubAIDesc">اسأل عن جامعة الأمير سطام واحصل على إجابات فورية</p>
+                    <p id="hubAIDesc">تحت الصيانة - سيتم العودة قريباً</p>
                 </div>
                 <div class="hub-card" onclick="switchTab('tasks')">
                     <div class="hub-icon">
@@ -105,19 +121,48 @@
                     <h3 id="hubSchedTitle">الجدول</h3>
                     <p id="hubSchedDesc">تنظيم المحاضرات بقوالب عصرية</p>
                 </div>
-                <div class="hub-card" onclick="switchTab('courses')">
-                    <div class="hub-icon">
-                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                    </div>
-                    <h3 id="hubCoursesTitle">المقررات</h3>
-                    <p id="hubCoursesDesc">مركز ذكي لكل مقرر دراسي</p>
-                </div>
                 <div class="hub-card" onclick="switchTab('feedback')">
                     <div class="hub-icon">
                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                     </div>
                     <h3 id="hubFeedTitle">الآراء</h3>
                     <p id="hubFeedDesc">شاركنا رأيك وتقييمك</p>
+                </div>
+                <div class="hub-card" onclick="switchTab('absence')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <h3 id="hubAbsenceTitle">الغيابات</h3>
+                    <p id="hubAbsenceDesc">حساب نسبة الغياب والتنبيه عند الخطر</p>
+                </div>
+                <div class="hub-card" onclick="switchTab('hourglass')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M12 2v4M12 18v4M6 2h12M6 22h12M6 4v2a6 6 0 0 0 6 6M18 4v2a6 6 0 0 1-6 6M6 20v-2a6 6 0 0 1 6-6M18 20v-2a6 6 0 0 0-6-6"/></svg>
+                    </div>
+                    <h3 id="hubHourglassTitle">الساعة الرملية</h3>
+                    <p id="hubHourglassDesc">مؤقت عكسي للاختبارات والمواعيد المهمة</p>
+                </div>
+
+                <div class="hub-card" onclick="switchTab('channels')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2z"/></svg>
+                    </div>
+                    <h3 id="hubChannelsTitle">القنوات</h3>
+                    <p id="hubChannelsDesc">قنوات تليجرام الجامعة الرسمية</p>
+                </div>
+                <div class="hub-card" onclick="switchTab('shrouhat')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.94 2C5.12 20 12 20 12 20s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+                    </div>
+                    <h3 id="hubShrouhatTitle">الشروحات</h3>
+                    <p id="hubShrouhatDesc">تحت الصيانة - سيتم العودة قريباً</p>
+                </div>
+                <div class="hub-card" onclick="switchTab('resources')">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </div>
+                    <h3 id="hubResourcesTitle">المصادر</h3>
+                    <p id="hubResourcesDesc">تحت الصيانة - سيتم العودة قريباً</p>
                 </div>
                 <div class="hub-card" onclick="switchTab('settings')">
                     <div class="hub-icon">
@@ -126,13 +171,7 @@
                     <h3 id="hubSetTitle">الإعدادات</h3>
                     <p id="hubSetDesc">تحديث البيانات أو حذف الحساب</p>
                 </div>
-                <div class="hub-card hub-admin-only" id="hubAdminCard" onclick="switchTab('adminFeedback')" style="display:none">
-                    <div class="hub-icon">
-                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
-                    <h3 id="hubAdminTitle">الشكاوى والاقتراحات</h3>
-                    <p id="hubAdminDesc">عرض ملاحظات المستخدمين</p>
-                </div>
+
                 <div class="hub-card hub-admin-only" id="hubAdminStatsCard" onclick="switchTab('adminStats')" style="display:none">
                     <div class="hub-icon">
                         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
@@ -140,51 +179,157 @@
                     <h3 id="hubAdminStatsTitle">الإحصائيات</h3>
                     <p id="hubAdminStatsDesc">بيانات الموقع والرسومات البيانية</p>
                 </div>
+                <div class="hub-card hub-admin-only" id="hubAdminDataCard" onclick="switchTab('adminData')" style="display:none">
+                    <div class="hub-icon">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    </div>
+                    <h3 id="hubAdminDataTitle">البيانات</h3>
+                    <p id="hubAdminDataDesc">عرض بيانات جميع المستخدمين المسجلين</p>
+                </div>
             </div>
         </section>
- 
-        <!-- ===== AI CHAT ===== -->
+
+        <!-- ===== HOURGLASS ===== -->
+        <section id="hourglass" class="tab hidden animate-in">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleHourglass">⏳ الساعة الرملية</h2>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+                    <input type="text" id="hgName" placeholder="اسم الحدث (مثال: اختبار فاينل تكامل)" style="flex:2;min-width:180px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:8px;padding:10px;">
+                    <input type="date" id="hgDate" style="flex:1;min-width:140px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:8px;padding:10px;">
+                    <button class="btn btn-primary" onclick="addHourglass()">➕ إضافة</button>
+                </div>
+            </div>
+            <div id="hourglassList"></div>
+        </section>
+
+        <!-- ===== CHANNELS ===== -->
+        <section id="channels" class="tab hidden animate-in">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleChannels">📡 القنوات</h2>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <div class="channels-category">
+                    <h3>المجموعات العامة</h3>
+                    <div class="channels-grid">
+                        <a href="https://t.me/PSAU_Group" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>المجموعة العامة للطلاب و الطالبات</span>
+                        </a>
+                        <a href="https://t.me/psau_scholarship_student" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>مجموعة المنح الداخلية</span>
+                        </a>
+                        <a href="https://t.me/Books_PSAU" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>مجموعة تبادل وبيع الكتب</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <div class="channels-category">
+                    <h3>القنوات العامة</h3>
+                    <div class="channels-grid">
+                        <a href="https://t.me/PSAU_Channel" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>القناة العامة للطلاب والطالبات</span>
+                        </a>
+                        <a href="https://t.me/psau_edu_sa" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>قناة الجامعة الرسمية</span>
+                        </a>
+                        <a href="https://t.me/PSAUHOUSING" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>قناة السكن (للطلاب فقط)</span>
+                        </a>
+                        <a href="https://t.me/Findmepsau" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>قناة مفقودات جامعة الأمير سطام</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <div class="channels-category">
+                    <h3>قنوات السنة التحضيرية</h3>
+                    <div class="channels-grid">
+                        <a href="https://t.me/psauprepyear" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>الخرج - المسار الهندسي والعلمي</span>
+                        </a>
+                        <a href="https://t.me/PSAUHT" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>الخرج - المسار الصحي</span>
+                        </a>
+                        <a href="https://t.me/ENG_PSAU_WAE" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>السنة التحضيرية - وادي الدواسر</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <div class="channels-category">
+                    <h3>قنوات فروع الجامعة</h3>
+                    <div class="channels-grid">
+                        <a href="https://t.me/Psau11_11" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>كليات حوطة بني تميم</span>
+                        </a>
+                        <a href="https://t.me/PSAU_Aflaj" target="_blank" rel="noopener" class="channel-link">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#229ED9"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.96 1.25-5.54 3.66-.52.36-1 .53-1.42.52-.47-.01-1.37-.26-2.04-.48-.82-.27-1.47-.42-1.41-.88.03-.24.36-.49.99-.74 3.9-1.7 6.5-2.82 7.8-3.36 3.71-1.52 4.48-1.79 4.99-1.79.11 0 .36.03.52.17.14.12.18.28.2.45-.02.06-.01.24-.02.37z"/></svg>
+                            <span>كليات الأفلاج</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SHROUHAT (تحت الصيانة) ===== -->
+        <section id="shrouhat" class="tab hidden animate-in">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleShrouhat">📺 الشروحات</h2>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40vh;text-align:center;padding:40px 20px;">
+                <div style="font-size:72px;margin-bottom:20px;">🔧</div>
+                <h3 style="font-size:24px;margin-bottom:12px;">تحت الصيانة</h3>
+                <p style="color:var(--text-muted);font-size:16px;max-width:400px;">نعمل على تجهيز قسم الشروحات، سيتم إطلاقه قريباً</p>
+            </div>
+        </section>
+
+        <!-- ===== RESOURCES (تحت الصيانة) ===== -->
+        <section id="resources" class="tab hidden animate-in">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleResources">📚 المصادر</h2>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40vh;text-align:center;padding:40px 20px;">
+                <div style="font-size:72px;margin-bottom:20px;">🔧</div>
+                <h3 style="font-size:24px;margin-bottom:12px;">تحت الصيانة</h3>
+                <p style="color:var(--text-muted);font-size:16px;max-width:400px;">نعمل على تجهيز قسم المصادر، سيتم إطلاقه قريباً</p>
+            </div>
+        </section>
+
+        <!-- ===== AI CHAT (تحت الصيانة) ===== -->
         <section id="ai" class="tab hidden animate-in">
             <div class="header-inline">
                 <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
-                <h2 id="titleAI">🤖 المساعد الذكي لجامعة الأمير سطام</h2>
+                <h2 id="titleAI">🤖 المساعد الذكي</h2>
             </div>
-            <div class="ai-container">
-                <div class="ai-sidebar">
-                    <div class="ai-avatar">
-                        <svg width="56" height="56" viewBox="0 0 100 100" fill="none">
-                            <circle cx="50" cy="50" r="45" fill="url(#aiGrad)"/>
-                            <circle cx="50" cy="35" r="15" fill="white" opacity="0.9"/>
-                            <path d="M25 75c0-15 15-25 25-25s25 10 25 25" fill="white" opacity="0.9"/>
-                            <defs><linearGradient id="aiGrad" x1="0" y1="0" x2="100" y2="100"><stop stop-color="#2563eb"/><stop offset="1" stop-color="#1e40af"/></linearGradient></defs>
-                        </svg>
-                    </div>
-                    <h4>PSAU AI Assistant</h4>
-                    <p id="aiDesc">اسأل عن كل ما يخص جامعة الأمير سطام: الكليات، القبول، الجداول، التواصل، وأكثر.</p>
- 
-                </div>
-                <div class="ai-chat-area">
-                    <div class="chat-header">
-                        <div class="chat-status">
-                            <span class="status-dot"></span>
-                            <span>AI نشط</span>
-                        </div>
-                    </div>
-                    <div class="chat-messages" id="chatMessages">
-                        <div class="message ai-message">
-                            <div class="msg-bubble">
-                                <span class="msg-sender">🎓 PSAU AI</span>
-                                <p id="welcomeMsg">مرحباً بك في مساعد جامعة الأمير سطام الذكي! أنا هنا للإجابة عن جميع استفساراتك حول الجامعة.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chat-input-area">
-                        <input type="text" id="chatInput" placeholder="اكتب سؤالك عن الجامعة هنا..." onkeypress="if(event.key==='Enter') sendChat()">
-                        <button class="btn-send" onclick="sendChat()">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-                        </button>
-                    </div>
-                </div>
+            <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:40vh;text-align:center;padding:40px 20px;">
+                <div style="font-size:72px;margin-bottom:20px;">🔧</div>
+                <h3 style="font-size:24px;margin-bottom:12px;">تحت الصيانة</h3>
+                <p style="color:var(--text-muted);font-size:16px;max-width:400px;">نعمل على تحسين المساعد الذكي، سيتم إعادة تشغيله قريباً</p>
             </div>
         </section>
  
@@ -197,25 +342,46 @@
             <div class="card tech-card">
                 <div class="card-glow"></div>
                 <h4 id="hAddTask">إضافة مهمة جديدة</h4>
-                <div class="grid-inputs">
-                    <input type="text" id="taskText" placeholder="المهمة أو الواجب...">
-                    <select id="taskPriority">
-                        <option value="urgent" id="pUrgent">🔴 عاجل</option>
-                        <option value="important" id="pImportant">⚠️ هام</option>
-                        <option value="normal" id="pNormal" selected>🔵 اعتيادي</option>
-                    </select>
-                    <select id="taskType">
-                        <option value="daily" id="oDaily">يومية</option>
-                        <option value="weekly" id="oWeekly">أسبوعية</option>
-                        <option value="monthly" id="oMonthly">شهرية</option>
-                        <option value="general" id="oGeneral">عامة</option>
-                    </select>
-                    <button class="btn btn-primary" id="btnAddTask" onclick="addTask()">➕ إضافة</button>
+                <div class="priority-legend" style="display:flex;gap:14px;margin-bottom:10px;font-size:12px;color:var(--text-muted);flex-wrap:wrap;">
+                    <span>🔴 عاجل</span>
+                    <span>⚠️ هام</span>
+                    <span>🔵 اعتيادي</span>
+                </div>
+                <div class="task-form-grid" style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <input type="text" id="taskText" placeholder="عنوان المهمة" style="flex:2;min-width:140px;padding:11px 14px;background:var(--surface-2);color:white;border:1px solid var(--border);border-radius:10px;font-size:13px;">
+                        <select id="taskPriority" style="flex:1;min-width:100px;padding:11px 14px;background:var(--surface-2);color:white;border:1px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;">
+                            <option value="urgent" id="pUrgent">🔴 عاجل</option>
+                            <option value="important" id="pImportant">⚠️ هام</option>
+                            <option value="normal" id="pNormal" selected>🔵 اعتيادي</option>
+                        </select>
+                        <select id="taskType" style="flex:1;min-width:90px;padding:11px 14px;background:var(--surface-2);color:white;border:1px solid var(--border);border-radius:10px;font-size:13px;cursor:pointer;">
+                            <option value="daily" id="oDaily">📅 يومية</option>
+                            <option value="weekly" id="oWeekly">📅 أسبوعية</option>
+                            <option value="monthly" id="oMonthly">📅 شهرية</option>
+                            <option value="general" id="oGeneral">📋 عامة</option>
+                        </select>
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        <div style="flex:2;min-width:140px;position:relative;">
+                            <input type="text" id="taskCourse" placeholder="المادة (اختياري)" autocomplete="off" oninput="suggestTaskCourse(this.value)" style="width:100%;padding:11px 14px;background:var(--surface-2);color:white;border:1px solid var(--border);border-radius:10px;font-size:13px;">
+                            <div class="autocomplete-dropdown hidden" id="taskCourseSuggestBox"></div>
+                        </div>
+                        <textarea id="taskDesc" placeholder="وصف المهمة (اختياري)" rows="2" style="flex:3;min-width:200px;padding:11px 14px;background:var(--surface-2);color:white;border:1px solid var(--border);border-radius:10px;font-size:13px;resize:vertical;"></textarea>
+                        <button class="btn btn-primary" id="btnAddTask" onclick="addTask()" style="flex:0;white-space:nowrap;padding:11px 18px;align-self:flex-start;">➕ إضافة</button>
+                    </div>
                 </div>
             </div>
             <div id="taskStatsBox" class="task-stats hidden">
                 <div class="stat-box task-stat-pending"><span class="stat-num" id="taskStatsPending">0</span><span class="stat-label">قائمة</span></div>
                 <div class="stat-box task-stat-done"><span class="stat-num" id="taskStatsDone">0</span><span class="stat-label">منجزة</span></div>
+                <div class="battery-wrap" style="padding:8px 18px;">
+                    <div class="battery" style="width:90px;height:26px;border-radius:13px;border-width:3px;">
+                        <div class="battery-fill" id="batteryFill" style="width:0%;border-radius:10px;"></div>
+                    </div>
+                    <span class="battery-label" id="batteryLabel" style="font-size:16px;min-width:40px;">0%</span>
+                    <span class="battery-text" style="font-size:11px;">نسبة الإنجاز</span>
+                </div>
             </div>
             <div class="tasks-container">
                 <div class="task-col"><h4 id="cDaily">📅 اليومية</h4><ul id="list-daily" class="task-list"></ul></div>
@@ -223,7 +389,7 @@
                 <div class="task-col"><h4 id="cMonthly">📅 الشهرية</h4><ul id="list-monthly" class="task-list"></ul></div>
                 <div class="task-col"><h4 id="cGeneral">📋 عامة</h4><ul id="list-general" class="task-list"></ul></div>
             </div>
-            <div class="task-col-completed"><h4>✅ المنجزة</h4><ul id="list-completed"></ul></div>
+            <div class="task-col-completed" style="margin-top:16px;"><h4>✅ المنجزة</h4><ul id="list-completed" class="task-list"></ul></div>
         </section>
  
         <!-- ===== GPA ===== -->
@@ -235,6 +401,7 @@
             <div class="gpa-toggle">
                 <button class="toggle-btn active" id="gpaSemTab" onclick="toggleGpaMode('semester')">📘 الفصلي</button>
                 <button class="toggle-btn" id="gpaCumTab" onclick="toggleGpaMode('cumulative')">📊 التراكمي</button>
+                <button class="toggle-btn" id="gpaSpecTab" onclick="toggleGpaMode('specialization')">📋 التخصص</button>
             </div>
             <datalist id="gpaCourseList"></datalist>
             <div id="semesterGpaBox" class="card tech-card">
@@ -255,7 +422,7 @@
                             <option value="2.00">D (2.0)</option>
                             <option value="0.00">F (0.0)</option>
                         </select>
-                        <button class="btn-icon" onclick="this.parentElement.remove()">✕</button>
+                        <button class="btn-del" onclick="this.parentElement.remove()" title="حذف">🗑️</button>
                     </div>
                 </div>
                 <div class="gpa-actions">
@@ -291,6 +458,27 @@
                     <span id="lblCumRes">المعدل التراكمي:</span> <strong id="gpaCumVal">0.00</strong> / 5.0
                 </div>
             </div>
+            <div id="specializationGpaBox" class="card tech-card hidden">
+                <div class="card-glow"></div>
+                <h3 id="lblSpecTitle">حساب معدل التخصيص</h3>
+                <div class="form-group">
+                    <label>اختر التخصص</label>
+                    <select id="specMajorSelect" onchange="updateSpecForm()">
+                        <option value="">-- اختر التخصص --</option>
+                        <option value="applied">الكلية التطبيقية</option>
+                        <option value="science">كلية العلوم</option>
+                        <option value="se">هندسة البرمجيات</option>
+                        <option value="ce">هندسة الحاسب</option>
+                        <option value="cs">علوم الحاسب</option>
+                        <option value="is">نظم المعلومات</option>
+                    </select>
+                </div>
+                <div id="specFieldsContainer"></div>
+                <button class="btn btn-primary" onclick="calculateSpecGpa()">💻 احسب معدل التخصيص</button>
+                <div class="result-box hidden" id="specGpaResult">
+                    <span>معدل التخصيص:</span> <strong id="specGpaVal">0.00</strong>
+                </div>
+            </div>
         </section>
  
         <!-- ===== SCHEDULE ===== -->
@@ -303,130 +491,88 @@
                 </h2>
             </div>
  
-            <!-- Add Lecture -->
-            <div class="card tech-card schedule-form-card">
-                <div class="card-glow"></div>
-                <div class="schedule-form-header">
-                    <h4 id="hAddLecture">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                        إضافة محاضرة
-                    </h4>
-                </div>
-                <div class="schedule-form-grid">
-                    <div class="form-field">
-                        <label>المادة</label>
-                        <div class="input-wrap">
-                            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                            <input type="text" id="schedSub" placeholder="اسم المقرر">
-                        </div>
-                    </div>
-                    <div class="form-field">
-                        <label>اليوم</label>
-                        <div class="day-selector" id="dayScrollSelect">
-                            <button type="button" class="day-btn active" data-day="Sunday">الأحد</button>
-                            <button type="button" class="day-btn" data-day="Monday">الإثنين</button>
-                            <button type="button" class="day-btn" data-day="Tuesday">الثلاثاء</button>
-                            <button type="button" class="day-btn" data-day="Wednesday">الأربعاء</button>
-                            <button type="button" class="day-btn" data-day="Thursday">الخميس</button>
-                        </div>
-                    </div>
-                    <div class="form-field time-field">
-                        <label>وقت المحاضرة</label>
-                        <div class="time-picker-modern">
-                            <div class="time-block">
-                                <span class="time-label">من</span>
-                                <div class="time-input-wrap">
-                                    <input type="time" id="schedFrom" class="time-input-styled" value="08:00">
-                                    <svg class="time-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                </div>
-                            </div>
-                            <span class="time-arrow">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 5 5 12 12 19"/></svg>
-                            </span>
-                            <div class="time-block">
-                                <span class="time-label">إلى</span>
-                                <div class="time-input-wrap">
-                                    <input type="time" id="schedTo" class="time-input-styled" value="09:00">
-                                    <svg class="time-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                                </div>
-                            </div>
-                            <button class="btn btn-primary btn-save" onclick="addSchedule()">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-                                حفظ
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <!-- Color Picker & PDF -->
+            <div id="schedGridColorBar" class="sched-grid-color-bar">
+                <span style="font-size:13px;color:var(--text-muted);">لون الجدول:</span>
+                <button class="sched-color-btn active" data-color="blue" onclick="setSchedGridColor('blue')" title="أزرق"></button>
+                <button class="sched-color-btn" data-color="purple" onclick="setSchedGridColor('purple')" title="بنفسجي"></button>
+                <button class="sched-color-btn" data-color="green" onclick="setSchedGridColor('green')" title="أخضر"></button>
+                <button class="sched-color-btn" data-color="red" onclick="setSchedGridColor('red')" title="أحمر"></button>
+                <button class="sched-color-btn" data-color="black" onclick="setSchedGridColor('black')" title="أسود"></button>
+                <button class="sched-color-btn" data-color="orange" onclick="setSchedGridColor('orange')" title="برتقالي"></button>
+                <button class="sched-color-btn" data-color="pink" onclick="setSchedGridColor('pink')" title="وردي"></button>
+                <button class="sched-color-btn" data-color="brown" onclick="setSchedGridColor('brown')" title="بني"></button>
+                <span style="flex:1"></span>
+                <button class="btn btn-sm" onclick="saveSchedule()" title="حفظ الجدول" style="font-size:12px;">💾 حفظ الجدول</button>
             </div>
- 
-            <!-- Theme Selector -->
-            <div class="theme-selector-bar">
-                <span id="lblSelectTheme">🎨 القالب:</span>
-                <div class="theme-chips-modern">
-                    <button class="theme-chip-modern active" id="theme-timeline" onclick="changeScheduleTheme('timeline')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="8 7 3 12 8 17"/></svg>
-                        <span id="scheduleTimeline">زمني</span>
-                    </button>
-                    <button class="theme-chip-modern" id="theme-cards" onclick="changeScheduleTheme('cards')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                        <span id="scheduleCards">بطاقات</span>
-                    </button>
-                    <button class="theme-chip-modern" id="theme-minimal" onclick="changeScheduleTheme('minimal')">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-                        <span id="scheduleMinimal">بسيط</span>
-                    </button>
-                </div>
-            </div>
- 
+
             <!-- Schedule Grid -->
-            <div class="schedule-accordion" id="scheduleContainer"></div>
+            <div id="scheduleGridContainer">
+                <div class="sched-grid-wrap">
+                    <table class="sched-grid sched-grid-theme-blue" id="schedGridTable">
+                        <thead><tr><th></th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th></tr></thead>
+                        <tbody id="schedGridBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Saved Schedules -->
+            <div id="savedSchedulesSection" class="card tech-card" style="margin-top:16px;">
+                <div class="card-glow"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <h4 style="font-size:14px;">📂 الجداول المحفوظة</h4>
+                    <span id="savedSchedCount" style="font-size:12px;color:var(--text-muted);"></span>
+                </div>
+                <div id="savedSchedulesList" style="margin-top:10px;">
+                    <p style="text-align:center;color:var(--text-muted);padding:10px;font-size:13px;">لا توجد جداول محفوظة</p>
+                </div>
+            </div>
         </section>
- 
-        <!-- ===== COURSES ===== -->
-        <section id="courses" class="tab hidden animate-in">
+        <!-- ===== ABSENCE CALCULATOR ===== -->
+        <section id="absence" class="tab hidden animate-in">
             <div class="header-inline">
                 <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
-                <h2 id="titleCourses">📚 المقررات الدراسية</h2>
+                <h2 id="titleAbsence">🧮 حاسبة الغيابات</h2>
             </div>
             <div class="card tech-card">
                 <div class="card-glow"></div>
-                <h4 id="hAddCourse">تسجيل مقرر جديد</h4>
-                <div class="grid-inputs" style="position:relative;">
-                    <input type="text" id="courseInputName" placeholder="اسم المقرر..." oninput="handleCourseAutocomplete(this.value)">
-                    <button class="btn btn-primary" id="btnAddCourse" onclick="addCourse()">📌 تسجيل</button>
-                    <div class="autocomplete-dropdown hidden" id="autoSuggestBox"></div>
+                <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;padding:12px;background:var(--surface-2);border-radius:10px;border-right:3px solid var(--primary-light);">
+                    💡 عدد الساعات الأسبوعية هي الساعات الفعلية التي يقضيها الطالب في قاعة المحاضرة
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 200px;gap:10px;align-items:center;margin-bottom:16px;">
+                    <label id="lblAbsenceWeekly" style="font-size:14px;">عدد الساعات الأسبوعية للمادة:</label>
+                    <input type="number" id="absenceWeeklyHours" step="0.5" min="0.5" max="30" placeholder="مثال: 3" style="padding:11px 14px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:10px;font-size:14px;text-align:center;width:100%;box-sizing:border-box;">
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 200px;gap:10px;align-items:center;margin-bottom:16px;">
+                    <label id="lblAbsenceAbsent" style="font-size:14px;">عدد الساعات التي غابها الطالب:</label>
+                    <input type="number" id="absenceAbsentHours" step="0.5" min="0" max="100" placeholder="مثال: 2" style="padding:11px 14px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:10px;font-size:14px;text-align:center;width:100%;box-sizing:border-box;">
+                </div>
+                <div style="display:none;" id="absenceFormula"></div>
+                <button class="btn btn-primary" onclick="calculateAbsence()">💻 احسب نسبة الغياب</button>
+                <div id="absenceBatteryBox" class="hidden" style="margin-top:16px;display:flex;flex-direction:column;align-items:center;gap:16px;">
+                    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center;width:100%;">
+                        <div class="battery" style="width:280px;height:50px;border-radius:25px;border-width:5px;flex-shrink:0;">
+                            <div class="battery-fill" id="absenceBatteryFill" style="width:0%;border-radius:20px;background:#22c55e;"></div>
+                        </div>
+                        <span id="absencePercent" style="font-size:28px;font-weight:800;color:var(--text);min-width:80px;text-align:center;">0.00%</span>
+                    </div>
+                    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center;">
+                        <span id="absenceStatusIcon" style="font-size:32px;">🟢</span>
+                        <span id="absenceStatusText" style="font-size:18px;font-weight:700;">آمان</span>
+                    </div>
                 </div>
             </div>
-            <div class="courses-layout">
-                <div class="courses-sidebar">
-                    <h4 id="lblMyCourses">مقرراتي</h4>
-                    <ul class="clean-list" id="myCoursesList"></ul>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <h4 style="margin-bottom:12px;">📂 المواد المحفوظة</h4>
+                <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+                    <input type="text" id="absSubjectName" placeholder="اسم المادة" style="flex:2;min-width:150px;background:var(--bg);color:white;border:1px solid var(--border);border-radius:8px;padding:10px;">
+                    <button class="btn btn-primary" onclick="saveAbsenceSubject()">💾 حفظ المادة</button>
                 </div>
-                <div class="course-details" id="courseDetailsPanel">
-                    <div class="empty-state" id="emptyStateCourse">
-                        <span class="empty-icon">📚</span>
-                        <p id="lblSelectCourseHint">اختر مقرراً من القائمة</p>
-                    </div>
-                    <div class="details-content hidden" id="courseDetailsContent">
-                        <div class="details-header">
-                            <h3 id="courseDetailTitle">المادة</h3>
-                            <button class="btn btn-danger-sm" onclick="deleteActiveCourse()">🗑️ حذف</button>
-                        </div>
-                        <div class="details-grid">
-                            <div class="detail-section">
-                                <h4 id="lblCourseTimes">📅 أوقات المحاضرات</h4>
-                                <ul class="clean-list" id="courseTimesList"></ul>
-                            </div>
-                            <div class="detail-section">
-                                <h4 id="lblCourseTasks">📝 المهام</h4>
-                                <ul class="clean-list" id="courseTasksList"></ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <div id="absenceSubjectsList"></div>
             </div>
         </section>
- 
+
         <!-- ===== FEEDBACK ===== -->
         <section id="feedback" class="tab hidden animate-in">
             <div class="header-inline">
@@ -459,7 +605,7 @@
         <section id="adminFeedback" class="tab hidden animate-in hub-admin-only">
             <div class="header-inline">
                 <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
-                <h2 id="titleAdminFeedback">🛡️ الشكاوى والاقتراحات</h2>
+                <h2 id="titleAdminFeedback">📋 الاقتراحات والتقييم</h2>
             </div>
             <div class="card tech-card">
                 <div class="card-glow"></div>
@@ -493,12 +639,12 @@
             <div id="statsUsersContent">
                 <div class="card tech-card">
                     <div class="card-glow"></div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                        <h3 style="font-size:15px;">📋 بيانات المستخدمين</h3>
-                        <span id="statsUsersCount" style="font-size:12px;color:var(--text-muted);"></span>
+                    <div class="admin-stats-header">
+                        <h3>📋 بيانات المستخدمين</h3>
+                        <span class="admin-stats-count" id="statsUsersCount"></span>
                     </div>
-                    <div id="adminUsersList">
-                        <p style="text-align:center;color:var(--text-muted);padding:20px;">جاري التحميل...</p>
+                    <div id="adminUsersList" class="admin-users-wrapper">
+                        <p style="text-align:center;color:var(--text-muted);padding:30px;">جاري التحميل...</p>
                     </div>
                 </div>
             </div>
@@ -534,6 +680,24 @@
             </div>
         </section>
  
+        <!-- ===== ADMIN DATA ===== -->
+        <section id="adminData" class="tab hidden animate-in hub-admin-only">
+            <div class="header-inline">
+                <button class="back-btn" onclick="switchTab('hub')">← البوابة</button>
+                <h2 id="titleAdminData">📋 بيانات المستخدمين</h2>
+            </div>
+            <div class="card tech-card">
+                <div class="card-glow"></div>
+                <div class="admin-stats-header">
+                    <h3>👤 جميع المستخدمين</h3>
+                    <span class="admin-stats-count" id="adminDataCount"></span>
+                </div>
+                <div id="adminDataList" class="admin-users-wrapper">
+                    <p style="text-align:center;color:var(--text-muted);padding:30px;">جاري التحميل...</p>
+                </div>
+            </div>
+        </section>
+
         <!-- ===== SETTINGS ===== -->
         <section id="settings" class="tab hidden animate-in">
             <div class="header-inline">
@@ -557,10 +721,52 @@
                         <input type="password" id="setNewPass" placeholder="••••••••">
                     </div>
                 </div>
+
                 <button class="btn btn-primary" onclick="updateSettings()">💾 حفظ التحديث</button>
             </div>
             <div class="card tech-card">
                 <div class="card-glow"></div>
+                <h4>📧 توثيق البريد الإلكتروني</h4>
+                <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">ربط حسابك ببريد Gmail وتوثيقه لزيادة الأمان</p>
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
+                    <span id="verifyBadge" class="verify-badge not-verified">⚠️ <span id="lblNotVerified">غير موثق</span></span>
+                    <span style="font-size:13px;color:var(--text-muted);" id="verifyEmail"></span>
+                    <button class="btn btn-sm" onclick="toggleEmailChange()" style="font-size:12px;padding:4px 10px;">✏️ تغيير البريد</button>
+                </div>
+                <div id="emailChangeArea" class="hidden" style="margin-bottom:12px;padding:10px;background:var(--surface-2);border-radius:10px;">
+                    <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;">البريد الإلكتروني الجديد</label>
+                    <div style="display:flex;gap:8px;">
+                        <input type="email" id="newVerifyEmail" placeholder="newemail@gmail.com" style="flex:1;direction:ltr;text-align:left;background:var(--bg);color:white;border:1px solid var(--border);border-radius:8px;padding:10px;">
+                        <button class="btn btn-primary" id="saveEmailBtn" onclick="saveNewEmail()" style="white-space:nowrap;">📨 إرسال الرمز</button>
+                    </div>
+                    <div id="emailCodeArea" class="hidden" style="margin-top:10px;">
+                        <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;">أدخل الرمز المرسل إلى البريد الجديد</label>
+                        <div style="display:flex;gap:8px;">
+                            <input type="text" id="emailChangeCode" maxlength="6" placeholder="6 أرقام" style="flex:1;text-align:center;letter-spacing:6px;font-size:18px;direction:ltr;background:var(--bg);color:white;border:1px solid var(--border);border-radius:8px;padding:10px;">
+                            <button class="btn btn-primary" onclick="confirmNewEmail()" style="white-space:nowrap;">✅ توثيق</button>
+                            <button class="btn btn-sm" onclick="saveNewEmail()" style="white-space:nowrap;">🔄 إعادة إرسال</button>
+                        </div>
+                        <div id="emailChangeCodeMsg" style="font-size:12px;margin-top:6px;"></div>
+                    </div>
+                    <input type="hidden" id="pendingNewEmail">
+                    <div id="emailChangeMsg" style="font-size:12px;margin-top:6px;"></div>
+                </div>
+                <div id="verifySection">
+                    <div id="otpArea">
+                        <button class="btn btn-primary" id="btnSendCode" onclick="requestVerify()" style="margin-bottom:10px;">📨 إرسال رمز التوثيق</button>
+                        <div id="otpInputGroup" style="display:none;flex-direction:column;gap:10px;">
+                            <div class="input-wrap">
+                                <input type="text" id="otpInput" maxlength="6" placeholder="أدخل الرمز (6 أرقام)" style="text-align:center;letter-spacing:6px;font-size:18px;direction:ltr;">
+                            </div>
+                            <div style="display:flex;gap:8px;">
+                                <button class="btn btn-primary" onclick="confirmVerify()" style="flex:1;">✅ توثيق</button>
+                                <button class="btn btn-sm" onclick="requestVerify()" style="flex:0;">🔄 إعادة إرسال</button>
+                            </div>
+                        </div>
+                        <div id="verifyMsg" style="font-size:13px;margin-top:6px;"></div>
+                        <div id="verifyConfirmMsg" style="font-size:13px;margin-top:6px;"></div>
+                    </div>
+                </div>
             </div>
             <div class="card danger-card">
                 <h4 style="color:#ef4444;">⚠️ منطقة الخطر</h4>
@@ -569,7 +775,7 @@
             </div>
         </section>
     </main>
-    <script src="app.js?v=6"></script>
+    <script src="app.js?v=15"></script>
 </body>
 </html>
  

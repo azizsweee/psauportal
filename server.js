@@ -15,8 +15,12 @@ const ADMIN_PASS = 'AzozS2005519';
 const GEMINI_API_KEY = 'AIzaSyDmQrbecOdkcdRL4sfwmhqqk1US869ZnbU';
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
 
-// Security headers
+// Security headers & HTTPS Redirect
 app.use((req, res, next) => {
+    // Redirect HTTP to HTTPS if behind a reverse proxy (like PythonAnywhere, Render, Heroku)
+    if (req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] !== 'https') {
+        return res.redirect(301, `https://${req.headers.host}${req.url}`);
+    }
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('X-XSS-Protection', '1; mode=block');
@@ -45,37 +49,67 @@ function sanitize(str) {
     return str.replace(/<[^>]*>/g, '').replace(/[<>"'']/g, '').trim();
 }
 
-// Email transporter (configurable)
+// Email transporter – supports Brevo SMTP via env vars, falls back to mail-config.json
 let transporter = null;
-try {
-    const emailConfigPath = path.join(__dirname, 'mail-config.json');
-    if (fs.existsSync(emailConfigPath)) {
-        const mailConfig = JSON.parse(fs.readFileSync(emailConfigPath, 'utf8'));
+function initTransporter() {
+    const host = process.env.BREVO_HOST || '';
+    const port = process.env.BREVO_PORT || '587';
+    const user = process.env.BREVO_USER || '';
+    const pass = process.env.BREVO_PASS || '';
+
+    if (host && user && pass) {
         transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: { user: mailConfig.email, pass: mailConfig.password }
+            host, port: parseInt(port), secure: port === '465',
+            auth: { user, pass }
         });
-        console.log('✅ Email sender configured: ' + mailConfig.email);
-    } else {
-        console.log('⚠️ No mail-config.json — emails go to terminal only');
+        console.log('✅ Brevo SMTP configured: ' + user);
+        return;
     }
-} catch (e) {
-    console.log('⚠️ Email config error:', e.message);
+    try {
+        const cfgPath = path.join(__dirname, 'mail-config.json');
+        if (fs.existsSync(cfgPath)) {
+            const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+            if (cfg.host && cfg.user && cfg.pass) {
+                transporter = nodemailer.createTransport({
+                    host: cfg.host, port: cfg.port || 587, secure: (cfg.port || 587) === 465,
+                    auth: { user: cfg.user, pass: cfg.pass }
+                });
+                console.log('✅ Brevo SMTP from mail-config.json: ' + cfg.user);
+                return;
+            }
+        }
+    } catch (e) { /* ignore */ }
+    console.log('⚠️ No SMTP configured — OTP logging to console only');
 }
+initTransporter();
 
 function sendOrLogEmail(to, subject, text) {
     if (transporter) {
-        transporter.sendMail({ from: transporter.options.auth.user, to, subject, text }).catch(e => console.log('Email send error:', e.message));
+        const from = transporter.options?.auth?.user || 'noreply@psau-portal.com';
+        transporter.sendMail({ from, to, subject, text }).catch(e => console.log('Email send error:', e.message));
     }
     console.log('[EMAIL to ' + to + '] ' + subject + ': ' + text);
 }
 
-let verificationCodes = {};
+// OTP store: { key: { code, expires, username } }
+const otpStore = {};
+
+function generateOTP() {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+function cleanExpiredOTPs() {
+    const now = Date.now();
+    for (const key in otpStore) {
+        if (otpStore[key].expires < now) delete otpStore[key];
+    }
+}
+setInterval(cleanExpiredOTPs, 60000);
 let chatHistory = {};
 
 function readDB() {
     if (!fs.existsSync(DB_FILE)) {
-        fs.writeFileSync(DB_FILE, JSON.stringify({ users: [], tasks: {}, schedules: {}, courses: {}, feedback: [] }, null, 2));
+        fs.writeFileSync(DB_FILE, JSON.stringify({ users: [], tasks: {}, schedules: {}, feedback: [], gpaData: {}, savedSchedules: {}, hourglass: {}, absence: {} }, null, 2));
     }
     return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
 }
@@ -224,51 +258,228 @@ ${faqList}
 
 // ====== AUTH ======
 
+// Temp storage for registration before email verification
+const regTempStore = {};
+
 app.post('/api/register', (req, res) => {
-    const { username, password, age, gender, college } = req.body;
+    const { username, password, age, gender, college, email } = req.body;
     const su = sanitize(username), sp = sanitize(password);
+    const se = email ? sanitize(email).trim().toLowerCase() : '';
     if (!su || !sp || !age || !gender || !college) {
         return res.status(400).json({ err_ar: 'أكمل جميع البيانات', err_en: 'Fill all fields' });
     }
     if (isNaN(age) || age < 15 || age > 80) {
         return res.status(400).json({ err_ar: 'العمر غير صالح', err_en: 'Invalid age' });
     }
+    if (!se || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(se)) {
+        return res.status(400).json({ err_ar: 'البريد الإلكتروني مطلوب', err_en: 'Email is required' });
+    }
     const db = readDB();
     if (db.users.find(u => u.username === su)) {
         return res.status(400).json({ err_ar: 'اسم المستخدم مكرر', err_en: 'Username taken' });
     }
-    db.users.push({ username: su, password: sp, age: parseInt(age), gender, college, phone: '' });
-    db.tasks[su] = [];
-    db.schedules[su] = [];
-    db.courses[su] = [];
+    if (db.users.find(u => u.email && u.email.toLowerCase() === se)) {
+        return res.status(400).json({ err_ar: 'البريد مسجل مسبقاً', err_en: 'Email already registered' });
+    }
+
+    // Rate limit: max 1 OTP per 60 seconds per email
+    if (!rateLimit('reg:' + se, 1, 60000)) {
+        return res.status(429).json({ err_ar: 'انتظر دقيقة قبل طلب رمز جديد', err_en: 'Wait 1 min before new code' });
+    }
+
+    // Generate OTP and store temp data
+    const code = generateOTP();
+    const expires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    const otpKey = 'reg:' + se;
+    otpStore[otpKey] = { code, expires, email: se };
+    regTempStore[se] = { username: su, password: sp, age: parseInt(age), gender, college };
+
+    const subject = '📧 رمز التحقق - جامعة الأمير سطام';
+    const text = `مرحباً ${su},
+رمز التحقق للتسجيل في بوابة جامعة الأمير سطام بن عبدالعزيز هو:
+${code}
+صلاحية هذا الرمز 10 دقائق.
+إذا لم تطلب هذا، تجاهل الرسالة.
+
+PSAU AI Portal`;
+
+    sendOrLogEmail(se, subject, text);
+
+    const response = { msg_ar: 'تم إرسال الرمز إلى بريدك', msg_en: 'Code sent to your email', email: se.replace(/(.{3})(.*)(@.*)/, (_, a, b, c) => a + '*'.repeat(b.length) + c) };
+    if (!transporter) {
+        response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
+        response.msg_en = '⚙️ Dev mode — code: ' + code;
+        response.dev_code = code;
+    }
+    res.json(response);
+});
+
+app.post('/api/verify-email', (req, res) => {
+    const { email, code } = req.body;
+    if (!email || !code) return res.status(400).json({ err_ar: 'أكمل البيانات', err_en: 'Fill all fields' });
+    const se = sanitize(email).trim().toLowerCase();
+    const sc = sanitize(code).trim();
+    if (!/^\d{6}$/.test(sc)) return res.status(400).json({ err_ar: 'الكود 6 أرقام', err_en: 'Code must be 6 digits' });
+
+    const otpKey = 'reg:' + se;
+    const stored = otpStore[otpKey];
+    if (!stored) return res.status(400).json({ err_ar: 'لم يتم طلب رمز أو انتهت صلاحيته', err_en: 'No code requested or expired' });
+    if (stored.expires < Date.now()) {
+        delete otpStore[otpKey];
+        return res.status(400).json({ err_ar: 'انتهت صلاحية الرمز، اطلب واحداً جديداً', err_en: 'Code expired, request a new one' });
+    }
+    if (stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
+
+    // Valid OTP – create user with verified=true
+    delete otpStore[otpKey];
+    const td = regTempStore[se];
+    if (!td) return res.status(400).json({ err_ar: 'انتهت الجلسة، أعد التسجيل', err_en: 'Session expired, re-register' });
+    delete regTempStore[se];
+
+    const db = readDB();
+    db.users.push({ username: td.username, password: td.password, email: se, age: td.age, gender: td.gender, college: td.college, phone: '', verified: true });
+    db.tasks[td.username] = [];
+    db.schedules[td.username] = [];
     writeDB(db);
-    res.json({ msg_ar: 'تم التسجيل بنجاح!', msg_en: 'Registered successfully!' });
+
+    res.json({ msg_ar: '✅ تم إنشاء الحساب وتوثيقه بنجاح!', msg_en: '✅ Account created and verified!' });
+});
+
+const ADMIN_EMAIL = 'abdulazizsowaankau@gmail.com';
+
+// Admin send OTP code
+app.post('/api/admin/send-code', (req, res) => {
+    const { username } = req.body;
+    if (sanitize(username) !== ADMIN_USER) {
+        return res.status(400).json({ err_ar: 'اسم المستخدم غير صحيح', err_en: 'Invalid admin username' });
+    }
+
+    if (!rateLimit('admin-otp', 1, 120000)) {
+        return res.status(429).json({ err_ar: 'انتظر دقيقتين قبل طلب رمز جديد', err_en: 'Wait 2 min before new code' });
+    }
+
+    const code = generateOTP();
+    const expires = Date.now() + 2 * 60 * 1000; // 2 minutes
+    otpStore['admin:login'] = { code, expires };
+
+    const subject = '🛡️ رمز دخول المشرف - PSAU Portal';
+    const text = `رمز دخول لوحة المشرف هو:
+${code}
+صلاحية هذا الرمز: دقيقتان فقط.
+إذا لم تطلب هذا، تجاهل الرسالة.
+
+PSAU AI Portal`;
+
+    sendOrLogEmail(ADMIN_EMAIL, subject, text);
+
+    const response = { msg_ar: 'تم إرسال الرمز إلى بريد المشرف', msg_en: 'Code sent to admin email' };
+    if (!transporter) {
+        response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
+        response.msg_en = '⚙️ Dev mode — code: ' + code;
+        response.dev_code = code;
+    }
+    res.json(response);
+});
+
+// Admin verify OTP code
+app.post('/api/admin/verify-code', (req, res) => {
+    const { username, code } = req.body;
+    if (sanitize(username) !== ADMIN_USER) {
+        return res.status(400).json({ err_ar: 'اسم المستخدم غير صحيح', err_en: 'Invalid admin username' });
+    }
+
+    const sc = sanitize(code).trim();
+    if (!/^\d{6}$/.test(sc)) {
+        return res.status(400).json({ err_ar: 'الكود 6 أرقام', err_en: 'Code must be 6 digits' });
+    }
+
+    const stored = otpStore['admin:login'];
+    if (!stored) {
+        return res.status(400).json({ err_ar: 'لم يتم طلب رمز أو انتهت صلاحيته', err_en: 'No code requested or expired' });
+    }
+    if (stored.expires < Date.now()) {
+        delete otpStore['admin:login'];
+        return res.status(400).json({ err_ar: 'انتهت صلاحية الرمز (دقيقتان فقط)، اطلب واحداً جديداً', err_en: 'Code expired (2 min only), request new one' });
+    }
+    if (stored.code !== sc) {
+        return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
+    }
+
+    delete otpStore['admin:login'];
+    res.json({ username: ADMIN_USER, role: 'admin' });
 });
 
 app.post('/api/login', (req, res) => {
-    const { username, password, role } = req.body;
-    if (role === 'admin') {
-        if (username === ADMIN_USER && password === ADMIN_PASS) {
-            return res.json({ username, role: 'admin' });
-        }
-        return res.status(400).json({ err_ar: 'بيانات المشرف غير صحيحة', err_en: 'Invalid admin credentials' });
-    }
+    const { username, password } = req.body;
     const db = readDB();
     const user = db.users.find(u => u.username === username && u.password === password);
     if (!user) {
         return res.status(400).json({ err_ar: 'البيانات غير صحيحة', err_en: 'Invalid credentials' });
     }
-    res.json({ username, email: user.email, role: 'student', gender: user.gender });
+    res.json({ username, email: user.email, role: 'student', gender: user.gender, verified: !!user.verified });
 });
 
 app.post('/api/forgot-password', (req, res) => {
-    const { username } = req.body;
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ err_ar: 'البريد الإلكتروني مطلوب', err_en: 'Email required' });
+    const se = sanitize(email).trim().toLowerCase();
     const db = readDB();
-    const user = db.users.find(u => u.username === sanitize(username));
-    if (user) {
-        return res.json({ found: true, password: user.password });
+    const user = db.users.find(u => u.email && u.email.toLowerCase() === se);
+    if (!user) return res.status(404).json({ err_ar: 'لا يوجد حساب بهذا البريد', err_en: 'No account with this email' });
+
+    if (!rateLimit('forgot:' + se, 1, 60000)) {
+        return res.status(429).json({ err_ar: 'انتظر دقيقة قبل طلب رمز جديد', err_en: 'Wait 1 min before new code' });
     }
-    res.json({ found: false });
+
+    const code = generateOTP();
+    const expires = Date.now() + 10 * 60 * 1000;
+    const otpKey = 'reset:' + se;
+    otpStore[otpKey] = { code, expires, email: se, username: user.username };
+
+    const subject = '🔑 إعادة تعيين كلمة المرور - جامعة الأمير سطام';
+    const text = `مرحباً ${user.username},
+رمز إعادة تعيين كلمة المرور لبريدك ${se} هو:
+${code}
+صلاحية هذا الرمز 10 دقائق.
+إذا لم تطلب هذا، تجاهل الرسالة.
+
+PSAU AI Portal`;
+
+    sendOrLogEmail(se, subject, text);
+
+    const response = { msg_ar: 'تم إرسال الرمز إلى بريدك', msg_en: 'Code sent to your email', email: se.replace(/(.{3})(.*)(@.*)/, (_, a, b, c) => a + '*'.repeat(b.length) + c) };
+    if (!transporter) {
+        response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
+        response.msg_en = '⚙️ Dev mode — code: ' + code;
+        response.dev_code = code;
+    }
+    res.json(response);
+});
+
+app.post('/api/reset-password', (req, res) => {
+    const { email, code, newPassword } = req.body;
+    if (!email || !code || !newPassword) return res.status(400).json({ err_ar: 'أكمل جميع البيانات', err_en: 'Fill all fields' });
+    const se = sanitize(email).trim().toLowerCase();
+    const sc = sanitize(code).trim();
+    if (!/^\d{6}$/.test(sc)) return res.status(400).json({ err_ar: 'الكود 6 أرقام', err_en: 'Code must be 6 digits' });
+    if (newPassword.length < 4) return res.status(400).json({ err_ar: 'كلمة المرور قصيرة', err_en: 'Password too short' });
+
+    const otpKey = 'reset:' + se;
+    const stored = otpStore[otpKey];
+    if (!stored) return res.status(400).json({ err_ar: 'لم يتم طلب رمز أو انتهت صلاحيته', err_en: 'No code requested or expired' });
+    if (stored.expires < Date.now()) {
+        delete otpStore[otpKey];
+        return res.status(400).json({ err_ar: 'انتهت صلاحية الرمز، اطلب واحداً جديداً', err_en: 'Code expired, request a new one' });
+    }
+    if (stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
+
+    delete otpStore[otpKey];
+    const db = readDB();
+    const user = db.users.find(u => u.email && u.email.toLowerCase() === se);
+    if (user) user.password = newPassword;
+    writeDB(db);
+
+    res.json({ msg_ar: '✅ تم تغيير كلمة المرور بنجاح!', msg_en: '✅ Password reset successfully!' });
 });
 
 app.post('/api/forgot-verify-identity', (req, res) => {
@@ -304,6 +515,13 @@ app.get('/api/feedback', (req, res) => {
     res.json(db.feedback || []);
 });
 
+app.get('/api/admin/feedback', (req, res) => {
+    if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
+    if (!rateLimit('get-feedback', 30, 60000)) return res.status(429).json({ error: 'rate limit' });
+    const db = readDB();
+    res.json(db.feedback || []);
+});
+
 // ====== ADMIN STATS ======
 function isAdmin(req) { return req.query.user === ADMIN_USER; }
 
@@ -313,26 +531,35 @@ app.get('/api/admin/stats', (req, res) => {
     const users = db.users.length;
     const tasks = Object.values(db.tasks || {}).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0);
     const schedules = Object.values(db.schedules || {}).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0);
-    const courses = Object.values(db.courses || {}).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0);
     const feedback = (db.feedback || []).length;
-    const males = db.users.filter(u => u.gender === 'ذكر' || u.gender === 'male').length;
-    const females = db.users.filter(u => u.gender === 'أنثى' || u.gender === 'female').length;
+    const males = db.users.filter(u => u.gender === 'طالب' || u.gender === 'male').length;
+    const females = db.users.filter(u => u.gender === 'طالبة' || u.gender === 'female').length;
     const activeUsers = Object.keys(db.tasks || {}).filter(k => db.tasks[k] && db.tasks[k].length > 0).length;
-    const usersWithCourses = Object.keys(db.courses || {}).filter(k => db.courses[k] && db.courses[k].length > 0).length;
     const usersWithSchedules = Object.keys(db.schedules || {}).filter(k => db.schedules[k] && db.schedules[k].length > 0).length;
-    res.json({ users, tasks, schedules, courses, feedback, males, females, activeUsers, usersWithCourses, usersWithSchedules });
+    res.json({ users, tasks, schedules, feedback, males, females, activeUsers, usersWithSchedules });
 });
 
 app.get('/api/admin/users', (req, res) => {
     if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
     const db = readDB();
-    const list = db.users.map(u => ({
-        username: u.username,
-        age: u.age,
-        gender: u.gender,
-        college: u.college,
-        password: u.password
-    }));
+    const list = db.users.map(u => {
+        const userTasks = db.tasks[u.username] || [];
+        const totalTasks = userTasks.length;
+        const completedTasks = userTasks.filter(t => t.completed).length;
+        const scheduleCount = (db.schedules[u.username] || []).length;
+        return {
+            username: u.username,
+            password: u.password,
+            email: u.email || '',
+            age: u.age,
+            gender: u.gender,
+            college: u.college,
+            scheduleCount,
+            taskCount: totalTasks,
+            completedCount: completedTasks,
+            completionPct: totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0
+        };
+    });
     res.json(list);
 });
 
@@ -355,10 +582,10 @@ app.get('/api/tasks/:username', (req, res) => {
 
 app.post('/api/tasks/:username', (req, res) => {
     const { username } = req.params;
-    const { text, type, priority } = req.body;
+    const { text, description, course, type, priority } = req.body;
     const db = readDB();
     if (!db.tasks[username]) db.tasks[username] = [];
-    db.tasks[username].push({ text: sanitize(text), type: sanitize(type), priority: sanitize(priority), completed: false });
+    db.tasks[username].push({ text: sanitize(text), description: sanitize(description || ''), course: sanitize(course || ''), type: sanitize(type), priority: sanitize(priority), completed: false });
     writeDB(db);
     res.json({ success: true });
 });
@@ -386,55 +613,164 @@ app.delete('/api/tasks/:username/:index', (req, res) => {
 // ====== SCHEDULE ======
 app.get('/api/schedule/:username', (req, res) => {
     const db = readDB();
-    res.json(db.schedules[req.params.username] || []);
+    const list = db.schedules[req.params.username] || [];
+    let changed = false;
+    list.forEach(s => {
+        if (!s._id) { s._id = Date.now().toString(36) + Math.random().toString(36).slice(2,6); changed = true; }
+    });
+    if (changed) writeDB(db);
+    res.json(list);
 });
 
 app.post('/api/schedule/:username', (req, res) => {
     const { username } = req.params;
     const db = readDB();
     if (!db.schedules[username]) db.schedules[username] = [];
-    db.schedules[username].push(req.body);
+    const entry = { ...req.body, _id: Date.now().toString(36) + Math.random().toString(36).slice(2,6) };
+    db.schedules[username].push(entry);
     writeDB(db);
-    res.json({ success: true });
+    res.json({ success: true, _id: entry._id });
 });
 
-app.delete('/api/schedule/:username/:index', (req, res) => {
-    const { username, index } = req.params;
+app.delete('/api/schedule/:username/:_id', (req, res) => {
+    const { username, _id } = req.params;
     const db = readDB();
-    if (db.schedules[username]) db.schedules[username].splice(index, 1);
-    writeDB(db);
-    res.json({ success: true });
-});
-
-// ====== COURSES ======
-app.get('/api/courses/:username', (req, res) => {
-    const db = readDB();
-    res.json(db.courses[req.params.username] || []);
-});
-
-app.post('/api/courses/:username', (req, res) => {
-    const { username } = req.params;
-    const db = readDB();
-    if (!db.courses[username]) db.courses[username] = [];
-    if (db.courses[username].includes(req.body.name)) {
-        return res.status(400).json({ err_ar: 'المقرر مضاف', err_en: 'Course exists' });
+    if (db.schedules[username]) {
+        db.schedules[username] = db.schedules[username].filter(s => s._id !== _id);
     }
-    db.courses[username].push(req.body.name);
     writeDB(db);
     res.json({ success: true });
 });
 
-app.delete('/api/courses/:username/:index', (req, res) => {
-    const { username, index } = req.params;
+// ====== GPA DATA ======
+app.get('/api/gpa-data/:username', (req, res) => {
     const db = readDB();
-    if (db.courses[username]) db.courses[username].splice(index, 1);
+    if (!db.gpaData) db.gpaData = {};
+    res.json(db.gpaData[req.params.username] || []);
+});
+
+app.post('/api/gpa-data/:username', (req, res) => {
+    const { username } = req.params;
+    const { rows } = req.body;
+    const db = readDB();
+    if (!db.gpaData) db.gpaData = {};
+    db.gpaData[username] = (rows || []).map(r => ({
+        course: sanitize(r.course || ''),
+        hours: parseInt(r.hours) || 0,
+        grade: parseFloat(r.grade) || 0
+    }));
+    writeDB(db);
+    res.json({ success: true });
+});
+
+// ====== SAVED SCHEDULES ======
+app.get('/api/saved-schedules/:username', (req, res) => {
+    const db = readDB();
+    if (!db.savedSchedules) db.savedSchedules = {};
+    res.json(db.savedSchedules[req.params.username] || []);
+});
+
+app.post('/api/saved-schedules/:username', (req, res) => {
+    const { username } = req.params;
+    const { name, data } = req.body;
+    if (!name || !data) return res.status(400).json({ err_ar: 'الاسم والبيانات مطلوبة', err_en: 'Name and data required' });
+    const db = readDB();
+    if (!db.savedSchedules) db.savedSchedules = {};
+    if (!db.savedSchedules[username]) db.savedSchedules[username] = [];
+    db.savedSchedules[username].push({ id: Date.now().toString(), name: sanitize(name), data, savedAt: new Date().toISOString() });
+    writeDB(db);
+    res.json({ success: true });
+});
+
+app.delete('/api/saved-schedules/:username/:id', (req, res) => {
+    const { username, id } = req.params;
+    const db = readDB();
+    if (!db.savedSchedules) db.savedSchedules = {};
+    if (db.savedSchedules[username]) {
+        db.savedSchedules[username] = db.savedSchedules[username].filter(s => s.id !== id);
+    }
+    writeDB(db);
+    res.json({ success: true });
+});
+
+// ====== ABSENCE DATA ======
+app.get('/api/absence/:username', (req, res) => {
+    const db = readDB();
+    if (!db.absence) db.absence = {};
+    res.json(db.absence[req.params.username] || []);
+});
+
+app.post('/api/absence/:username', (req, res) => {
+    const { username } = req.params;
+    const { name, weekly, absent } = req.body;
+    if (!name || weekly == null || absent == null) return res.status(400).json({ err_ar: 'أكمل البيانات', err_en: 'Complete data' });
+    const db = readDB();
+    if (!db.absence) db.absence = {};
+    if (!db.absence[username]) db.absence[username] = [];
+    db.absence[username].push({ id: Date.now().toString(), name: sanitize(name), weekly: parseFloat(weekly), absent: parseFloat(absent) });
+    writeDB(db);
+    res.json({ success: true });
+});
+
+app.patch('/api/absence/:username/:id', (req, res) => {
+    const { username, id } = req.params;
+    const { absent } = req.body;
+    const db = readDB();
+    if (!db.absence) db.absence = {};
+    if (db.absence[username]) {
+        const idx = db.absence[username].findIndex(a => a.id === id);
+        if (idx !== -1) {
+            db.absence[username][idx].absent = parseFloat(absent);
+        }
+    }
+    writeDB(db);
+    res.json({ success: true });
+});
+
+app.delete('/api/absence/:username/:id', (req, res) => {
+    const { username, id } = req.params;
+    const db = readDB();
+    if (!db.absence) db.absence = {};
+    if (db.absence[username]) {
+        db.absence[username] = db.absence[username].filter(a => a.id !== id);
+    }
+    writeDB(db);
+    res.json({ success: true });
+});
+
+// ====== HOURGLASS (COUNTDOWN) ======
+app.get('/api/hourglass/:username', (req, res) => {
+    const db = readDB();
+    if (!db.hourglass) db.hourglass = {};
+    res.json(db.hourglass[req.params.username] || []);
+});
+
+app.post('/api/hourglass/:username', (req, res) => {
+    const { username } = req.params;
+    const { name, targetDate } = req.body;
+    if (!name || !targetDate) return res.status(400).json({ err_ar: 'الاسم والتاريخ مطلوبان', err_en: 'Name and date required' });
+    const db = readDB();
+    if (!db.hourglass) db.hourglass = {};
+    if (!db.hourglass[username]) db.hourglass[username] = [];
+    db.hourglass[username].push({ id: Date.now().toString(), name: sanitize(name), targetDate });
+    writeDB(db);
+    res.json({ success: true });
+});
+
+app.delete('/api/hourglass/:username/:id', (req, res) => {
+    const { username, id } = req.params;
+    const db = readDB();
+    if (!db.hourglass) db.hourglass = {};
+    if (db.hourglass[username]) {
+        db.hourglass[username] = db.hourglass[username].filter(h => h.id !== id);
+    }
     writeDB(db);
     res.json({ success: true });
 });
 
 // ====== SETTINGS ======
 app.post('/api/settings/update', (req, res) => {
-    const { currentUsername, newUsername, newPassword } = req.body;
+    const { currentUsername, newUsername, newPassword, newEmail } = req.body;
     const db = readDB();
     const userIndex = db.users.findIndex(u => u.username === currentUsername);
     if (userIndex === -1) return res.status(404).json({ err_ar: 'خطأ', err_en: 'Error' });
@@ -444,15 +780,71 @@ app.post('/api/settings/update', (req, res) => {
         }
         db.tasks[newUsername] = db.tasks[currentUsername];
         db.schedules[newUsername] = db.schedules[currentUsername];
-        db.courses[newUsername] = db.courses[currentUsername];
         delete db.tasks[currentUsername];
         delete db.schedules[currentUsername];
-        delete db.courses[currentUsername];
         db.users[userIndex].username = newUsername;
     }
     if (newPassword) db.users[userIndex].password = newPassword;
     writeDB(db);
     res.json({ updatedUsername: db.users[userIndex].username });
+});
+
+// Send OTP to new email for email change
+app.post('/api/settings/send-new-email-code', (req, res) => {
+    const { username, newEmail } = req.body;
+    if (!username || !newEmail) return res.status(400).json({ err_ar: 'أكمل البيانات', err_en: 'Fill all fields' });
+    const se = sanitize(newEmail).trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(se)) {
+        return res.status(400).json({ err_ar: 'البريد غير صالح', err_en: 'Invalid email' });
+    }
+    if (!rateLimit('newemail:' + username, 1, 60000)) {
+        return res.status(429).json({ err_ar: 'انتظر دقيقة قبل طلب رمز جديد', err_en: 'Wait 1 min before new code' });
+    }
+    const code = generateOTP();
+    const expires = Date.now() + 10 * 60 * 1000;
+    const otpKey = 'newemail:' + sanitize(username);
+    otpStore[otpKey] = { code, expires, newEmail: se };
+    const subject = '✉️ تغيير البريد الإلكتروني - جامعة الأمير سطام';
+    const text = `مرحباً ${sanitize(username)},
+رمز تغيير البريد الإلكتروني إلى ${se} هو:
+${code}
+صلاحية هذا الرمز 10 دقائق.
+إذا لم تطلب هذا، تجاهل الرسالة.
+
+PSAU AI Portal`;
+    sendOrLogEmail(se, subject, text);
+    const response = { msg_ar: 'تم إرسال الرمز إلى بريدك الجديد', msg_en: 'Code sent to your new email', email: se.replace(/(.{3})(.*)(@.*)/, (_, a, b, c) => a + '*'.repeat(b.length) + c) };
+    if (!transporter) {
+        response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
+        response.msg_en = '⚙️ Dev mode — code: ' + code;
+        response.dev_code = code;
+    }
+    res.json(response);
+});
+
+// Verify OTP and update email
+app.post('/api/settings/verify-new-email', (req, res) => {
+    const { username, code } = req.body;
+    if (!username || !code) return res.status(400).json({ err_ar: 'أكمل البيانات', err_en: 'Fill all fields' });
+    const su = sanitize(username);
+    const sc = sanitize(code).trim();
+    if (!/^\d{6}$/.test(sc)) return res.status(400).json({ err_ar: 'الكود 6 أرقام', err_en: 'Code must be 6 digits' });
+    const otpKey = 'newemail:' + su;
+    const stored = otpStore[otpKey];
+    if (!stored) return res.status(400).json({ err_ar: 'لم يتم طلب رمز أو انتهت صلاحيته', err_en: 'No code requested or expired' });
+    if (stored.expires < Date.now()) {
+        delete otpStore[otpKey];
+        return res.status(400).json({ err_ar: 'انتهت صلاحية الرمز، اطلب واحداً جديداً', err_en: 'Code expired, request a new one' });
+    }
+    if (stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
+    delete otpStore[otpKey];
+    const db = readDB();
+    const user = db.users.find(u => u.username === su);
+    if (!user) return res.status(404).json({ err_ar: 'المستخدم غير موجود', err_en: 'User not found' });
+    user.email = stored.newEmail;
+    if (user.verified) user.verified = false;
+    writeDB(db);
+    res.json({ msg_ar: '✅ تم تحديث البريد بنجاح', msg_en: '✅ Email updated successfully' });
 });
 
 app.post('/api/settings/delete', (req, res) => {
@@ -461,9 +853,85 @@ app.post('/api/settings/delete', (req, res) => {
     db.users = db.users.filter(u => u.username !== username);
     delete db.tasks[username];
     delete db.schedules[username];
-    delete db.courses[username];
     writeDB(db);
     res.json({ success: true });
+});
+
+// ====== EMAIL VERIFICATION (OTP) ======
+
+// Request OTP – send 6-digit code to user's email
+app.post('/api/verify-request', (req, res) => {
+    const { username } = req.body;
+    if (!username) return res.status(400).json({ err_ar: 'اسم المستخدم مطلوب', err_en: 'Username required' });
+    const db = readDB();
+    const user = db.users.find(u => u.username === sanitize(username));
+    if (!user) return res.status(404).json({ err_ar: 'المستخدم غير موجود', err_en: 'User not found' });
+    if (!user.email) return res.status(400).json({ err_ar: 'لا يوجد بريد إلكتروني مسجل', err_en: 'No email registered' });
+    if (user.verified) return res.json({ msg_ar: 'الحساب موثق مسبقاً', msg_en: 'Already verified', already: true });
+
+    // Rate limit: max 1 OTP per 60 seconds per user
+    const key = 'otp:' + user.username;
+    if (!rateLimit(key, 1, 60000)) {
+        return res.status(429).json({ err_ar: 'انتظر دقيقة قبل طلب رمز جديد', err_en: 'Wait 1 min before new code' });
+    }
+
+    const code = generateOTP();
+    const expires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    otpStore[key] = { code, expires, username: user.username, email: user.email };
+
+    const subject = '📧 رمز توثيق حساب جامعة الأمير سطام';
+    const text = `مرحباً ${user.username},
+رمز توثيق حسابك في بوابة جامعة الأمير سطام بن عبدالعزيز هو:
+${code}
+صلاحية هذا الرمز 10 دقائق.
+إذا لم تطلب هذا، تجاهل الرسالة.
+
+PSAU AI Portal`;
+
+    sendOrLogEmail(user.email, subject, text);
+    const response = { msg_ar: 'تم إرسال الرمز إلى بريدك', msg_en: 'Code sent to your email', email: user.email.replace(/(.{3})(.*)(@.*)/, (_,a,b,c) => a + '*'.repeat(b.length) + c) };
+    if (!transporter) {
+        response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
+        response.msg_en = '⚙️ Dev mode — code: ' + code;
+        response.dev_code = code;
+    }
+    res.json(response);
+});
+
+// Confirm OTP – verify the code
+app.post('/api/verify-confirm', (req, res) => {
+    const { username, code } = req.body;
+    if (!username || !code) return res.status(400).json({ err_ar: 'أكمل البيانات', err_en: 'Fill all fields' });
+    const su = sanitize(username);
+    const sc = sanitize(code).trim();
+    if (!/^\d{6}$/.test(sc)) return res.status(400).json({ err_ar: 'الكود 6 أرقام', err_en: 'Code must be 6 digits' });
+
+    const key = 'otp:' + su;
+    const stored = otpStore[key];
+    if (!stored) return res.status(400).json({ err_ar: 'لم يتم طلب رمز أو انتهت صلاحيته', err_en: 'No code requested or expired' });
+    if (stored.expires < Date.now()) {
+        delete otpStore[key];
+        return res.status(400).json({ err_ar: 'انتهت صلاحية الرمز، اطلب واحداً جديداً', err_en: 'Code expired, request a new one' });
+    }
+    if (stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
+
+    // Success – mark user as verified
+    delete otpStore[key];
+    const db = readDB();
+    const user = db.users.find(u => u.username === su);
+    if (user) {
+        user.verified = true;
+        writeDB(db);
+    }
+    res.json({ msg_ar: '✅ تم توثيق الحساب بنجاح!', msg_en: '✅ Account verified successfully!' });
+});
+
+// Check verification status
+app.get('/api/user/:username/verified', (req, res) => {
+    const db = readDB();
+    const user = db.users.find(u => u.username === sanitize(req.params.username));
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json({ verified: !!user.verified, email: user.email || '' });
 });
 
 // ====== CHAT ======

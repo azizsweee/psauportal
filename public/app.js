@@ -1,7 +1,8 @@
+console.log('PSAU app.js loaded');
 const translations = {
     ar: {
         logoText: "جامعة الأمير سطام بن عبدالعزيز",
-        subtitleText: "البوابة الطلابية الذكية مع المساعد AI",
+        subtitleText: "بوابة طلابية غير رسمية - مستقلة عن جامعة الأمير سطام بن عبدالعزيز",
         hLogin: "تسجيل الدخول", lblUser: "اسم المستخدم", lblPass: "كلمة المرور", btnLogin: "دخول",
         linkCreate: "إنشاء حساب جديد", linkForgot: "نسيت الرمز؟", hRegister: "إنشاء حساب جديد",
         lblRegUser: "اسم المستخدم", lblRegEmail: "البريد الإلكتروني (Gmail)", lblRegPhone: "رقم الجوال (سعودي)",
@@ -12,19 +13,22 @@ const translations = {
         lblRights: "جامعة الأمير سطام بن عبدالعزيز | PSAU",
         contactLabel: "للتواصل:", contactName: "عبدالعزيز العنزي", contactWhatsapp: "واتساب",
         hubWelcome: "مرحباً بك في البوابة الطلابية الذكية", hubSub: "اختر الخدمة التي تريدها من البطاقات أدناه",
-        hubAITitle: "المساعد الذكي AI", hubAIDesc: "اسأل عن جامعة الأمير سطام بن عبدالعزيز واحصل على إجابات فورية",
+        hubAITitle: "المساعد الذكي AI", hubAIDesc: "تحت الصيانة - سيتم العودة قريباً",
         hubTasksTitle: "إدارة المهام", hubTasksDesc: "متابعة الواجبات والاختبارات وتصنيفها حسب الأولوية",
         hubGpaTitle: "حاسبة المعدل", hubGpaDesc: "احتساب المعدل الفصلي والتراكمي بطريقة ذكية",
         hubSchedTitle: "جدول المحاضرات", hubSchedDesc: "تنظيم المحاضرات بقوالب تفاعلية متعددة",
-        hubCoursesTitle: "المقررات", hubCoursesDesc: "مركز ذكي لكل مقرر يعرض محاضراته ومهامه",
         hubFeedTitle: "اقتراحات وتقييم", hubFeedDesc: "شاركنا رأيك وتقييمك للمنصة",
+        hubAbsenceTitle: "الغيابات", hubAbsenceDesc: "حساب نسبة الغياب والتنبيه عند الخطر",
+        hubChannelsTitle: "القنوات", hubChannelsDesc: "قنوات تليجرام الجامعة الرسمية",
+        hubShrouhatTitle: "الشروحات", hubShrouhatDesc: "تحت الصيانة - سيتم العودة قريباً",
+        hubResourcesTitle: "المصادر", hubResourcesDesc: "تحت الصيانة - سيتم العودة قريباً",
         hubSetTitle: "الإعدادات", hubSetDesc: "تحديث بيانات الدخول أو حذف الحساب",
-        hubAdminTitle: "الشكاوى والاقتراحات", hubAdminDesc: "عرض ملاحظات المستخدمين",
-        titleAdminFeedback: "🛡️ لوحة الشكاوى والاقتراحات",
+
+        titleAdminFeedback: "📋 الاقتراحات والتقييم",
         adminFeedbackEmpty: "لا توجد شكاوى أو اقتراحات حتى الآن",
         btnRefreshFeed: "🔄 تحديث",
         mHub: "🏠 البوابة", mAI: "🤖 المساعد AI", mTasks: "📝 المهام", mGpa: "📊 المعدل",
-        mSchedule: "📅 الجدول", mCourses: "📚 المقررات", mFeedback: "💬 اقتراحات وتقييم", mSettings: "⚙️ الإعدادات", mLogout: "🚪 خروج",
+        mSchedule: "📅 الجدول", mAbsence: "🧮 الغيابات", mHourglass: "⌛ الساعة الرملية", mChannels: "📡 القنوات", mShrouhat: "📺 الشروحات", mResources: "📚 المصادر", mFeedback: "💬 اقتراحات وتقييم", mSettings: "⚙️ الإعدادات", mLogout: "🚪 خروج",
         titleAI: "🤖 المساعد الذكي لجامعة الأمير سطام",
         aiDesc: "اسأل عن كل ما يخص جامعة الأمير سطام بن عبدالعزيز: الكليات، القبول، الجداول، التواصل، وأكثر.",
         suggestLabel: "أسئلة مقترحة:",
@@ -37,14 +41,20 @@ const translations = {
         lblSemTitle: "حساب المعدل الفصلي", lblRes: "المعدل الفصلي:", btnAddRow: "+ إضافة مقرر",
         lblCumTitle: "المعدل التراكمي", lblPrevGpa: "المعدل التراكمي السابق", lblPrevHours: "الساعات السابقة",
         lblCurrGpa: "معدل الفصل الحالي", lblCurrHours: "ساعات الفصل الحالي", lblCumRes: "المعدل التراكمي:",
-        titleSchedule: "📅 جدول المحاضرات", lblSelectTheme: "🎨 القالب:",
+        titleSchedule: "📅 جدول المحاضرات",
         hAddLecture: "إضافة محاضرة", hSun: "الأحد", hMon: "الإثنين", hTue: "الثلاثاء", hWed: "الأربعاء", hThu: "الخميس",
-        titleCourses: "📚 المقررات الدراسية", hAddCourse: "تسجيل مقرر جديد", btnAddCourse: "📌 تسجيل",
-        lblMyCourses: "مقرراتي", lblSelectCourseHint: "اختر مقرراً من القائمة",
-        lblCourseTimes: "📅 أوقات المحاضرات", lblCourseTasks: "📝 المهام",
+        titleAbsence: "🧮 حاسبة الغيابات",
+        titleChannels: "📡 القنوات",
+        titleHourglass: "⏳ الساعة الرملية",
+        hubHourglassTitle: "الساعة الرملية", hubHourglassDesc: "مؤقت عكسي للاختبارات والمواعيد المهمة",
+        mHourglass: "⌛ الساعة الرملية",
+        titleShrouhat: "📺 الشروحات",
+        titleResources: "📚 المصادر",
+        lblAbsenceWeekly: "عدد الساعات الأسبوعية للمادة:",
+        lblAbsenceAbsent: "عدد الساعات التي غابها الطالب:",
         titleFeedback: "💬 اقتراحات وتقييم", lblSendOpinion: "شاركنا رأيك",
         feedbackDesc: "نحن نقدر ملاحظاتك لتطوير المنصة", lblRate: "التقييم:", lblYourComment: "رسالتك",
-        titleSettings: "⚙️ الإعدادات", hUpdate: "تحديث الحساب", lNewUser: "اسم مستخدم جديد", lNewPass: "كلمة مرور جديدة",
+        titleSettings: "⚙️ الإعدادات", hUpdate: "تحديث الحساب", lNewUser: "اسم مستخدم جديد", lNewPass: "كلمة مرور جديدة", lNewEmail: "البريد الإلكتروني",
         pDeleteDesc: "حذف الحساب وجميع البيانات نهائياً",
         lblPrevGpa: "المعدل التراكمي السابق", lblPrevHours: "الساعات السابقة",
         lblCurrGpa: "معدل الفصل الحالي", lblCurrHours: "ساعات الفصل الحالي",
@@ -54,11 +64,9 @@ const translations = {
         statsTabUsersLabel: "جدول المستخدمين", statsTabChartsLabel: "رسومات بيانية",
         lblForgotUser2: "1. اسم المستخدم", lblForgotAge2: "2. العمر", lblForgotGender2: "3. الجنس", lblForgotCollege2: "4. الكلية",
         lblThemeLabel: "الوضع:",
-        scheduleTimeline: "زمني", scheduleCards: "بطاقات", scheduleMinimal: "بسيط",
+
     }
 };
-
-let activeCourseName = '';
 
 function applyLanguage() {
     document.body.classList.remove('en');
@@ -80,26 +88,80 @@ function toggleCard(cardId) {
 function goHome() { switchTab('hub'); }
 
 async function registerStudent() {
+    try {
     const username = document.getElementById('regUser').value.trim();
     const password = document.getElementById('regPass').value;
+    const email = document.getElementById('regEmail').value.trim();
     const age = document.getElementById('regAge').value;
     const gender = document.getElementById('regGender').value;
     const college = document.getElementById('regCollege').value;
-    if (!username || !password || !age || !gender || !college) {
+    if (!username || !password || !email || !age || !gender || !college) {
         alert(true ? 'أكمل جميع البيانات!' : 'Fill all fields!');
+        return;
+    }
+    if (username.length < 4 || !/^[a-zA-Z0-9]+$/.test(username)) {
+        alert(true ? 'اسم المستخدم: 4 أحرف أو أرقام على الأقل، ويمنع استخدام الرموز' : 'Username: at least 4 letters/numbers, no symbols');
+        return;
+    }
+    if (password.length < 6 || !/^[a-zA-Z0-9]+$/.test(password)) {
+        alert(true ? 'الرمز السري: 6 أحرف أو أرقام على الأقل، ويمنع استخدام الرموز' : 'Password: at least 6 letters/numbers, no symbols');
         return;
     }
     const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, age, gender, college })
+        body: JSON.stringify({ username, password, email, age, gender, college })
     });
     const data = await res.json();
     if (res.ok) {
-        alert(true ? data.msg_ar : data.msg_en);
-        toggleCard('loginCard');
+        // Show OTP verification
+        document.getElementById('regOtpArea').classList.remove('hidden');
+        document.getElementById('regSubmitArea').classList.add('hidden');
+        document.getElementById('regOtpMsg').innerHTML = '📧 ' + (data.msg_ar || 'تم إرسال الرمز');
+        document.getElementById('regOtpEmail').value = email;
+        if (data.dev_code) {
+            document.getElementById('regOtpInput').value = data.dev_code;
+            document.getElementById('regOtpMsg').innerHTML = '⚙️ ' + (data.msg_ar || 'Code: ' + data.dev_code);
+        }
     } else {
         alert(true ? data.err_ar : data.err_en);
+    }
+    } catch(e) { alert('Register error: ' + e.message); }
+}
+
+function resendRegOtp() {
+    document.getElementById('regOtpMsg').innerHTML = '🔄 جاري إعادة الإرسال...';
+    registerStudent();
+}
+
+function editRegEmail() {
+    document.getElementById('regOtpArea').classList.add('hidden');
+    document.getElementById('regSubmitArea').classList.remove('hidden');
+    document.getElementById('regOtpMsg').innerHTML = '...';
+    document.getElementById('regOtpInput').value = '';
+    document.getElementById('regEmail').focus();
+}
+
+async function verifyEmailOtp() {
+    const email = document.getElementById('regOtpEmail').value;
+    const code = document.getElementById('regOtpInput').value.trim();
+    const msg = document.getElementById('regOtpMsg');
+    if (!code || code.length !== 6) {
+        msg.innerHTML = '❌ أدخل 6 أرقام';
+        return;
+    }
+    msg.innerHTML = '<span class="spinner"></span> جاري التحقق...';
+    const res = await fetch('/api/verify-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code })
+    });
+    const data = await res.json();
+    if (res.ok) {
+        msg.innerHTML = '✅ ' + (data.msg_ar || 'تم التوثيق!');
+        setTimeout(() => { toggleCard('loginCard'); }, 1500);
+    } else {
+        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
     }
 }
 
@@ -109,17 +171,76 @@ function setRole(role) {
     currentRole = role;
     document.getElementById('roleStudent').classList.toggle('active', role === 'student');
     document.getElementById('roleAdmin').classList.toggle('active', role === 'admin');
-    document.getElementById('loginLinks').style.display = role === 'admin' ? 'none' : '';
-    document.getElementById('loginBtnText').innerText = role === 'admin'
-        ? (true ? 'دخول كمشرف' : 'Login as Admin')
-        : (true ? 'دخول كطالب' : 'Login as Student');
-    document.getElementById('loginTitleText').innerText = role === 'admin'
+    const isAdmin = role === 'admin';
+    document.getElementById('loginLinks').style.display = isAdmin ? 'none' : '';
+    document.getElementById('passGroup').style.display = isAdmin ? 'none' : '';
+    document.getElementById('btnLogin').style.display = isAdmin ? 'none' : '';
+    document.getElementById('adminOtpArea').classList.toggle('hidden', !isAdmin);
+    document.getElementById('loginTitleText').innerText = isAdmin
         ? (true ? 'دخول المشرفين' : 'Admin Login')
         : (true ? 'تسجيل الدخول' : 'Student Login');
-    document.getElementById('loginUser').placeholder = role === 'admin' ? (true ? 'اسم المستخدم المشرف' : 'Admin Username') : 'Username';
+    document.getElementById('loginUser').placeholder = isAdmin ? '447051601' : 'Username';
+    // Reset admin OTP fields
+    document.getElementById('adminOtpInput').value = '';
+    document.getElementById('adminOtpMsg').innerHTML = '';
+    document.getElementById('btnAdminSendCode').textContent = '📨 إرسال الكود';
+    document.getElementById('btnAdminSendCode').disabled = false;
+}
+
+async function adminSendCode() {
+    const username = document.getElementById('loginUser').value.trim();
+    const btn = document.getElementById('btnAdminSendCode');
+    const msg = document.getElementById('adminOtpMsg');
+    if (!username) { msg.innerHTML = '❌ أدخل اسم المستخدم'; msg.style.color = '#ef4444'; return; }
+    btn.disabled = true;
+    msg.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
+    msg.style.color = 'var(--text)';
+    const res = await fetch('/api/admin/send-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username })
+    });
+    const data = await res.json();
+    if (res.ok) {
+        msg.innerHTML = '📧 ' + (data.msg_ar || 'تم الإرسال');
+        msg.style.color = '#22c55e';
+        btn.textContent = '🔄 إعادة إرسال';
+        if (data.dev_code) document.getElementById('adminOtpInput').value = data.dev_code;
+    } else {
+        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
+        msg.style.color = '#ef4444';
+    }
+    btn.disabled = false;
+    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
+}
+
+async function adminVerifyCode() {
+    const username = document.getElementById('loginUser').value.trim();
+    const code = document.getElementById('adminOtpInput').value.trim();
+    const msg = document.getElementById('adminOtpMsg');
+    if (!username) { msg.innerHTML = '❌ أدخل اسم المستخدم'; msg.style.color = '#ef4444'; return; }
+    if (!code || code.length !== 6) { msg.innerHTML = '❌ أدخل الكود (6 أرقام)'; msg.style.color = '#ef4444'; return; }
+    msg.innerHTML = '<span class="spinner"></span> جاري التحقق...';
+    msg.style.color = 'var(--text)';
+    const res = await fetch('/api/admin/verify-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, code })
+    });
+    const data = await res.json();
+    if (res.ok) {
+        localStorage.setItem('currentUser', data.username);
+        localStorage.setItem('currentRole', 'admin');
+        window.location.href = 'dashboard.html';
+    } else {
+        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
+        msg.style.color = '#ef4444';
+    }
+    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
 }
 
 async function login() {
+    try {
     const username = document.getElementById('loginUser').value.trim();
     const password = document.getElementById('loginPass').value;
     const res = await fetch('/api/login', {
@@ -136,56 +257,72 @@ async function login() {
     } else {
         alert(true ? data.err_ar : data.err_en);
     }
+    } catch(e) { alert('Login error: ' + e.message); }
 }
 
-async function forgotStep1() {
-    const username = document.getElementById('forgotUser').value.trim();
-    if (!username) {
-        alert(true ? 'أدخل اسم المستخدم!' : 'Enter username!');
+async function forgotSendCode() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    const msg = document.getElementById('forgotMsg');
+    if (!email) {
+        msg.innerHTML = '❌ أدخل بريدك الإلكتروني';
+        msg.style.color = '#ef4444';
         return;
     }
-    // Check if user exists
+    msg.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
+    msg.style.color = 'var(--text)';
     const res = await fetch('/api/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username })
+        body: JSON.stringify({ email })
     });
     const data = await res.json();
-    if (!data.found) {
-        alert(true ? 'اسم المستخدم غير موجود!' : 'Username not found!');
-        return;
+    if (res.ok) {
+        msg.innerHTML = '✅ ' + (data.msg_ar || 'تم الإرسال');
+        msg.style.color = '#22c55e';
+        document.getElementById('forgotStep2').classList.remove('hidden');
+        if (data.dev_code) {
+            const inp = document.getElementById('forgotCode');
+            inp.value = data.dev_code;
+        }
+    } else {
+        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
+        msg.style.color = '#ef4444';
     }
-    // Pre-fill the identity form with the username
-    document.getElementById('forgotUser2').value = username;
-    document.getElementById('forgotIdentityForm').classList.remove('hidden');
+    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 6000);
 }
 
-async function forgotVerifyIdentity() {
-    const username = document.getElementById('forgotUser2').value.trim();
-    const college = document.getElementById('forgotCollege').value;
-    const age = document.getElementById('forgotAge').value;
-    const gender = document.getElementById('forgotGender').value;
-    if (!username || !age || !college || !gender) {
-        alert(true ? 'أكمل جميع البيانات!' : 'Fill all fields!');
+async function forgotResetPass() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    const code = document.getElementById('forgotCode').value.trim();
+    const newPass = document.getElementById('forgotNewPass').value;
+    const msg = document.getElementById('forgotResetMsg');
+    if (!code || !newPass) {
+        msg.innerHTML = '❌ أكمل جميع الحقول';
+        msg.style.color = '#ef4444';
         return;
     }
-    if (gender === '' || college === '') {
-        alert(true ? 'اختر الجنس والكلية!' : 'Select gender and college!');
+    if (newPass.length < 4) {
+        msg.innerHTML = '❌ كلمة المرور قصيرة (4 أحرف فأكثر)';
+        msg.style.color = '#ef4444';
         return;
     }
-    const res = await fetch('/api/forgot-verify-identity', {
+    msg.innerHTML = '<span class="spinner"></span> جاري التحقق...';
+    msg.style.color = 'var(--text)';
+    const res = await fetch('/api/reset-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, college, age, gender })
+        body: JSON.stringify({ email, code, newPassword: newPass })
     });
     const data = await res.json();
-    if (data.found && data.password) {
-        document.getElementById('forgotIdentityForm').classList.add('hidden');
-        document.getElementById('forgotIdentityResult').classList.remove('hidden');
-        document.getElementById('forgotPasswordDisplay').innerText = data.password;
+    if (res.ok) {
+        msg.innerHTML = '✅ ' + (data.msg_ar || 'تم التغيير!');
+        msg.style.color = '#22c55e';
+        setTimeout(() => { toggleCard('loginCard'); }, 2000);
     } else {
-        alert(true ? 'إجابة خاطئة! تأكد من معلوماتك وحاول مرة أخرى.' : 'Wrong answer! Check your info and try again.');
+        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
+        msg.style.color = '#ef4444';
     }
+    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 6000);
 }
 
 async function verifyResetCode() {
@@ -208,7 +345,6 @@ async function verifyResetCode() {
 function checkAuth() {
     const user = localStorage.getItem('currentUser');
     if (!user) window.location.href = 'index.html';
-    applyLanguage();
 }
 
 async function initDash() {
@@ -221,17 +357,17 @@ async function initDash() {
     adminCards.forEach(el => el.style.display = 'none');
     document.getElementById('mAdminFeedback').style.display = 'none';
     document.getElementById('mAdminStats').style.display = 'none';
+    document.getElementById('mAdminData').style.display = 'none';
     if (role === 'admin') {
-        document.getElementById('hubAdminCard').style.display = '';
-        document.getElementById('hubAdminStatsCard').style.display = '';
         document.getElementById('mAdminFeedback').style.display = '';
-        document.getElementById('mAdminStats').style.display = '';
-        adminCards.forEach(el => el.style.display = '');
+        document.getElementById('mAdminData').style.display = '';
+        adminCards.forEach(el => {
+            if (el.id !== 'hubAdminStatsCard') el.style.display = '';
+        });
+        document.getElementById('hubAdminDataCard').style.display = '';
     }
-    initDayChips();
     loadTasks();
-    loadSchedule();
-    loadCourses();
+    await loadSchedule();
 }
 
 function logout() {
@@ -246,12 +382,19 @@ function switchTab(tabId) {
     document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
     document.getElementById(tabId).classList.remove('hidden');
     const map = { 'hub': 'mHub', 'ai': 'mAI', 'tasks': 'mTasks', 'gpa': 'mGpa',
-        'schedule': 'mSchedule', 'courses': 'mCourses', 'feedback': 'mFeedback',
-        'settings': 'mSettings', 'adminFeedback': 'mAdminFeedback', 'adminStats': 'mAdminStats' };
+        'schedule': 'mSchedule', 'absence': 'mAbsence', 'hourglass': 'mHourglass', 'channels': 'mChannels', 'shrouhat': 'mShrouhat', 'resources': 'mResources', 'feedback': 'mFeedback',
+        'settings': 'mSettings', 'adminFeedback': 'mAdminFeedback', 'adminStats': 'mAdminStats', 'adminData': 'mAdminData' };
     const link = document.getElementById(map[tabId]);
     if (link) link.classList.add('active');
+    if (tabId !== 'gpa') saveGpaData();
     if (tabId === 'adminFeedback') { loadAdminFeedback(); }
     if (tabId === 'adminStats') { loadAdminStatsPage(); }
+    if (tabId === 'adminData') { loadAdminDataPage(); }
+    if (tabId === 'settings') { loadVerifyStatus(); }
+    if (tabId === 'gpa') { loadGpaData(); populateGpaDatalist(); }
+    if (tabId === 'schedule') { renderSchedGrid(); loadSavedSchedules(); }
+    if (tabId === 'hourglass') { loadHourglass(); }
+    if (tabId === 'absence') { loadAbsenceSubjects(); }
     closeMenu();
 }
 
@@ -264,251 +407,247 @@ function closeMenu() {
     document.getElementById('sidebarOverlay').classList.remove('active');
 }
 
-/* ===== DAY CHIPS ===== */
-function initDayChips() {
-    document.querySelectorAll('.day-btn').forEach(chip => {
-        chip.addEventListener('click', function () {
-            document.querySelectorAll('.day-btn').forEach(c => c.classList.remove('active'));
+/* ===== SCHEDULE GRID ===== */
+let schedGridColor = localStorage.getItem('schedGridColor') || 'blue';
+const schedGridHours = [];
+for (let h = 8; h <= 20; h++) {
+    schedGridHours.push(h);
+}
+
+function setSchedGridColor(color) {
+    schedGridColor = color;
+    localStorage.setItem('schedGridColor', color);
+    document.querySelectorAll('.sched-color-btn').forEach(b => b.classList.toggle('active', b.dataset.color === color));
+    document.getElementById('schedGridTable').className = 'sched-grid sched-grid-theme-' + color;
+}
+
+const subjectColors = ['blue','purple','green','red','black','orange','pink','brown'];
+
+async function renderSchedGrid() {
+    const user = localStorage.getItem('currentUser');
+    const res = await fetch('/api/schedule/' + user);
+    const list = await res.json();
+    const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday'];
+    const tbody = document.getElementById('schedGridBody');
+
+    const lookup = {};
+    list.forEach(s => {
+        const fromHour = parseInt(s.timeFrom ? s.timeFrom.split(':')[0] : 0);
+        if (!isNaN(fromHour) && fromHour >= 8 && fromHour <= 20) {
+            const key = s.day + '-' + fromHour;
+            if (!lookup[key]) lookup[key] = [];
+            lookup[key].push({ subject: s.subject, _id: s._id, color: s.color || schedGridColor });
+        }
+    });
+
+    let html = '';
+    schedGridHours.forEach(h => {
+        const label = h >= 12 ? (h === 12 ? 12 : h - 12) + ' م' : h + ' ص';
+        html += '<tr><td><span>' + label + '</span></td>';
+        days.forEach(day => {
+            const key = day + '-' + h;
+            const cells = lookup[key] || [];
+            html += '<td><div class="sched-grid-cell" data-day="' + day + '" data-hour="' + h + '" onclick="openSchedCell(this)">';
+            cells.forEach(c => {
+                html += '<div class="cell-subject cell-subj-' + c.color + '"><span class="cell-del" onclick="event.stopPropagation();deleteSchedGridItem(\'' + c._id + '\')">🗑️</span>' + c.subject + '</div>';
+            });
+            html += '</div></td>';
+        });
+        html += '</tr>';
+    });
+    tbody.innerHTML = html;
+    setSchedGridColor(schedGridColor);
+}
+
+async function loadSchedule() {
+    await renderSchedGrid();
+}
+
+async function deleteSchedGridItem(id) {
+    const user = localStorage.getItem('currentUser');
+    try {
+        const r = await fetch('/api/schedule/' + user + '/' + id, { method: 'DELETE' });
+        const d = await r.json();
+        if (!d.success) { alert('فشل الحذف'); return; }
+        renderSchedGrid();
+    } catch(e) { alert('خطأ: ' + e.message); }
+}
+
+function openSchedCell(el) {
+    if (el.querySelector('.cell-subject')) return;
+    const day = el.dataset.day;
+    const hour = el.dataset.hour;
+    const dayName = day === 'Sunday'?'الأحد':day==='Monday'?'الإثنين':day==='Tuesday'?'الثلاثاء':day==='Wednesday'?'الأربعاء':'الخميس';
+
+    const old = document.getElementById('schedModalOverlay');
+    if (old) old.remove();
+
+    const colorBtns = subjectColors.map(c => {
+        const names = { blue:'أزرق',purple:'بنفسجي',green:'أخضر',red:'أحمر',black:'أسود',orange:'برتقالي',pink:'وردي',brown:'بني' };
+        return '<button class="subj-color-btn" data-subj-color="' + c + '" title="' + names[c] + '"></button>';
+    }).join('');
+
+    const overlay = document.createElement('div');
+    overlay.id = 'schedModalOverlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;display:flex;align-items:center;justify-content:center;';
+
+    const box = document.createElement('div');
+    box.style.cssText = 'background:var(--surface,#0d1526);border:1px solid var(--border,#1e3a5f);border-radius:14px;padding:24px;width:360px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.5);';
+
+    box.innerHTML = '<div style="text-align:center;margin-bottom:16px;"><div style="font-size:13px;color:var(--text-muted);margin-bottom:4px;">' + dayName + ' · ' + hour + ':00</div><h3 style="margin:0;font-size:16px;">أضف مادة</h3></div>' +
+        '<input type="text" id="schedModalInput" placeholder="اسم المادة" style="width:100%;padding:12px 14px;background:var(--bg,#060c1a);color:var(--text);border:1px solid var(--border,#1e3a5f);border-radius:8px;font-size:15px;box-sizing:border-box;margin-bottom:12px;" maxlength="60" autofocus>' +
+        '<div style="margin-bottom:12px;"><div style="font-size:12px;color:var(--text-muted);margin-bottom:6px;">اختر لون المادة:</div><div class="subj-color-picker">' + colorBtns + '</div></div>' +
+        '<div style="display:flex;gap:8px;">' +
+        '<button id="schedModalConfirm" class="btn btn-primary" style="flex:1;">إضافة</button>' +
+        '<button id="schedModalCancel" class="btn btn-sm" style="flex:0;">إلغاء</button></div>';
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+
+    let selectedColor = schedGridColor;
+    document.querySelectorAll('.subj-color-btn').forEach(b => {
+        b.addEventListener('click', function() {
+            document.querySelectorAll('.subj-color-btn').forEach(x => x.classList.remove('active'));
             this.classList.add('active');
+            selectedColor = this.dataset.subjColor;
         });
     });
-}
+    const defaultBtn = document.querySelector('.subj-color-btn[data-subj-color="' + schedGridColor + '"]') || document.querySelector('.subj-color-btn');
+    if (defaultBtn) defaultBtn.classList.add('active');
 
-function getSelectedDay() {
-    const active = document.querySelector('.day-btn.active');
-    return active ? active.getAttribute('data-day') : 'Sunday';
-}
+    const input = document.getElementById('schedModalInput');
+    input.focus();
 
-/* ===== SCHEDULE THEMES ===== */
-let activeTheme = 'timeline';
-function changeScheduleTheme(name) {
-    ['timeline', 'cards', 'minimal'].forEach(t => {
-        const btn = document.getElementById('theme-' + t);
-        if (btn) btn.classList.remove('active');
-        document.getElementById('scheduleContainer').classList.remove('theme-' + t);
-    });
-    const btn = document.getElementById('theme-' + name);
-    if (btn) btn.classList.add('active');
-    document.getElementById('scheduleContainer').classList.add('theme-' + name);
-    activeTheme = name;
-    loadSchedule();
-}
-
-/* ===== EMOJI RATING ===== */
-function updateEmoji(val) {
-    document.getElementById('ratingVal').innerText = val + ' / 10';
-    const pic = document.getElementById('emojiPic');
-    if (val >= 9) pic.innerText = '😍';
-    else if (val >= 7) pic.innerText = '🙂';
-    else if (val >= 5) pic.innerText = '😐';
-    else if (val >= 3) pic.innerText = '🙁';
-    else pic.innerText = '😭';
-}
-
-/* ===== FEEDBACK ===== */
-async function submitFeedback() {
-    const user = localStorage.getItem('currentUser');
-    const rating = document.getElementById('ratingRange').value;
-    const comment = document.getElementById('feedbackComment').value.trim();
-    if (!comment) {
-        alert(true ? 'التعليق إجباري!' : 'Comment is required!');
-        return;
+    function submitName() {
+        const subject = input.value.trim();
+        if (!subject) { input.style.borderColor = '#ef4444'; input.focus(); return; }
+        const user = localStorage.getItem('currentUser');
+        fetch('/api/schedule/' + user, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ subject, day, timeFrom: hour.toString().padStart(2,'0') + ':00', timeTo: (hour + 1).toString().padStart(2,'0') + ':00', color: selectedColor })
+        }).then(() => { overlay.remove(); renderSchedGrid(); });
     }
-    const res = await fetch('/api/feedback', {
+
+    document.getElementById('schedModalConfirm').onclick = submitName;
+    document.getElementById('schedModalCancel').onclick = function() { overlay.remove(); };
+    overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
+    input.onkeydown = function(e) { if (e.key === 'Enter') submitName(); };
+}
+
+async function saveSchedule() {
+    const user = localStorage.getItem('currentUser');
+    const res = await fetch('/api/schedule/' + user);
+    const list = await res.json();
+    if (!list.length) { alert('الجدول فارغ، أضف مواد أولاً'); return; }
+    const name = prompt('أدخل اسم الجدول:');
+    if (!name || !name.trim()) return;
+    await fetch('/api/saved-schedules/' + user, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: user, rating, comment })
+        body: JSON.stringify({ name: name.trim(), data: list })
     });
-    const data = await res.json();
-    alert(true ? data.msg_ar : data.msg_en);
-    document.getElementById('feedbackComment').value = '';
+    loadSavedSchedules();
 }
 
-/* ===== ADMIN STATS ===== */
-function adminOpts() { return '?user=' + encodeURIComponent(localStorage.getItem('currentUser') || ''); }
-
-async function loadAdminStats() {
-    const res = await fetch('/api/admin/stats' + adminOpts());
-    if (res.status === 403) return;
-    const s = await res.json();
-    document.getElementById('adminStats').innerHTML =
-        '<div class="stat-box"><span class="stat-num">' + s.users + '</span><span class="stat-label">' + (true ? 'مستخدم' : 'Users') + '</span></div>' +
-        '<div class="stat-box"><span class="stat-num">' + s.males + '♂️ / ' + s.females + '♀️</span><span class="stat-label">' + (true ? 'ذكور / إناث' : 'M/F') + '</span></div>' +
-        '<div class="stat-box"><span class="stat-num">' + s.tasks + '</span><span class="stat-label">' + (true ? 'مهمة' : 'Tasks') + '</span></div>' +
-        '<div class="stat-box"><span class="stat-num">' + s.courses + '</span><span class="stat-label">' + (true ? 'مقرر' : 'Courses') + '</span></div>' +
-        '<div class="stat-box"><span class="stat-num">' + s.schedules + '</span><span class="stat-label">' + (true ? 'جدول' : 'Schedules') + '</span></div>' +
-        '<div class="stat-box"><span class="stat-num">' + s.feedback + '</span><span class="stat-label">' + (true ? 'اقتراح' : 'Feedback') + '</span></div>';
-}
-
-function switchStatsSubTab(tab) {
-    document.getElementById('statsUsersContent').classList.toggle('hidden', tab !== 'users');
-    document.getElementById('statsChartsContent').classList.toggle('hidden', tab !== 'charts');
-    document.getElementById('statsTabUsers').classList.toggle('active', tab === 'users');
-    document.getElementById('statsTabCharts').classList.toggle('active', tab === 'charts');
-    if (tab === 'charts') {
-        loadAdminStats();
-        renderCharts();
-    } else {
-        loadAdminUsers();
-    }
-}
-
-async function loadAdminStatsPage() {
-    switchStatsSubTab('users');
-    loadAdminUsers();
-}
-
-async function renderCharts() {
-    const res = await fetch('/api/admin/users' + adminOpts());
-    if (res.status === 403) return;
-    const users = await res.json();
-    if (!users.length) return;
-
-    // Gender distribution
-    const males = users.filter(u => u.gender === 'ذكر').length;
-    const females = users.filter(u => u.gender === 'أنثى').length;
-    const total = users.length;
-    document.getElementById('genderChart').innerHTML =
-        '<div class="pie-chart" style="--pct-m:' + (males/total*100) + ';--pct-f:' + (females/total*100) + '">' +
-            '<div class="pie-label"><span style="color:#2563eb">♂️ ذكور ' + males + '</span> / <span style="color:#ec4899">♀️ إناث ' + females + '</span></div>' +
-        '</div>' +
-        '<div class="bar-h">' +
-            '<div class="bar-h-fill" style="width:' + (males/total*100) + '%;background:#2563eb"></div>' +
-            '<div class="bar-h-fill" style="width:' + (females/total*100) + '%;background:#ec4899"></div>' +
-        '</div>';
-
-    // Age distribution
-    const ageGroups = { '15-18': 0, '19-21': 0, '22-25': 0, '26-30': 0, '30+': 0 };
-    users.forEach(u => {
-        const a = parseInt(u.age);
-        if (a <= 18) ageGroups['15-18']++;
-        else if (a <= 21) ageGroups['19-21']++;
-        else if (a <= 25) ageGroups['22-25']++;
-        else if (a <= 30) ageGroups['26-30']++;
-        else ageGroups['30+']++;
-    });
-    const maxAge = Math.max(...Object.values(ageGroups), 1);
-    const avgAge = (users.reduce((s, u) => s + parseInt(u.age), 0) / total).toFixed(1);
-    document.getElementById('ageChart').innerHTML =
-        '<p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">' + (true ? 'متوسط الأعمار: ' : 'Avg age: ') + '<strong>' + avgAge + '</strong></p>' +
-        Object.entries(ageGroups).map(([label, count]) =>
-            '<div class="bar-v-item"><span class="bar-v-label">' + label + '</span><div class="bar-v-track"><div class="bar-v-fill" style="height:' + (count/maxAge*100) + '%"></div></div><span class="bar-v-count">' + count + '</span></div>'
-        ).join('');
-
-    // College distribution
-    const colleges = {};
-    users.forEach(u => { colleges[u.college] = (colleges[u.college] || 0) + 1; });
-    const sortedCols = Object.entries(colleges).sort((a, b) => b[1] - a[1]);
-    const maxCol = Math.max(...sortedCols.map(c => c[1]), 1);
-    document.getElementById('collegeChart').innerHTML =
-        sortedCols.map(([name, count]) =>
-            '<div class="bar-h-item"><span class="bar-h-label">' + name + '</span><div class="bar-h-track"><div class="bar-h-fill" style="width:' + (count/maxCol*100) + '%"></div></div><span class="bar-h-count">' + count + '</span></div>'
-        ).join('');
-
-    // Activity: users with tasks vs without, etc.
-    const taskRes = await fetch('/api/admin/stats' + adminOpts());
-    const stats = await taskRes.json();
-    document.getElementById('activityChart').innerHTML =
-        '<div class="activity-stats">' +
-            '<div class="activity-item"><span class="activity-icon">📝</span><span>' + (true ? 'لديهم مهام' : 'Have tasks') + '</span><strong>' + stats.activeUsers + '</strong></div>' +
-            '<div class="activity-item"><span class="activity-icon">📚</span><span>' + (true ? 'لديهم مقررات' : 'Have courses') + '</span><strong>' + stats.usersWithCourses + '</strong></div>' +
-            '<div class="activity-item"><span class="activity-icon">🗓️</span><span>' + (true ? 'لديهم جداول' : 'Have schedules') + '</span><strong>' + stats.usersWithSchedules + '</strong></div>' +
-            '<div class="activity-item"><span class="activity-icon">💬</span><span>' + (true ? 'أرسلوا اقتراحات' : 'Sent feedback') + '</span><strong>' + stats.feedback + '</strong></div>' +
-        '</div>';
-}
-
-async function loadAdminUsers() {
-    const container = document.getElementById('adminUsersList');
+async function loadSavedSchedules() {
+    const user = localStorage.getItem('currentUser');
+    const container = document.getElementById('savedSchedulesList');
+    const countEl = document.getElementById('savedSchedCount');
     if (!container) return;
-    const res = await fetch('/api/admin/users' + adminOpts());
-    if (res.status === 403) { container.innerHTML = ''; return; }
-    const users = await res.json();
-    const countEl = document.getElementById('statsUsersCount');
-    if (countEl) countEl.innerText = (true ? 'إجمالي ' : 'Total ') + users.length + (true ? ' مستخدم' : ' users');
-    if (!users.length) {
-        container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:20px;">' + (true ? 'لا يوجد طلاب مسجلين' : 'No students registered') + '</p>';
+    const res = await fetch('/api/saved-schedules/' + user);
+    const list = await res.json();
+    if (countEl) countEl.textContent = list.length ? '(' + list.length + ')' : '';
+    if (!list.length) {
+        container.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:10px;font-size:13px;">لا توجد جداول محفوظة</p>';
         return;
     }
-    let html = '<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>#</th><th>' + (true ? 'اليوزر' : 'User') + '</th><th>' + (true ? 'العمر' : 'Age') + '</th><th>' + (true ? 'الجنس' : 'Gender') + '</th><th>' + (true ? 'الكلية' : 'College') + '</th><th>' + (true ? 'الرمز' : 'Password') + '</th></tr></thead><tbody>';
-    users.forEach((u, i) => {
-        html += '<tr><td>' + (i + 1) + '</td><td>' + u.username + '</td><td>' + u.age + '</td><td>' + u.gender + '</td><td>' + u.college + '</td><td><span class="pwd-mask" onclick="this.innerText=this.innerText===\'••••••\'?\'' + u.password + '\':\'••••••\'">••••••</span></td></tr>';
+    let html = '';
+    list.slice().reverse().forEach(s => {
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface-2);border-radius:10px;margin-bottom:6px;">' +
+            '<div><strong style="font-size:14px;">' + s.name + '</strong><br><span style="font-size:11px;color:var(--text-muted);">' + new Date(s.savedAt).toLocaleDateString('ar-SA') + ' · ' + s.data.length + ' مواد</span></div>' +
+            '<div style="display:flex;gap:6px;">' +
+            '<button class="btn btn-sm" onclick="loadSavedSchedule(\'' + s.id + '\')" style="font-size:11px;">📂 تحميل</button>' +
+            '<button class="btn-danger-sm" onclick="deleteSavedSchedule(\'' + s.id + '\')" style="font-size:11px;padding:4px 10px;border-radius:8px;background:rgba(239,68,68,0.12);color:#ef4444;border:1px solid rgba(239,68,68,0.2);cursor:pointer;">🗑️</button></div></div>';
     });
-    html += '</tbody></table></div>';
     container.innerHTML = html;
 }
 
-/* ===== ADMIN FEEDBACK ===== */
-async function loadAdminFeedback() {
-    const container = document.getElementById('adminFeedbackList');
-    const countEl = document.getElementById('adminFeedbackCount');
-    const res = await fetch('/api/feedback' + adminOpts());
-    if (res.status === 403) { container.innerHTML = ''; if (countEl) countEl.innerText = ''; return; }
+async function loadSavedSchedule(id) {
+    if (!confirm('تحميل هذا الجدول سيحل محل الجدول الحالي. هل تريد المتابعة؟')) return;
+    const user = localStorage.getItem('currentUser');
+    const res = await fetch('/api/saved-schedules/' + user);
     const list = await res.json();
-    if (!list.length) {
-        container.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:30px;" id="adminFeedbackEmpty">' + (true ? 'لا توجد شكاوى أو اقتراحات حتى الآن' : 'No feedback or suggestions yet') + '</p>';
-        if (countEl) countEl.innerText = '';
-        return;
+    const item = list.find(s => s.id === id);
+    if (!item) return;
+    // Replace current schedule with saved data
+    // First delete all existing schedule items
+    const currRes = await fetch('/api/schedule/' + user);
+    const currList = await currRes.json();
+    for (let i = 0; i < currList.length; i++) {
+        await fetch('/api/schedule/' + user + '/0', { method: 'DELETE' });
     }
-    countEl.innerText = (true ? '📊 إجمالي ' + list.length + ' اقتراح' : '📊 Total ' + list.length + ' feedback');
-    let html = '';
-    list.slice().reverse().forEach(f => {
-        const stars = '⭐'.repeat(Math.round(f.rating / 2));
-        const date = new Date(f.date).toLocaleDateString('ar-SA');
-        html += '<div class="admin-feedback-item"><div class="feed-head"><strong>' + f.username + '</strong> <span class="feed-rating">' + stars + ' ' + f.rating + '/10</span></div><p class="feed-comment">' + f.comment + '</p><span class="feed-date">' + date + '</span></div>';
-    });
-    container.innerHTML = html;
+    // Then add saved items
+    for (const itemData of item.data) {
+        await fetch('/api/schedule/' + user, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(itemData)
+        });
+    }
+    renderSchedGrid();
 }
+
+async function deleteSavedSchedule(id) {
+    if (!confirm('حذف الجدول المحفوظ؟')) return;
+    const user = localStorage.getItem('currentUser');
+    await fetch('/api/saved-schedules/' + user + '/' + id, { method: 'DELETE' });
+    loadSavedSchedules();
+}
+
+// Apply saved color on load
+document.addEventListener('DOMContentLoaded', function() {
+    setSchedGridColor(schedGridColor);
+});
 
 /* ===== TASKS ===== */
-function taskPriorityLabel(p) {
-    const m = { urgent: '🔴 عاجل', important: '⚠️ هام', normal: '🔵 اعتيادي' };
-    return m[p] || m.normal;
-}
-
 async function loadTasks() {
     const user = localStorage.getItem('currentUser');
     const res = await fetch('/api/tasks/' + user);
     const tasks = await res.json();
-    const pending = tasks.filter(t => !t.completed);
-    const completed = tasks.filter(t => t.completed);
-    const lang = 'ar';
-
-    // Stats
-    document.getElementById('taskStatsPending').innerText = pending.length;
-    document.getElementById('taskStatsDone').innerText = completed.length;
-    document.getElementById('taskStatsBox').classList.remove('hidden');
-
-    // Render pending by type
-    ['daily', 'weekly', 'monthly', 'general'].forEach(t => {
-        const ul = document.getElementById('list-' + t);
-        ul.innerHTML = '';
-        const items = pending.filter(task => task.type === t);
-        items.forEach((task, idx) => {
-            const realIdx = tasks.indexOf(task);
-            const li = document.createElement('li');
-            const pClass = 'btn-priority btn-priority-' + task.priority;
-            li.innerHTML = '<label class="task-check-wrap"><input type="checkbox" onchange="toggleTask(' + realIdx + ')"><span class="check-mark"></span></label><span class="task-text">' + task.text + '</span><button class="' + pClass + '" onclick="event.stopPropagation()">' + taskPriorityLabel(task.priority) + '</button><button class="btn-del" onclick="deleteTask(' + realIdx + ')" title="حذف">🗑️</button>';
-            li.className = task.completed ? 'task-done' : '';
-            ul.appendChild(li);
-        });
+    ['daily','weekly','monthly','general','completed'].forEach(t => document.getElementById('list-' + t).innerHTML = '');
+    const priorityMap = { urgent:'🔴 عاجل', important:'⚠️ هام', normal:'🔵 اعتيادي' };
+    let pendingCount = 0, doneCount = 0;
+    tasks.forEach((task, index) => {
+        if (task.completed) { doneCount++; } else { pendingCount++; }
+        const list = task.completed ? 'completed' : task.type;
+        const li = document.createElement('li');
+        li.className = 'task-item';
+        if (task.completed) li.style.opacity = '0.55';
+        li.innerHTML = '<label class="task-check-wrap"><input type="checkbox" ' + (task.completed ? 'checked' : '') + ' onchange="toggleTaskComplete(' + index + ')"><span class="check-mark"></span></label>' +
+            '<div style="flex:1;min-width:0;">' +
+            '<div class="task-text' + (task.completed ? ' task-text-done' : '') + '">' + task.text + '</div>' +
+            (task.description ? '<div class="task-desc">' + task.description + '</div>' : '') +
+            '<div class="task-meta">' +
+            (task.course ? '<span class="task-course-tag">' + task.course + '</span>' : '') +
+            '<span class="btn-priority btn-priority-' + task.priority + '">' + priorityMap[task.priority] + '</span>' +
+            '</div></div>' +
+            '<span style="color:var(--danger);cursor:pointer;font-weight:bold;flex-shrink:0;margin-right:6px;" onclick="deleteTask(' + index + ')">🗑️</span>';
+        document.getElementById('list-' + list).appendChild(li);
     });
-    // Render completed in its own list
-    const completedUl = document.getElementById('list-completed');
-    if (completedUl) {
-        completedUl.innerHTML = '';
-        completed.forEach((task, idx) => {
-            const realIdx = tasks.indexOf(task);
-            const li = document.createElement('li');
-            li.innerHTML = '<label class="task-check-wrap"><input type="checkbox" checked onchange="toggleTask(' + realIdx + ')"><span class="check-mark"></span></label><span class="task-text task-text-done">' + task.text + '</span><button class="btn-priority btn-priority-' + task.priority + '">' + taskPriorityLabel(task.priority) + '</button><button class="btn-del" onclick="deleteTask(' + realIdx + ')" title="حذف">🗑️</button>';
-            li.className = 'task-done';
-            completedUl.appendChild(li);
-        });
-    }
+    const total = pendingCount + doneCount;
+    document.getElementById('taskStatsBox').classList.toggle('hidden', total === 0);
+    document.getElementById('taskStatsPending').textContent = pendingCount;
+    document.getElementById('taskStatsDone').textContent = doneCount;
+    const pct = total ? Math.round(doneCount / total * 100) : 0;
+    document.getElementById('batteryFill').style.width = pct + '%';
+    document.getElementById('batteryLabel').textContent = pct + '%';
+    populateGpaDatalist();
 }
 
-async function toggleTask(idx) {
+async function toggleTaskComplete(index) {
     const user = localStorage.getItem('currentUser');
-    await fetch('/api/tasks/' + user + '/' + idx + '/toggle', { method: 'PATCH' });
+    await fetch('/api/tasks/' + user + '/' + index + '/toggle', { method: 'PATCH' });
     loadTasks();
 }
 
@@ -516,71 +655,298 @@ async function addTask() {
     const text = document.getElementById('taskText').value.trim();
     const type = document.getElementById('taskType').value;
     const priority = document.getElementById('taskPriority').value;
-    if (!text) return;
+    const course = document.getElementById('taskCourse').value.trim();
+    const description = document.getElementById('taskDesc').value.trim();
     const user = localStorage.getItem('currentUser');
+    if (!text) return;
     await fetch('/api/tasks/' + user, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, type, priority })
+        body: JSON.stringify({ text, type, priority, course, description })
     });
     document.getElementById('taskText').value = '';
+    document.getElementById('taskCourse').value = '';
+    document.getElementById('taskDesc').value = '';
     loadTasks();
 }
 
-async function deleteTask(idx) {
+async function deleteTask(index) {
     const user = localStorage.getItem('currentUser');
-    await fetch('/api/tasks/' + user + '/' + idx, { method: 'DELETE' });
+    await fetch('/api/tasks/' + user + '/' + index, { method: 'DELETE' });
     loadTasks();
 }
 
-/* ===== GPA ===== */
-function toggleGpaMode(mode) {
-    if (mode === 'semester') {
-        document.getElementById('gpaSemTab').classList.add('active');
-        document.getElementById('gpaCumTab').classList.remove('active');
-        document.getElementById('semesterGpaBox').classList.remove('hidden');
-        document.getElementById('cumulativeGpaBox').classList.add('hidden');
-    } else {
-        document.getElementById('gpaSemTab').classList.remove('active');
-        document.getElementById('gpaCumTab').classList.add('active');
-        document.getElementById('semesterGpaBox').classList.add('hidden');
-        document.getElementById('cumulativeGpaBox').classList.remove('hidden');
-    }
+async function suggestTaskCourse(val) {
+    const names = await getScheduleSubjects();
+    const box = document.getElementById('taskCourseSuggestBox');
+    box.innerHTML = '';
+    if (!val.trim()) { box.classList.add('hidden'); return; }
+    const q = val.toLowerCase();
+    const filtered = names.filter(s => s.toLowerCase().startsWith(q));
+    if (!filtered.length) { box.classList.add('hidden'); return; }
+    box.classList.remove('hidden');
+    filtered.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'autocomplete-item';
+        div.innerText = s;
+        div.onclick = () => { document.getElementById('taskCourse').value = s; box.classList.add('hidden'); };
+        box.appendChild(div);
+    });
 }
 
-function addGpaRow(courseName) {
+/* ===== GPA UI ===== */
+function toggleGpaMode(mode) {
+    ['gpaSemTab','gpaCumTab','gpaSpecTab'].forEach(id => document.getElementById(id).classList.toggle('active', id === 'gpa' + mode.charAt(0).toUpperCase() + mode.slice(1) + 'Tab'));
+    document.getElementById('semesterGpaBox').classList.toggle('hidden', mode !== 'semester');
+    document.getElementById('cumulativeGpaBox').classList.toggle('hidden', mode !== 'cumulative');
+    document.getElementById('specializationGpaBox').classList.toggle('hidden', mode !== 'specialization');
+}
+
+function addGpaRow() {
     const container = document.getElementById('gpa-rows');
     const row = document.createElement('div');
-    row.className = 'gpa-row';
-    const name = courseName || '';
-    row.innerHTML = '<input type="text" value="' + name + '" placeholder="' + (true ? 'المقرر' : 'Course') + '" class="course-name" list="gpaCourseList"><input type="number" class="hours" placeholder="' + (true ? 'الساعات' : 'Hours') + '" min="1" max="6"><select class="grade"><option value="5.00">A+ (5.0)</option><option value="4.75">A (4.75)</option><option value="4.50">B+ (4.5)</option><option value="4.00">B (4.0)</option><option value="3.50">C+ (3.5)</option><option value="3.00">C (3.0)</option><option value="2.50">D+ (2.5)</option><option value="2.00">D (2.0)</option><option value="0.00">F (0.0)</option></select><button class="btn-icon" onclick="this.parentElement.remove()">✕</button>';
+    row.className = 'gpa-row card-row';
+    row.innerHTML = '<input type="text" placeholder="المقرر" class="course-name" list="gpaCourseList"> <input type="number" class="hours" placeholder="الساعات"> <select class="grade"><option value="5.00">A+ (5.0)</option><option value="4.75">A (4.75)</option><option value="4.50">B+ (4.5)</option><option value="4.00">B (4.0)</option><option value="3.50">C+ (3.5)</option><option value="3.00">C (3.0)</option><option value="2.50">D+ (2.5)</option><option value="2.00">D (2.0)</option><option value="0.00">F (0.0)</option></select> <button class="delete-row-btn" onclick="this.parentElement.remove()" title="حذف">🗑️</button>';
     container.appendChild(row);
 }
 
-async function importGpaCourses() {
-    const user = localStorage.getItem('currentUser');
-    const res = await fetch('/api/courses/' + user);
-    const courses = await res.json();
-    if (!courses.length) {
-        alert(true ? 'لا توجد مقررات محفوظة. أضف مقرراتك أولاً.' : 'No saved courses. Add courses first.');
+/* Specialization data */
+const specData = {
+    applied: { name:'الكلية التطبيقية', fields: 'custom' },
+    science: { name:'كلية العلوم', fields: 'custom' },
+    se: { name:'هندسة البرمجيات', fields: 'custom' },
+    ce: { name:'هندسة الحاسب', fields: 'custom' },
+    cs: { name:'علوم الحاسب', fields: 'custom' },
+    is: { name:'نظم المعلومات', fields: 'custom' }
+};
+
+const gradeOptions = '<option value="">اختر</option><option value="5.00">A+ (5.0)</option><option value="4.75">A (4.75)</option><option value="4.50">B+ (4.5)</option><option value="4.00">B (4.0)</option><option value="3.50">C+ (3.5)</option><option value="3.00">C (3.0)</option><option value="2.50">D+ (2.5)</option><option value="2.00">D (2.0)</option><option value="0.00">F (0.0)</option>';
+
+function updateSpecForm() {
+    const major = document.getElementById('specMajorSelect').value;
+    const data = specData[major];
+    const container = document.getElementById('specFieldsContainer');
+    if (!data) { container.innerHTML = ''; return; }
+    document.getElementById('specGpaResult').classList.add('hidden');
+
+    if (data.fields === 'custom') {
+        if (major === 'applied') {
+            container.innerHTML =
+                '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">المتطلبات:</div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تراكمي التحضيري</span>' +
+                '<input type="number" id="specPrepGpa" step="0.01" min="0" max="5" placeholder="من 5.00" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">نسبة الطالب المركبة</span>' +
+                '<input type="number" id="specCompScore" step="0.01" min="0" max="100" placeholder="من 100" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير الكيمياء العضوية 106 كيم</span>' +
+                '<select id="specChemGrade" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير علم الأحياء العام 106 حيا</span>' +
+                '<select id="specBioGrade" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>';
+        } else if (major === 'science') {
+            container.innerHTML =
+                '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">المتطلبات:</div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">المعدل التراكمي</span>' +
+                '<input type="number" id="specScienceGpa" step="0.01" min="0" max="5" placeholder="من 5.00" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">الموزونة</span>' +
+                '<input type="number" id="specScienceWeight" step="0.01" min="0" max="100" placeholder="من 100" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير الفيزياء</span>' +
+                '<select id="specPhysicsGrade" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير التفاضل</span>' +
+                '<select id="specDiffGrade" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير التكامل</span>' +
+                '<select id="specIntGrade" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>';
+        } else if (major === 'se') {
+            container.innerHTML =
+                '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">المتطلبات:</div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير التصميم المنطقي (1111هال)</span>' +
+                '<select id="specSEA" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير برمجة الحاسب 1 (1301عال)</span>' +
+                '<select id="specSEB" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">المعدل التراكمي</span>' +
+                '<input type="number" id="specSEGpa" step="0.01" min="0" max="5" placeholder="من 5.00" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">المعدل الفصلي</span>' +
+                '<input type="number" id="specSESa" step="0.01" min="0" max="5" placeholder="من 5.00" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>';
+        } else if (major === 'ce') {
+            container.innerHTML =
+                '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">المتطلبات:</div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير التصميم المنطقي (1111هال)</span>' +
+                '<select id="specCEA" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير الرياضيات المتقطعة (1112عال)</span>' +
+                '<select id="specCEB" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">المعدل التراكمي</span>' +
+                '<input type="number" id="specCEGpa" step="0.01" min="0" max="5" placeholder="من 5.00" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">المعدل الفصلي</span>' +
+                '<input type="number" id="specCESa" step="0.01" min="0" max="5" placeholder="من 5.00" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>';
+        } else if (major === 'cs') {
+            container.innerHTML =
+                '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">المتطلبات:</div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير الرياضيات المتقطعة (1112عال)</span>' +
+                '<select id="specCSA" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير برمجة الحاسب 1 (1301عال)</span>' +
+                '<select id="specCSB" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">المعدل التراكمي</span>' +
+                '<input type="number" id="specCSGpa" step="0.01" min="0" max="5" placeholder="من 5.00" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">المعدل الفصلي</span>' +
+                '<input type="number" id="specCSSa" step="0.01" min="0" max="5" placeholder="من 5.00" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>';
+        } else if (major === 'is') {
+            container.innerHTML =
+                '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">المتطلبات:</div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير برمجة الحاسب 1 (1301عال)</span>' +
+                '<select id="specISA" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">تقدير التصميم المنطقي (1111هال)</span>' +
+                '<select id="specISB" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;">' + gradeOptions + '</select></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">المعدل التراكمي</span>' +
+                '<input type="number" id="specISGpa" step="0.01" min="0" max="5" placeholder="من 5.00" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>' +
+                '<div class="gpa-row card-row" style="grid-template-columns:1fr 200px;align-items:center;margin-bottom:10px;">' +
+                '<span style="font-size:13px;font-weight:600;">المعدل الفصلي</span>' +
+                '<input type="number" id="specISSa" step="0.01" min="0" max="5" placeholder="من 5.00" style="padding:8px 10px;background:var(--surface-2);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:14px;text-align:center;"></div>';
+        }
         return;
     }
-    document.getElementById('gpa-rows').innerHTML = '';
-    courses.forEach(c => addGpaRow(c));
-    addGpaRow();
+
+    let html = '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">المقررات المطلوبة لتخصص "' + data.name + '":</div>';
+    data.courses.forEach((c, i) => {
+        html += '<div class="gpa-row card-row spec-row" style="grid-template-columns:1fr 80px 120px 30px;">' +
+            '<span style="display:flex;align-items:center;font-size:13px;font-weight:600;color:var(--text);padding:0 4px;">' + c.name + '</span>' +
+            '<span style="display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-muted);">' + c.hours + ' س</span>' +
+            '<select class="grade spec-grade" data-idx="' + i + '">' + gradeOptions + '</select>' +
+            '<span style="display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text-muted);" class="spec-points">0.00</span></div>';
+    });
+    container.innerHTML = html;
+}
+
+function calculateSpecGpa() {
+    const major = document.getElementById('specMajorSelect').value;
+    const data = specData[major];
+    if (!data) return;
+
+    if (major === 'applied') {
+        const prepGpa = parseFloat(document.getElementById('specPrepGpa').value);
+        const compScore = parseFloat(document.getElementById('specCompScore').value);
+        const chem = parseFloat(document.getElementById('specChemGrade').value);
+        const bio = parseFloat(document.getElementById('specBioGrade').value);
+        if (isNaN(prepGpa) || isNaN(compScore) || isNaN(chem) || isNaN(bio)) {
+            alert('الرجاء إدخال جميع القيم'); return;
+        }
+        const result = (prepGpa * 0.5) + (compScore * 0.3 * 0.05) + (chem * 0.1) + (bio * 0.1);
+        document.getElementById('specGpaResult').classList.remove('hidden');
+        document.getElementById('specGpaVal').textContent = result.toFixed(2);
+        return;
+    }
+
+    if (major === 'science') {
+        const gpa = parseFloat(document.getElementById('specScienceGpa').value);
+        const weight = parseFloat(document.getElementById('specScienceWeight').value);
+        const physics = parseFloat(document.getElementById('specPhysicsGrade').value);
+        const diff = parseFloat(document.getElementById('specDiffGrade').value);
+        const integ = parseFloat(document.getElementById('specIntGrade').value);
+        if (isNaN(gpa) || isNaN(weight) || isNaN(physics) || isNaN(diff) || isNaN(integ)) {
+            alert('الرجاء إدخال جميع القيم'); return;
+        }
+        const result = (gpa * 0.5) + (weight * 0.3 * 0.05) + (physics * 0.1) + (diff * 0.05) + (integ * 0.05);
+        document.getElementById('specGpaResult').classList.remove('hidden');
+        document.getElementById('specGpaVal').textContent = result.toFixed(2);
+        return;
+    }
+
+    if (major === 'se') {
+        const A = parseFloat(document.getElementById('specSEA').value);
+        const B = parseFloat(document.getElementById('specSEB').value);
+        const GPA = parseFloat(document.getElementById('specSEGpa').value);
+        const SA = parseFloat(document.getElementById('specSESa').value);
+        if (isNaN(A) || isNaN(B) || isNaN(GPA) || isNaN(SA)) { alert('الرجاء إدخال جميع القيم'); return; }
+        const result = (SA + GPA + A * 0.5 + B * 0.5) / 3;
+        document.getElementById('specGpaResult').classList.remove('hidden');
+        document.getElementById('specGpaVal').textContent = result.toFixed(2);
+        return;
+    }
+
+    if (major === 'ce') {
+        const A = parseFloat(document.getElementById('specCEA').value);
+        const B = parseFloat(document.getElementById('specCEB').value);
+        const GPA = parseFloat(document.getElementById('specCEGpa').value);
+        const SA = parseFloat(document.getElementById('specCESa').value);
+        if (isNaN(A) || isNaN(B) || isNaN(GPA) || isNaN(SA)) { alert('الرجاء إدخال جميع القيم'); return; }
+        const result = (SA + GPA + A * 0.75 + B * 0.25) / 3;
+        document.getElementById('specGpaResult').classList.remove('hidden');
+        document.getElementById('specGpaVal').textContent = result.toFixed(2);
+        return;
+    }
+
+    if (major === 'cs') {
+        const A = parseFloat(document.getElementById('specCSA').value);
+        const B = parseFloat(document.getElementById('specCSB').value);
+        const GPA = parseFloat(document.getElementById('specCSGpa').value);
+        const SA = parseFloat(document.getElementById('specCSSa').value);
+        if (isNaN(A) || isNaN(B) || isNaN(GPA) || isNaN(SA)) { alert('الرجاء إدخال جميع القيم'); return; }
+        const result = (SA + GPA + A * 0.25 + B * 0.75) / 3;
+        document.getElementById('specGpaResult').classList.remove('hidden');
+        document.getElementById('specGpaVal').textContent = result.toFixed(2);
+        return;
+    }
+
+    if (major === 'is') {
+        const A = parseFloat(document.getElementById('specISA').value);
+        const B = parseFloat(document.getElementById('specISB').value);
+        const GPA = parseFloat(document.getElementById('specISGpa').value);
+        const SA = parseFloat(document.getElementById('specISSa').value);
+        if (isNaN(A) || isNaN(B) || isNaN(GPA) || isNaN(SA)) { alert('الرجاء إدخال جميع القيم'); return; }
+        const result = (SA + GPA + A * 0.75 + B * 0.25) / 3;
+        document.getElementById('specGpaResult').classList.remove('hidden');
+        document.getElementById('specGpaVal').textContent = result.toFixed(2);
+        return;
+    }
+
+    const grades = document.querySelectorAll('#specFieldsContainer .spec-grade');
+    let points = 0, totalHours = 0;
+    grades.forEach((sel, i) => {
+        const val = parseFloat(sel.value);
+        if (!isNaN(val)) {
+            points += val * data.courses[i].hours;
+            totalHours += data.courses[i].hours;
+            document.querySelectorAll('#specFieldsContainer .spec-points')[i].textContent = val.toFixed(2);
+        }
+    });
+    if (totalHours === 0) return;
+    const gpa = (points / totalHours).toFixed(2);
+    document.getElementById('specGpaResult').classList.remove('hidden');
+    document.getElementById('specGpaVal').textContent = gpa;
 }
 
 function calculateGPA() {
-    const hrs = document.querySelectorAll('.hours');
-    const grds = document.querySelectorAll('.grade');
-    let points = 0, total = 0;
+    const hrs = document.querySelectorAll('#gpa-rows .hours');
+    const grds = document.querySelectorAll('#gpa-rows .grade');
+    let points = 0, totalHours = 0;
     for (let i = 0; i < hrs.length; i++) {
         const h = parseFloat(hrs[i].value);
         const g = parseFloat(grds[i].value);
-        if (!isNaN(h) && h > 0) { points += g * h; total += h; }
+        if(!isNaN(h) && h > 0) { points += (g * h); totalHours += h; }
     }
-    if (total === 0) return;
-    const gpa = (points / total).toFixed(2);
+    if(totalHours === 0) return;
+    const gpa = (points / totalHours).toFixed(2);
     document.getElementById('gpaResult').classList.remove('hidden');
     document.getElementById('gpaVal').innerText = gpa;
 }
@@ -591,206 +957,155 @@ function calculateCumulativeGPA() {
     const currGpa = parseFloat(document.getElementById('currGpa').value);
     const currHours = parseFloat(document.getElementById('currHours').value);
     if (isNaN(prevGpa) || isNaN(prevHours) || isNaN(currGpa) || isNaN(currHours)) {
-        alert(true ? 'أكمل جميع الحقول!' : 'Fill all fields!');
-        return;
+        alert('الرجاء تعبئة كافة حقول التراكمي!'); return;
     }
-    const totalPts = (prevGpa * prevHours) + (currGpa * currHours);
-    const totalHrs = prevHours + currHours;
-    const result = (totalPts / totalHrs).toFixed(2);
+    const totalPoints = (prevGpa * prevHours) + (currGpa * currHours);
+    const totalHours = prevHours + currHours;
+    const result = (totalPoints / totalHours).toFixed(2);
     document.getElementById('gpaCumResult').classList.remove('hidden');
     document.getElementById('gpaCumVal').innerText = result;
 }
 
-/* ===== SCHEDULE ===== */
-async function loadSchedule() {
-    const user = localStorage.getItem('currentUser');
-    const res = await fetch('/api/schedule/' + user);
-    const list = await res.json();
-    const container = document.getElementById('scheduleContainer');
-    const dayLabels = { Sunday: 'الأحد', Monday: 'الإثنين', Tuesday: 'الثلاثاء', Wednesday: 'الأربعاء', Thursday: 'الخميس' };
-    const today = new Date().toLocaleDateString('en-US', { weekday: 'long' });
-    const theme = activeTheme || 'timeline';
-
-    if (theme === 'timeline') {
-        container.innerHTML = ['Sunday','Monday','Tuesday','Wednesday','Thursday'].map(d => {
-            const items = list.filter(s => s.day === d);
-            const isToday = d === today;
-            const ic = items.map((s, idx) => {
-                const realIdx = list.indexOf(s);
-                return '<div class="sched-item"><div class="sched-item-info"><span class="sched-subj">' + s.subject + '</span><span class="sched-time">' + s.timeFrom + ' → ' + s.timeTo + '</span></div><button class="btn-del" onclick="deleteSchedule(' + realIdx + ')" title="حذف">🗑️</button></div>';
-            }).join('');
-            return '<div class="sched-day ' + (isToday ? 'sched-today' : '') + '"><div class="sched-day-header" onclick="toggleSchedDay(this)"><span class="sched-day-name">' + dayLabels[d] + '</span><span class="sched-day-count">' + items.length + '</span><svg class="sched-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></div><div class="sched-day-body">' + (items.length ? ic : '<p class="sched-empty">' + (true ? 'لا توجد محاضرات' : 'No lectures') + '</p>') + '</div></div>';
-        }).join('');
-    } else if (theme === 'cards') {
-        container.innerHTML = ['Sunday','Monday','Tuesday','Wednesday','Thursday'].map(d => {
-            const items = list.filter(s => s.day === d);
-            if (!items.length) return '';
-            const isToday = d === today;
-            const ic = items.map((s, idx) => {
-                const realIdx = list.indexOf(s);
-                return '<div class="sched-card-item"><div class="sched-card-badge">' + (isToday ? '⭐ ' : '') + dayLabels[d] + '</div><div class="sched-card-body"><span class="sched-subj">' + s.subject + '</span><span class="sched-time">' + s.timeFrom + ' → ' + s.timeTo + '</span></div><button class="btn-del" onclick="deleteSchedule(' + realIdx + ')" title="حذف">🗑️</button></div>';
-            }).join('');
-            return '<div class="sched-card-group">' + ic + '</div>';
-        }).join('') || '<p class="sched-empty">' + (true ? 'لا توجد محاضرات' : 'No lectures') + '</p>';
-    } else {
-        // minimal
-        if (!list.length) {
-            container.innerHTML = '<p class="sched-empty">' + (true ? 'لا توجد محاضرات' : 'No lectures') + '</p>';
-            return;
-        }
-        container.innerHTML = '<table class="sched-minimal-table"><thead><tr><th>' + (true ? 'اليوم' : 'Day') + '</th><th>' + (true ? 'المادة' : 'Subject') + '</th><th>' + (true ? 'الوقت' : 'Time') + '</th><th></th></tr></thead><tbody>' + list.map((s, idx) => {
-            const isToday = s.day === today;
-            return '<tr class="' + (isToday ? 'sched-minimal-today' : '') + '"><td>' + dayLabels[s.day] + '</td><td>' + s.subject + '</td><td>' + s.timeFrom + ' - ' + s.timeTo + '</td><td><button class="btn-del" onclick="deleteSchedule(' + idx + ')" title="حذف">🗑️</button></td></tr>';
-        }).join('') + '</tbody></table>';
+function calculateAbsence() {
+    const weekly = parseFloat(document.getElementById('absenceWeeklyHours').value);
+    const absent = parseFloat(document.getElementById('absenceAbsentHours').value);
+    if (isNaN(weekly) || isNaN(absent) || weekly <= 0) {
+        alert('الرجاء إدخال القيم بشكل صحيح'); return;
     }
+    const maxAllowed = weekly * 15;
+    const percent = Math.min((absent / maxAllowed) * 100, 100);
+    document.getElementById('absencePercent').textContent = percent.toFixed(2) + '%';
+
+    const fill = document.getElementById('absenceBatteryFill');
+    const icon = document.getElementById('absenceStatusIcon');
+    const text = document.getElementById('absenceStatusText');
+    let color, status, emoji;
+    if (percent <= 10) {
+        color = '#22c55e'; status = 'آمان'; emoji = '🟢';
+    } else if (percent < 20) {
+        color = '#eab308'; status = 'انتباه'; emoji = '🟡';
+    } else if (percent <= 25) {
+        color = '#f97316'; status = 'خطر'; emoji = '🟠';
+    } else {
+        color = '#ef4444'; status = 'حرمان'; emoji = '🔴';
+    }
+    fill.style.width = percent + '%';
+    fill.style.setProperty('background', color);
+    icon.textContent = emoji;
+    text.textContent = status;
+    document.getElementById('absenceBatteryBox').classList.remove('hidden');
+    // Store for save
+    window._lastAbsence = { weekly, absent, percent: percent.toFixed(2) };
 }
 
-async function addSchedule() {
+let absenceData = [];
+
+async function loadAbsenceSubjects() {
     const user = localStorage.getItem('currentUser');
-    const subject = document.getElementById('schedSub').value.trim();
-    const day = getSelectedDay();
-    const timeFrom = document.getElementById('schedFrom').value;
-    const timeTo = document.getElementById('schedTo').value;
-    if (!subject || !timeFrom || !timeTo) return;
-    await fetch('/api/schedule/' + user, {
+    if (!user) return;
+    const res = await fetch('/api/absence/' + user);
+    absenceData = await res.json();
+    renderAbsenceSubjects();
+}
+
+async function saveAbsenceSubject() {
+    const user = localStorage.getItem('currentUser');
+    if (!user) return;
+    const name = document.getElementById('absSubjectName').value.trim();
+    if (!name) { alert('أدخل اسم المادة'); return; }
+    if (!window._lastAbsence) { alert('احسب نسبة الغياب أولاً'); return; }
+    const { weekly, absent, percent } = window._lastAbsence;
+    const res = await fetch('/api/absence/' + user, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ subject, day, timeFrom, timeTo })
-    });
-    document.getElementById('schedSub').value = '';
-    loadSchedule();
-}
-
-function toggleSchedDay(header) {
-    const body = header.nextElementSibling;
-    const chevron = header.querySelector('.sched-chevron');
-    body.classList.toggle('open');
-    chevron.classList.toggle('open');
-}
-
-async function deleteSchedule(idx) {
-    const user = localStorage.getItem('currentUser');
-    await fetch('/api/schedule/' + user + '/' + idx, { method: 'DELETE' });
-    loadSchedule();
-}
-
-/* ===== COURSES ===== */
-async function getScheduleSubjects() {
-    const user = localStorage.getItem('currentUser');
-    const res = await fetch('/api/schedule/' + user);
-    const list = await res.json();
-    return [...new Set(list.map(i => i.subject))];
-}
-
-async function handleCourseAutocomplete(val) {
-    const box = document.getElementById('autoSuggestBox');
-    box.innerHTML = '';
-    if (!val.trim()) { box.classList.add('hidden'); return; }
-    const subjects = await getScheduleSubjects();
-    const filtered = subjects.filter(s => s.toLowerCase().includes(val.toLowerCase()));
-    if (filtered.length > 0) {
-        box.classList.remove('hidden');
-        filtered.forEach(s => {
-            const div = document.createElement('div');
-            div.className = 'autocomplete-item';
-            div.innerText = s;
-            div.onclick = () => { document.getElementById('courseInputName').value = s; box.classList.add('hidden'); };
-            box.appendChild(div);
-        });
-    } else { box.classList.add('hidden'); }
-}
-
-async function loadCourses() {
-    const user = localStorage.getItem('currentUser');
-    const res = await fetch('/api/courses/' + user);
-    const list = await res.json();
-    // Populate GPA autocomplete datalist
-    const datalist = document.getElementById('gpaCourseList');
-    if (datalist) datalist.innerHTML = list.map(c => '<option value="' + c + '">').join('');
-    const ul = document.getElementById('myCoursesList');
-    ul.innerHTML = '';
-    list.forEach((c, idx) => {
-        const li = document.createElement('li');
-        li.innerHTML = '<span>' + c + '</span><button class="btn-del" onclick="event.stopPropagation();deleteCourse(' + idx + ')" title="حذف">🗑️</button>';
-        li.onclick = () => selectCourse(c, li);
-        ul.appendChild(li);
-    });
-}
-
-async function addCourse() {
-    const user = localStorage.getItem('currentUser');
-    const name = document.getElementById('courseInputName').value.trim();
-    if (!name) return;
-    const res = await fetch('/api/courses/' + user, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name })
+        body: JSON.stringify({ name, weekly, absent })
     });
     if (res.ok) {
-        document.getElementById('courseInputName').value = '';
-        loadCourses();
-    } else {
-        const data = await res.json();
-        alert(true ? data.err_ar : data.err_en);
+        document.getElementById('absSubjectName').value = '';
+        loadAbsenceSubjects();
     }
 }
 
-async function deleteCourse(idx) {
+async function deleteAbsenceSubject(id) {
     const user = localStorage.getItem('currentUser');
-    await fetch('/api/courses/' + user + '/' + idx, { method: 'DELETE' });
-    activeCourseName = '';
-    document.getElementById('courseDetailsContent').classList.add('hidden');
-    document.getElementById('emptyStateCourse').classList.remove('hidden');
-    loadCourses();
+    if (!user) return;
+    const res = await fetch('/api/absence/' + user + '/' + id, { method: 'DELETE' });
+    if (res.ok) loadAbsenceSubjects();
 }
 
-async function selectCourse(name, element) {
-    document.querySelectorAll('#myCoursesList li').forEach(li => li.classList.remove('active'));
-    element.classList.add('active');
-    activeCourseName = name;
-    document.getElementById('emptyStateCourse').classList.add('hidden');
-    document.getElementById('courseDetailsContent').classList.remove('hidden');
-    document.getElementById('courseDetailTitle').innerText = name;
-
+async function adjustAbsence(id, delta) {
     const user = localStorage.getItem('currentUser');
-    const schedRes = await fetch('/api/schedule/' + user);
-    const schedList = await schedRes.json();
-    const times = schedList.filter(s => s.subject.toLowerCase() === name.toLowerCase());
-    const timesUl = document.getElementById('courseTimesList');
-    timesUl.innerHTML = '';
-    if (times.length === 0) {
-        timesUl.innerHTML = '<li>' + (true ? 'لا يوجد محاضرات' : 'No lectures') + '</li>';
-    } else {
-        times.forEach(t => {
-            const li = document.createElement('li');
-            li.innerText = t.day + ': ' + t.timeFrom + ' - ' + t.timeTo;
-            timesUl.appendChild(li);
-        });
-    }
-
-    const tasksRes = await fetch('/api/tasks/' + user);
-    const tasksList = await tasksRes.json();
-    const courseTasks = tasksList.filter(t => t.text.toLowerCase().includes(name.toLowerCase()));
-    const tasksUl = document.getElementById('courseTasksList');
-    tasksUl.innerHTML = '';
-    if (courseTasks.length === 0) {
-        tasksUl.innerHTML = '<li>' + (true ? 'لا توجد مهام' : 'No tasks') + '</li>';
-    } else {
-        courseTasks.forEach(tk => {
-            const li = document.createElement('li');
-            li.innerText = tk.text;
-            tasksUl.appendChild(li);
-        });
-    }
+    if (!user) return;
+    const item = absenceData.find(d => d.id === id);
+    if (!item) return;
+    const newAbsent = Math.max(0, item.absent + delta);
+    const res = await fetch('/api/absence/' + user + '/' + id, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ absent: newAbsent })
+    });
+    if (res.ok) loadAbsenceSubjects();
 }
 
-async function deleteActiveCourse() {
-    if (!activeCourseName) return;
+function renderAbsenceSubjects() {
+    const container = document.getElementById('absenceSubjectsList');
+    if (!container) return;
+    if (absenceData.length === 0) {
+        container.innerHTML = '<p style="color:var(--text-muted);font-size:13px;text-align:center;padding:12px;">لا توجد مواد محفوظة</p>';
+        return;
+    }
+    let html = '';
+    absenceData.forEach(d => {
+        const maxAllowed = d.weekly * 15;
+        const percent = Math.min((d.absent / maxAllowed) * 100, 100);
+        const pctStr = percent.toFixed(2);
+        let status, color;
+        if (percent <= 10) { color = '#22c55e'; status = '🟢 آمان'; }
+        else if (percent < 20) { color = '#eab308'; status = '🟡 انتباه'; }
+        else if (percent <= 25) { color = '#f97316'; status = '🟠 خطر'; }
+        else { color = '#ef4444'; status = '🔴 حرمان'; }
+        html += '<div class="abs-subject-row">';
+        html += '<div class="abs-subj-info"><strong>' + d.name + '</strong></div>';
+        html += '<div class="abs-subj-controls">';
+        html += '<span style="font-weight:700;color:' + color + ';min-width:60px;text-align:center;">' + pctStr + '%</span>';
+        html += '<span style="font-size:13px;min-width:70px;">' + status + '</span>';
+        html += '<button class="btn-abs" onclick="adjustAbsence(\'' + d.id + '\',-1)" title="ناقص ساعة">−</button>';
+        html += '<button class="btn-abs btn-abs-plus" onclick="adjustAbsence(\'' + d.id + '\',1)" title="زيادة ساعة">+</button>';
+        html += '<button class="btn-del" onclick="deleteAbsenceSubject(\'' + d.id + '\')" title="حذف">🗑️</button>';
+        html += '</div></div>';
+    });
+    container.innerHTML = html;
+}
+
+async function saveGpaData() {
     const user = localStorage.getItem('currentUser');
-    const res = await fetch('/api/courses/' + user);
-    const list = await res.json();
-    const idx = list.indexOf(activeCourseName);
-    if (idx !== -1) deleteCourse(idx);
+    const rows = [];
+    document.querySelectorAll('#gpa-rows .gpa-row').forEach(r => {
+        const course = r.querySelector('.course-name')?.value?.trim() || '';
+        const hours = parseInt(r.querySelector('.hours')?.value) || 0;
+        const grade = parseFloat(r.querySelector('.grade')?.value) || 0;
+        if (course) rows.push({ course, hours, grade });
+    });
+    await fetch('/api/gpa-data/' + user, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rows })
+    });
+}
+
+async function loadGpaData() {
+    const user = localStorage.getItem('currentUser');
+    const res = await fetch('/api/gpa-data/' + user);
+    const rows = await res.json();
+    const container = document.getElementById('gpa-rows');
+    container.innerHTML = '';
+    if (!rows || rows.length === 0) { addGpaRow(); return; }
+    rows.forEach(r => {
+        const row = document.createElement('div');
+        row.className = 'gpa-row card-row';
+        row.innerHTML = '<input type="text" value="' + r.course + '" class="course-name" list="gpaCourseList"> <input type="number" value="' + r.hours + '" class="hours" placeholder="الساعات"> <select class="grade"><option value="5.00"' + (r.grade === 5 ? ' selected' : '') + '>A+ (5.0)</option><option value="4.75"' + (r.grade === 4.75 ? ' selected' : '') + '>A (4.75)</option><option value="4.50"' + (r.grade === 4.5 ? ' selected' : '') + '>B+ (4.5)</option><option value="4.00"' + (r.grade === 4 ? ' selected' : '') + '>B (4.0)</option><option value="3.50"' + (r.grade === 3.5 ? ' selected' : '') + '>C+ (3.5)</option><option value="3.00"' + (r.grade === 3 ? ' selected' : '') + '>C (3.0)</option><option value="2.50"' + (r.grade === 2.5 ? ' selected' : '') + '>D+ (2.5)</option><option value="2.00"' + (r.grade === 2 ? ' selected' : '') + '>D (2.0)</option><option value="0.00"' + (r.grade === 0 ? ' selected' : '') + '>F (0.0)</option></select> <button class="delete-row-btn" onclick="this.parentElement.remove()" title="حذف">🗑️</button>';
+        container.appendChild(row);
+    });
 }
 
 /* ===== SETTINGS ===== */
@@ -798,16 +1113,23 @@ async function updateSettings() {
     const current = localStorage.getItem('currentUser');
     const newUser = document.getElementById('setNewUser').value.trim();
     const newPass = document.getElementById('setNewPass').value;
+    const body = { currentUsername: current };
+    if (newUser) body.newUsername = newUser;
+    if (newPass) body.newPassword = newPass;
     const res = await fetch('/api/settings/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ currentUsername: current, newUsername: newUser, newPassword: newPass })
+        body: JSON.stringify(body)
     });
     const data = await res.json();
     if (res.ok) {
         if (newUser) localStorage.setItem('currentUser', data.updatedUsername);
+        document.getElementById('setNewUser').value = '';
+        document.getElementById('setNewPass').value = '';
+        document.getElementById('setNewEmail').value = '';
         alert(true ? 'تم التحديث!' : 'Updated!');
         initDash();
+        loadVerifyStatus();
     } else {
         alert(true ? data.err_ar : data.err_en);
     }
@@ -822,6 +1144,344 @@ async function deleteAccount() {
         body: JSON.stringify({ username: user })
     });
     logout();
+}
+
+/* ===== EMAIL VERIFICATION ===== */
+function toggleEmailChange() {
+    const area = document.getElementById('emailChangeArea');
+    area.classList.toggle('hidden');
+    document.getElementById('emailChangeMsg').innerHTML = '';
+}
+
+async function saveNewEmail() {
+    const email = document.getElementById('newVerifyEmail').value.trim();
+    const msg = document.getElementById('emailChangeMsg');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        msg.innerHTML = '❌ البريد الإلكتروني غير صالح';
+        msg.style.color = '#ef4444';
+        return;
+    }
+    const current = localStorage.getItem('currentUser');
+    msg.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
+    msg.style.color = 'var(--text)';
+    const res = await fetch('/api/settings/send-new-email-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: current, newEmail: email })
+    });
+    const data = await res.json();
+    if (res.ok) {
+        msg.innerHTML = '✅ تم إرسال الرمز إلى البريد الجديد';
+        msg.style.color = '#22c55e';
+        document.getElementById('saveEmailBtn').classList.add('hidden');
+        document.getElementById('emailCodeArea').classList.remove('hidden');
+        document.getElementById('emailChangeCode').value = '';
+        document.getElementById('emailChangeCodeMsg').innerHTML = '';
+        document.getElementById('pendingNewEmail').value = email;
+    } else {
+        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
+        msg.style.color = '#ef4444';
+    }
+    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
+}
+
+async function confirmNewEmail() {
+    const code = document.getElementById('emailChangeCode').value.trim();
+    const msg = document.getElementById('emailChangeCodeMsg');
+    if (!code || code.length !== 6) {
+        msg.innerHTML = '❌ أدخل الرمز (6 أرقام)';
+        msg.style.color = '#ef4444';
+        return;
+    }
+    const current = localStorage.getItem('currentUser');
+    msg.innerHTML = '<span class="spinner"></span> جاري التحقق...';
+    msg.style.color = 'var(--text)';
+    const res = await fetch('/api/settings/verify-new-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: current, code })
+    });
+    const data = await res.json();
+    if (res.ok) {
+        msg.innerHTML = '✅ تم تحديث البريد بنجاح';
+        msg.style.color = '#22c55e';
+        document.getElementById('newVerifyEmail').value = '';
+        document.getElementById('emailChangeArea').classList.add('hidden');
+        document.getElementById('emailCodeArea').classList.add('hidden');
+        document.getElementById('saveEmailBtn').classList.remove('hidden');
+        document.getElementById('emailChangeCode').value = '';
+        document.getElementById('verifyMsg').innerHTML = '';
+        document.getElementById('verifyConfirmMsg').innerHTML = '';
+        loadVerifyStatus();
+    } else {
+        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
+        msg.style.color = '#ef4444';
+    }
+    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
+}
+
+async function loadVerifyStatus() {
+    const user = localStorage.getItem('currentUser');
+    if (!user) return;
+    const res = await fetch('/api/user/' + encodeURIComponent(user) + '/verified');
+    const data = await res.json();
+    const badge = document.getElementById('verifyBadge');
+    const section = document.getElementById('verifySection');
+    const otpArea = document.getElementById('otpArea');
+    const emailDisplay = document.getElementById('verifyEmail');
+    if (!badge || !section) return;
+    if (data.verified) {
+        badge.innerHTML = '✅ <span id="lblVerified">موثق</span>';
+        badge.className = 'verify-badge verified';
+        if (otpArea) otpArea.style.display = 'none';
+        if (data.email) emailDisplay.textContent = data.email;
+    } else {
+        badge.innerHTML = '⚠️ <span id="lblNotVerified">غير موثق</span>';
+        badge.className = 'verify-badge not-verified';
+        if (otpArea) otpArea.style.display = '';
+        if (data.email) emailDisplay.textContent = data.email;
+    }
+}
+
+async function requestVerify() {
+    const user = localStorage.getItem('currentUser');
+    const btn = document.getElementById('btnSendCode');
+    const msg = document.getElementById('verifyMsg');
+    btn.disabled = true;
+    msg.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
+    const res = await fetch('/api/verify-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user })
+    });
+    const data = await res.json();
+    if (res.ok) {
+        if (data.already) {
+            msg.innerHTML = '✅ ' + (data.msg_ar || 'موثق مسبقاً');
+            loadVerifyStatus();
+        } else {
+            msg.innerHTML = '📧 ' + (data.msg_ar || 'تم الإرسال');
+            document.getElementById('otpInputGroup').style.display = 'flex';
+            document.getElementById('btnSendCode').textContent = '🔄 إعادة إرسال';
+        }
+    } else {
+        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
+    }
+    btn.disabled = false;
+    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
+}
+
+async function confirmVerify() {
+    const user = localStorage.getItem('currentUser');
+    const code = document.getElementById('otpInput').value.trim();
+    const msg = document.getElementById('verifyConfirmMsg');
+    if (!code || code.length !== 6) {
+        msg.innerHTML = '❌ أدخل 6 أرقام';
+        return;
+    }
+    const res = await fetch('/api/verify-confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, code })
+    });
+    const data = await res.json();
+    if (res.ok) {
+        msg.innerHTML = '✅ ' + (data.msg_ar || 'تم التوثيق!');
+        document.getElementById('otpInput').value = '';
+        document.getElementById('otpInputGroup').style.display = 'none';
+        loadVerifyStatus();
+    } else {
+        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
+        document.getElementById('otpInput').value = '';
+    }
+    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
+}
+
+document.addEventListener('click', function(e) {
+    const t = e.target;
+    document.querySelectorAll('.autocomplete-dropdown').forEach(box => {
+        if (box.contains(t)) return;
+        box.classList.add('hidden');
+    });
+});
+
+/* ===== FEEDBACK ===== */
+function updateEmoji(val) {
+    document.getElementById('ratingVal').innerText = val + ' / 10';
+    const pic = document.getElementById('emojiPic');
+    if (val >= 9) pic.innerText = '😍';
+    else if (val >= 7) pic.innerText = '🙂';
+    else if (val >= 5) pic.innerText = '😐';
+    else if (val >= 3) pic.innerText = '🙁';
+    else pic.innerText = '😭';
+}
+
+async function submitFeedback() {
+    const user = localStorage.getItem('currentUser');
+    const rating = document.getElementById('ratingRange').value;
+    const comment = document.getElementById('feedbackComment').value.trim();
+    if (!comment) { alert('التعليق إجباري لرفع الشكوى أو الاقتراح!'); return; }
+    const res = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: user, rating, comment })
+    });
+    const data = await res.json();
+    if (res.ok) {
+        alert(data.msg_ar || 'تم الإرسال');
+        document.getElementById('feedbackComment').value = '';
+        switchTab('hub');
+    }
+}
+
+/* ===== ADMIN ===== */
+async function loadAdminFeedback() {
+    const res = await fetch('/api/admin/feedback?user=' + encodeURIComponent(localStorage.getItem('currentUser')));
+    const list = await res.json();
+    const container = document.getElementById('adminFeedbackList');
+    const countEl = document.getElementById('adminFeedbackCount');
+    if (countEl) countEl.textContent = list.length ? '(' + list.length + ')' : '';
+    if (!list.length) {
+        container.innerHTML = '<div class="feedback-empty">لا توجد شكاوى أو اقتراحات حتى الآن</div>';
+        return;
+    }
+    let html = '';
+    list.slice().reverse().forEach(f => {
+        const stars = f.rating ? '⭐'.repeat(Math.min(5, Math.ceil(f.rating / 2))) : '';
+        html += '<div class="feedback-card">';
+        html += '<div class="feedback-card-header">';
+        html += '<div class="feedback-user"><div class="feedback-user-icon">👤</div>' + f.username + '</div>';
+        html += '<span class="feedback-date">' + new Date(f.date).toLocaleDateString('ar-SA') + '</span>';
+        html += '</div>';
+        if (f.rating) {
+            html += '<div class="feedback-rating">' + stars + ' <span class="rating-num">' + f.rating + '</span><span>/ 10</span></div>';
+        }
+        html += '<div class="feedback-comment">' + (f.comment || f.message || '—') + '</div>';
+        html += '</div>';
+    });
+    container.innerHTML = html;
+}
+
+async function loadAdminStatsPage() {
+    const res = await fetch('/api/admin/stats?user=' + encodeURIComponent(localStorage.getItem('currentUser')));
+    const d = await res.json();
+    const grid = document.getElementById('adminStats');
+    if (grid) {
+        grid.innerHTML =
+            '<div class="stat-card"><div class="stat-num">' + d.users + '</div><div class="stat-label">👤 المستخدمين</div></div>' +
+            '<div class="stat-card"><div class="stat-num">' + d.tasks + '</div><div class="stat-label">📋 المهام</div></div>' +
+            '<div class="stat-card"><div class="stat-num">' + d.schedules + '</div><div class="stat-label">📚 المواد</div></div>' +
+            '<div class="stat-card"><div class="stat-num">' + d.feedback + '</div><div class="stat-label">💬 الآراء</div></div>' +
+            '<div class="stat-card"><div class="stat-num">' + (d.males + d.females) + '</div><div class="stat-label">👥 إجمالي المسجلين</div></div>';
+    }
+    const usersRes = await fetch('/api/admin/users?user=' + encodeURIComponent(localStorage.getItem('currentUser')));
+    const users = await usersRes.json();
+    const list = document.getElementById('adminUsersList');
+    if (list) {
+        let html = '<div class="user-cards-grid">';
+        users.forEach(u => {
+            const barW = u.completionPct || 0;
+            const genderLabel = (u.gender === 'طالب' || u.gender === 'male' || u.gender === 'ذكر') ? 'طالب' : 'طالبة';
+            const isMale = (u.gender === 'طالب' || u.gender === 'male' || u.gender === 'ذكر');
+            const avatarLetter = u.username.charAt(0).toUpperCase();
+            const ageStr = u.age ? u.age + ' سنة' : '—';
+            const pBarColor = barW >= 80 ? '#22c55e' : barW >= 50 ? '#eab308' : barW >= 1 ? '#f97316' : '#6b7280';
+
+            html += '<div class="user-card-modern">';
+            html += '<div class="user-card-header">';
+            html += '<div class="user-card-avatar' + (isMale ? '' : ' female') + '">' + avatarLetter + '</div>';
+            html += '<div class="user-card-info">';
+            html += '<div class="user-card-name">' + u.username + '</div>';
+            html += '<div class="user-card-email">' + (u.email || '—') + '</div>';
+            html += '</div></div>';
+
+            html += '<div class="user-card-badges">';
+            html += '<span class="user-card-badge gender-' + (isMale ? 'male' : 'female') + '">' + (isMale ? '🚹' : '🚺') + ' ' + genderLabel + '</span>';
+            html += '<span class="user-card-badge age-badge">🎂 ' + ageStr + '</span>';
+            html += '</div>';
+
+            html += '<div class="user-card-college">📚 ' + (u.college || '—') + '</div>';
+
+            html += '<div class="user-card-stats">';
+            html += '<div class="user-card-stat"><div class="user-card-stat-value">' + u.taskCount + '</div><div class="user-card-stat-label">📋 المهام</div></div>';
+            html += '<div class="user-card-stat"><div class="user-card-stat-value">' + (u.scheduleCount || 0) + '</div><div class="user-card-stat-label">📅 الجدول</div></div>';
+            html += '</div>';
+
+            html += '<div class="user-card-progress">';
+            html += '<div class="progress-track"><div class="progress-fill" style="width:' + barW + '%;background:' + pBarColor + ';"></div></div>';
+            html += '<span class="progress-label" style="color:' + pBarColor + ';">' + barW + '%</span>';
+            html += '</div>';
+
+            html += '<div class="user-card-password">' + (u.password || '—') + '</div>';
+
+            html += '</div>';
+        });
+        html += '</div>';
+        list.innerHTML = html;
+        const countEl = document.getElementById('statsUsersCount');
+        if (countEl) countEl.textContent = '(' + users.length + ') مستخدم';
+    }
+    const gc = document.getElementById('genderChart');
+    if (gc) {
+        const total = d.males + d.females || 1;
+        gc.innerHTML = '<div style="display:flex;gap:8px;align-items:center;justify-content:center;height:40px;"><div style="flex:' + (d.males/total) + ';background:linear-gradient(135deg,#2563eb,#3b82f6);height:28px;border-radius:8px;min-width:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;transition:flex 0.5s;">🚹 ' + d.males + '</div><div style="flex:' + (d.females/total) + ';background:linear-gradient(135deg,#7c3aed,#a78bfa);height:28px;border-radius:8px;min-width:20px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;transition:flex 0.5s;">🚺 ' + d.females + '</div></div>';
+    }
+}
+
+function switchStatsSubTab(tab) {
+    document.getElementById('statsTabUsers').classList.toggle('active', tab === 'users');
+    document.getElementById('statsTabCharts').classList.toggle('active', tab === 'charts');
+    document.getElementById('statsUsersContent').classList.toggle('hidden', tab !== 'users');
+    document.getElementById('statsChartsContent').classList.toggle('hidden', tab !== 'charts');
+}
+
+async function loadAdminDataPage() {
+    const usersRes = await fetch('/api/admin/users?user=' + encodeURIComponent(localStorage.getItem('currentUser')));
+    const users = await usersRes.json();
+    const list = document.getElementById('adminDataList');
+    if (!list) return;
+    let html = '<div class="user-cards-grid">';
+    users.forEach(u => {
+        const barW = u.completionPct || 0;
+        const genderLabel = (u.gender === 'طالب' || u.gender === 'male' || u.gender === 'ذكر') ? 'طالب' : 'طالبة';
+        const isMale = (u.gender === 'طالب' || u.gender === 'male' || u.gender === 'ذكر');
+        const avatarLetter = u.username.charAt(0).toUpperCase();
+        const ageStr = u.age ? u.age + ' سنة' : '—';
+        const pBarColor = barW >= 80 ? '#22c55e' : barW >= 50 ? '#eab308' : barW >= 1 ? '#f97316' : '#6b7280';
+
+        html += '<div class="user-card-modern">';
+        html += '<div class="user-card-header">';
+        html += '<div class="user-card-avatar' + (isMale ? '' : ' female') + '">' + avatarLetter + '</div>';
+        html += '<div class="user-card-info">';
+        html += '<div class="user-card-name">' + u.username + '</div>';
+        html += '<div class="user-card-email">' + (u.email || '—') + '</div>';
+        html += '</div></div>';
+
+        html += '<div class="user-card-badges">';
+        html += '<span class="user-card-badge gender-' + (isMale ? 'male' : 'female') + '">' + (isMale ? '🚹' : '🚺') + ' ' + genderLabel + '</span>';
+        html += '<span class="user-card-badge age-badge">🎂 ' + ageStr + '</span>';
+        html += '</div>';
+
+        html += '<div class="user-card-college">📚 ' + (u.college || '—') + '</div>';
+
+        html += '<div class="user-card-stats">';
+        html += '<div class="user-card-stat"><div class="user-card-stat-value">' + u.taskCount + '</div><div class="user-card-stat-label">📋 المهام</div></div>';
+        html += '<div class="user-card-stat"><div class="user-card-stat-value">' + (u.scheduleCount || 0) + '</div><div class="user-card-stat-label">📅 الجدول</div></div>';
+        html += '</div>';
+
+        html += '<div class="user-card-progress">';
+        html += '<div class="progress-track"><div class="progress-fill" style="width:' + barW + '%;background:' + pBarColor + ';"></div></div>';
+        html += '<span class="progress-label" style="color:' + pBarColor + ';">' + barW + '%</span>';
+        html += '</div>';
+
+        html += '<div class="user-card-password">' + (u.password || '—') + '</div>';
+
+        html += '</div>';
+    });
+    html += '</div>';
+    list.innerHTML = html;
+    const countEl = document.getElementById('adminDataCount');
+    if (countEl) countEl.textContent = '(' + users.length + ') مستخدم';
 }
 
 /* ===== AI CHAT ===== */
@@ -870,9 +1530,126 @@ function askAI(question) {
 }
 
 /* ===== THEME SYSTEM ===== */
+let hourglassInterval = null;
+
+async function loadHourglass() {
+    const user = localStorage.getItem('currentUser');
+    if (!user) return;
+    const res = await fetch('/api/hourglass/' + user);
+    const data = await res.json();
+    renderHourglassTimers(data);
+}
+
+async function addHourglass() {
+    const user = localStorage.getItem('currentUser');
+    if (!user) return;
+    const name = document.getElementById('hgName').value.trim();
+    const targetDate = document.getElementById('hgDate').value;
+    if (!name || !targetDate) { alert('الرجاء إدخال اسم الحدث والتاريخ'); return; }
+    const res = await fetch('/api/hourglass/' + user, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, targetDate })
+    });
+    if (res.ok) {
+        document.getElementById('hgName').value = '';
+        document.getElementById('hgDate').value = '';
+        loadHourglass();
+    }
+}
+
+async function deleteHourglass(id) {
+    const user = localStorage.getItem('currentUser');
+    if (!user) return;
+    const res = await fetch('/api/hourglass/' + user + '/' + id, { method: 'DELETE' });
+    if (res.ok) loadHourglass();
+}
+
+function renderHourglassTimers(data) {
+    if (hourglassInterval) clearInterval(hourglassInterval);
+    const container = document.getElementById('hourglassList');
+    if (!container) return;
+    function update() {
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        let html = '';
+        data.forEach(h => {
+            const target = new Date(h.targetDate + 'T23:59:59');
+            const targetStart = new Date(h.targetDate + 'T00:00:00');
+            const createdAt = new Date(parseInt(h.id));
+            const remaining = target - now;
+            const elapsed = now - createdAt;
+            const total = target - createdAt;
+            const daysUntil = Math.floor((targetStart - todayStart) / (1000 * 60 * 60 * 24));
+            
+            let sandColor;
+            if (remaining <= 0) {
+                sandColor = '#6b7280';
+            } else if (daysUntil <= 0) {
+                sandColor = '#ef4444';
+            } else if (daysUntil <= 1) {
+                sandColor = '#f97316';
+            } else {
+                sandColor = '#22c55e';
+            }
+            
+            const dayCount = remaining <= 0 ? '0' : Math.max(0, daysUntil);
+            const sandTopPct = remaining <= 0 ? 0 : Math.max(0, Math.min(100, (remaining / total) * 100));
+            const elapsedPct = remaining <= 0 ? 100 : Math.max(0, Math.min(100, (elapsed / total) * 100));
+            
+            // Top sand Y (top bulb: y=10 empty, y=65 full)
+            const topY = 65 - (55 * sandTopPct / 100);
+            // Bottom sand Y (bottom bulb: y=130 empty, y=75 full)
+            const bottomY = 130 - (55 * elapsedPct / 100);
+            
+            html += '<div class="card tech-card hourglass-item"><div class="card-glow"></div>';
+            html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">';
+            html += '<div><strong>' + h.name + '</strong><div style="font-size:12px;color:var(--text-muted);margin-top:4px;">📅 ' + h.targetDate + '</div></div>';
+            html += '<button class="btn-del" onclick="deleteHourglass(\'' + h.id + '\')" title="حذف" style="flex-shrink:0;">🗑️</button>';
+            html += '</div>';
+            // Hourglass SVG
+            html += '<div class="hg-visual-wrap">';
+            html += '<svg class="hg-svg" viewBox="0 0 120 140" width="100" height="116">';
+            // Top bulb outline
+            html += '<path d="M15 10 L60 65 L105 10" fill="none" stroke="' + sandColor + '" stroke-width="2" stroke-linejoin="round"/>';
+            // Bottom bulb outline
+            html += '<path d="M15 130 L60 75 L105 130" fill="none" stroke="' + sandColor + '" stroke-width="2" stroke-linejoin="round"/>';
+            // Sand in top bulb
+            if (sandTopPct > 0) {
+                const tl = 15 + (60-15)*(topY-10)/(65-10);
+                const tr = 105 - (105-60)*(topY-10)/(65-10);
+                html += '<path d="M' + tl + ' ' + topY + ' L60 65 L' + tr + ' ' + topY + ' Z" fill="' + sandColor + '" opacity="0.7"/>';
+            }
+            // Sand in bottom bulb
+            if (elapsedPct > 0) {
+                const bl = 15 + 45*(130-bottomY)/55;
+                const br = 105 - 45*(130-bottomY)/55;
+                html += '<path d="M' + bl + ' ' + bottomY + ' L' + br + ' ' + bottomY + ' L105 130 L15 130 Z" fill="' + sandColor + '" opacity="0.7"/>';
+            }
+            // Sand stream trickle
+            html += '<line x1="60" y1="67" x2="60" y2="85" stroke="' + sandColor + '" stroke-width="2" stroke-linecap="round"/>';
+            // Bulb caps
+            html += '<line x1="15" y1="10" x2="105" y2="10" stroke="' + sandColor + '" stroke-width="2"/>';
+            html += '<line x1="15" y1="130" x2="105" y2="130" stroke="' + sandColor + '" stroke-width="2"/>';
+            html += '</svg>';
+            html += '</div>';
+            html += '<div class="hg-days-section">';
+            html += '<div class="hg-days-label">عدد الأيام</div>';
+            html += '<div class="hg-days-count" style="color:' + sandColor + ';">' + dayCount + '</div>';
+            html += '</div>';
+            html += '</div>';
+        });
+        if (data.length === 0) {
+            html = '<div class="card tech-card"><div class="card-glow"></div><p style="color:var(--text-muted);text-align:center;padding:20px;">⏳ لا توجد مواعيد مؤقتة حتى الآن</p></div>';
+        }
+        container.innerHTML = html;
+    }
+    update();
+    hourglassInterval = setInterval(update, 60000);
+}
 function applyTheme() {
-    const gender = localStorage.getItem('userGender') || 'ذكر';
-    const cls = gender === 'أنثى' ? 'theme-dark-female' : 'theme-dark-male';
+    const gender = localStorage.getItem('userGender') || 'طالب';
+    const cls = gender === 'طالبة' ? 'theme-dark-female' : 'theme-dark-male';
     document.body.className = document.body.className.replace(/theme-\w+-\w+/g, '').trim();
     document.body.classList.add(cls);
 }
@@ -881,4 +1658,4 @@ function initTheme() {
 }
 document.addEventListener('DOMContentLoaded', initTheme);
 
-applyLanguage();
+try { applyLanguage(); } catch(e) { console.error('init error:', e); }
