@@ -1,7 +1,7 @@
 {
-  "host": "smtp.gmail.com",
+  "host": "smtp-relay.brevo.com",
   "port": 587,
-  "user": "psaused447@gmail.com",
-  "pass": "xoft leee kmdj wgsi",
-  "from_email": "PSAU Portal <psaused447@gmail.com>"
+  "user": "ac7177001@smtp-brevo.com",
+  "pass": "dY2tVIw1zh3kFDRE",
+  "from_email": "PSAU Portal <ac7177001@smtp-brevo.com>"
 }

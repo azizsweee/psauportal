@@ -78,20 +78,21 @@ function initTransporter() {
         return null;
     };
 
-    let src = tryEnv('BREVO') || tryEnv('SMTP');
+    let src;
 
-    if (!src) {
-        try {
-            const cfgPath = path.join(__dirname, 'mail-config.json');
-            if (fs.existsSync(cfgPath)) {
-                const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
-                if (cfg.host && cfg.user && cfg.pass) {
-                    transporter = makeTransporter(cfg.host, cfg.port || 587, cfg.user, cfg.pass);
-                    src = { label: 'mail-config.json', user: cfg.user };
-                }
+    // Priority: mail-config.json (committed with Brevo) >> BREVO_* >> SMTP_*
+    try {
+        const cfgPath = path.join(__dirname, 'mail-config.json');
+        if (fs.existsSync(cfgPath)) {
+            const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
+            if (cfg.host && cfg.user && cfg.pass) {
+                transporter = makeTransporter(cfg.host, cfg.port || 587, cfg.user, cfg.pass);
+                src = { label: 'mail-config.json', user: cfg.user };
             }
-        } catch (e) { /* ignore */ }
-    }
+        }
+    } catch (e) { /* ignore */ }
+
+    if (!src) src = tryEnv('BREVO') || tryEnv('SMTP');
 
     if (transporter) {
         console.log('✅ SMTP configured via ' + src.label + ': ' + src.user);
@@ -599,6 +600,18 @@ app.get('/api/admin/users', async (req, res) => {
 
 app.get('/api/is-admin', (req, res) => {
     res.json({ admin: req.query.role === 'admin' });
+});
+
+// SMTP debug endpoint — shows live SMTP config (no secrets)
+app.get('/api/debug-smtp', (req, res) => {
+    const info = transporter ? {
+        configured: true,
+        host: transporter.options?.host || 'unknown',
+        port: transporter.options?.port || 'unknown',
+        user: transporter.options?.auth?.user || 'unknown',
+        secure: transporter.options?.secure || false
+    } : { configured: false, reason: 'No SMTP transporter (check logs)' };
+    res.json(info);
 });
 
 app.get('/api/users/:username/gender', async (req, res) => {
