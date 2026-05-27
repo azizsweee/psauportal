@@ -60,13 +60,19 @@ function sanitize(str) {
 let transporter = null;
 
 function initTransporter() {
+    const makeTransporter = (host, port, user, pass) => nodemailer.createTransport({
+        host, port: parseInt(port), secure: port === 465,
+        auth: { user, pass },
+        tls: { rejectUnauthorized: false }
+    });
+
     const tryEnv = (prefix) => {
         const host = process.env[prefix + '_HOST'];
         const port = process.env[prefix + '_PORT'] || '587';
         const user = process.env[prefix + '_USER'];
         const pass = process.env[prefix + '_PASS'];
         if (host && user && pass) {
-            transporter = nodemailer.createTransport({ host, port: parseInt(port), secure: port === '465', auth: { user, pass } });
+            transporter = makeTransporter(host, port, user, pass);
             return { label: prefix + ' env', user };
         }
         return null;
@@ -80,7 +86,7 @@ function initTransporter() {
             if (fs.existsSync(cfgPath)) {
                 const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
                 if (cfg.host && cfg.user && cfg.pass) {
-                    transporter = nodemailer.createTransport({ host: cfg.host, port: cfg.port || 587, secure: (cfg.port || 587) === 465, auth: { user: cfg.user, pass: cfg.pass } });
+                    transporter = makeTransporter(cfg.host, cfg.port || 587, cfg.user, cfg.pass);
                     src = { label: 'mail-config.json', user: cfg.user };
                 }
             }
@@ -92,9 +98,7 @@ function initTransporter() {
         transporter.verify().then(ok => {
             if (ok) console.log('✅ SMTP connection verified successfully');
         }).catch(e => {
-            console.log('❌ SMTP connection FAILED: ' + e.message);
-            console.log('❌ Emails will NOT be sent. Check your SMTP credentials.');
-            transporter = null;
+            console.log('⚠️ SMTP verify warning (may still work): ' + e.message);
         });
     } else {
         console.log('⚠️ No SMTP configured — OTP will be shown on screen only');
@@ -115,16 +119,16 @@ async function sendMailWithRetry(to, subject, text, html, retries) {
         console.log('[EMAIL DEV] to ' + to + ' | ' + subject + ': ' + text);
         return false;
     }
-    retries = retries || 2;
+    retries = retries || 3;
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
-            let from = 'PSAU Portal <' + (transporter.options?.auth?.user || 'noreply@psau-portal.com') + '>';
-            await transporter.sendMail({ from, to, subject, text, html });
+            const user = transporter.options?.auth?.user || 'noreply@psau-portal.com';
+            await transporter.sendMail({ from: '"PSAU Portal" <' + user + '>', to, subject, text, html });
             console.log('[EMAIL sent] to ' + to + ' (attempt ' + attempt + ')');
             return true;
         } catch (e) {
             console.log('[EMAIL ERROR] to ' + to + ' (attempt ' + attempt + '/' + retries + '): ' + e.message);
-            if (attempt < retries) await new Promise(r => setTimeout(r, 2000));
+            if (attempt < retries) await new Promise(r => setTimeout(r, 3000));
         }
     }
     return false;
@@ -343,11 +347,7 @@ PSAU AI Portal`;
     const emailSent = await sendOrLogEmail(se, subject, text, html);
 
     const response = { msg_ar: 'تم إرسال الرمز إلى بريدك', msg_en: 'Code sent to your email', email: se.replace(/(.{3})(.*)(@.*)/, (_, a, b, c) => a + '*'.repeat(b.length) + c) };
-    if (!transporter) {
-        response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
-        response.msg_en = '⚙️ Dev mode — code: ' + code;
-        response.dev_code = code;
-    } else if (!emailSent) {
+    if (!emailSent) {
         response.msg_ar = '❌ فشل إرسال البريد الإلكتروني، حاول مرة أخرى';
         response.msg_en = '❌ Failed to send email, try again';
     }
@@ -377,7 +377,7 @@ PSAU AI Portal`;
     if (sent) {
         res.json({ msg_ar: 'تم إعادة إرسال الرمز', msg_en: 'Code resent' });
     } else {
-        res.json({ msg_ar: '⚙️ فشل الإرسال، الكود: ' + stored.code, msg_en: '⚙️ Send failed, code: ' + stored.code, dev_code: stored.code });
+        res.json({ msg_ar: '❌ فشل إعادة الإرسال، حاول مرة أخرى', msg_en: '❌ Resend failed, try again' });
     }
 });
 
@@ -436,13 +436,9 @@ app.post('/api/admin/send-code', async (req, res) => {
     const emailSent = await sendOrLogEmail(ADMIN_EMAIL, subject, text, html);
 
     const response = { msg_ar: 'تم إرسال الرمز إلى بريد المشرف', msg_en: 'Code sent to admin email' };
-    if (!transporter) {
-        response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
-        response.msg_en = '⚙️ Dev mode — code: ' + code;
-        response.dev_code = code;
-    } else if (!emailSent) {
-        response.msg_ar = '❌ فشل إرسال البريد الإلكتروني، حاول مرة أخرى';
-        response.msg_en = '❌ Failed to send email, try again';
+    if (!emailSent) {
+        response.msg_ar = '❌ فشل إرسال البريد، تحقق من إعدادات SMTP';
+        response.msg_en = '❌ Failed to send email, check SMTP settings';
     }
     res.json(response);
 });
@@ -462,7 +458,7 @@ app.post('/api/admin/resend', async (req, res) => {
     if (sent) {
         res.json({ msg_ar: 'تم إعادة الإرسال', msg_en: 'Resent' });
     } else {
-        res.json({ msg_ar: '⚙️ الكود: ' + stored.code, msg_en: '⚙️ Code: ' + stored.code, dev_code: stored.code });
+        res.json({ msg_ar: '❌ فشل إعادة الإرسال، حاول مرة أخرى', msg_en: '❌ Resend failed, try again' });
     }
 });
 
@@ -526,9 +522,8 @@ app.post('/api/forgot-password', async (req, res) => {
 
     const response = { msg_ar: 'تم إرسال الرمز إلى بريدك', msg_en: 'Code sent to your email', email: se.replace(/(.{3})(.*)(@.*)/, (_, a, b, c) => a + '*'.repeat(b.length) + c) };
     if (!emailSent) {
-        response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
-        response.msg_en = '⚙️ Dev mode — code: ' + code;
-        response.dev_code = code;
+        response.msg_ar = '❌ فشل إرسال الرمز، حاول مرة أخرى';
+        response.msg_en = '❌ Failed to send code, try again';
     }
     res.json(response);
 });
@@ -820,9 +815,8 @@ app.post('/api/settings/send-new-email-code', async (req, res) => {
     const emailSent = await sendOrLogEmail(se, subject, text, html);
     const response = { msg_ar: 'تم إرسال الرمز إلى بريدك الجديد', msg_en: 'Code sent to your new email', email: se.replace(/(.{3})(.*)(@.*)/, (_, a, b, c) => a + '*'.repeat(b.length) + c) };
     if (!emailSent) {
-        response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
-        response.msg_en = '⚙️ Dev mode — code: ' + code;
-        response.dev_code = code;
+        response.msg_ar = '❌ فشل إرسال الرمز، حاول مرة أخرى';
+        response.msg_en = '❌ Failed to send code, try again';
     }
     res.json(response);
 });
@@ -885,9 +879,8 @@ app.post('/api/verify-request', async (req, res) => {
     const emailSent = await sendOrLogEmail(user.email, subject, text, html);
     const response = { msg_ar: 'تم إرسال الرمز إلى بريدك', msg_en: 'Code sent to your email', email: user.email.replace(/(.{3})(.*)(@.*)/, (_,a,b,c) => a + '*'.repeat(b.length) + c) };
     if (!emailSent) {
-        response.msg_ar = '⚙️ وضع التطوير: الكود هو ' + code;
-        response.msg_en = '⚙️ Dev mode — code: ' + code;
-        response.dev_code = code;
+        response.msg_ar = '❌ فشل إرسال الرمز لبريدك الإلكتروني، حاول مرة أخرى أو تواصل مع الدعم';
+        response.msg_en = '❌ Failed to send code to your email, try again or contact support';
     }
     res.json(response);
 });
