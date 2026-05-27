@@ -8,13 +8,20 @@ const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DB_FILE = path.join(__dirname, 'database.json');
 const KB_FILE = path.join(__dirname, 'knowledge-base.json');
-const ADMIN_USER = '447051601';
-const ADMIN_PASS = 'AzozS2005519';
 
-const GEMINI_API_KEY = 'AIzaSyDmQrbecOdkcdRL4sfwmhqqk1US869ZnbU';
+const ADMIN_USER = process.env.ADMIN_USER || '447051601';
+const ADMIN_PASS = process.env.ADMIN_PASS || 'AzozS2005519';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'abdulazizsowaankau@gmail.com';
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDmQrbecOdkcdRL4sfwmhqqk1US869ZnbU';
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
+// Database layer (Firestore or JSON file)
+const dbHelper = require('./db');
+const USE_FIRESTORE = dbHelper.USE_FIRESTORE;
+if (USE_FIRESTORE) console.log('Firestore mode enabled');
+else console.log('JSON file mode (no Firestore configured)');
 
 // Security headers & HTTPS Redirect
 app.use((req, res, next) => {
@@ -142,17 +149,6 @@ function cleanExpiredOTPs() {
 }
 setInterval(cleanExpiredOTPs, 60000);
 let chatHistory = {};
-
-function readDB() {
-    if (!fs.existsSync(DB_FILE)) {
-        fs.writeFileSync(DB_FILE, JSON.stringify({ users: [], tasks: {}, schedules: {}, feedback: [], gpaData: {}, savedSchedules: {}, hourglass: {}, absence: {} }, null, 2));
-    }
-    return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-}
-
-function writeDB(data) {
-    fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
-}
 
 function readKB() {
     return JSON.parse(fs.readFileSync(KB_FILE, 'utf8'));
@@ -310,11 +306,12 @@ app.post('/api/register', async (req, res) => {
     if (!se || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(se)) {
         return res.status(400).json({ err_ar: 'البريد الإلكتروني مطلوب', err_en: 'Email is required' });
     }
-    const db = readDB();
-    if (db.users.find(u => u.username === su)) {
+    const existingUser = await dbHelper.findUserByUsername(su);
+    if (existingUser) {
         return res.status(400).json({ err_ar: 'اسم المستخدم مكرر', err_en: 'Username taken' });
     }
-    if (db.users.find(u => u.email && u.email.toLowerCase() === se)) {
+    const existingEmail = await dbHelper.findUserByEmail(se);
+    if (existingEmail) {
         return res.status(400).json({ err_ar: 'البريد مسجل مسبقاً', err_en: 'Email already registered' });
     }
 
@@ -328,6 +325,9 @@ app.post('/api/register', async (req, res) => {
     const expires = Date.now() + 10 * 60 * 1000; // 10 minutes
     const otpKey = 'reg:' + se;
     otpStore[otpKey] = { code, expires, email: se };
+    if (USE_FIRESTORE) {
+        await dbHelper.createOtpCode(se, code, 'register', new Date(Date.now() + 10 * 60 * 1000));
+    }
     regTempStore[se] = { username: su, password: sp, age: parseInt(age), gender, college };
 
     const subject = 'رمز التحقق - جامعة الأمير سطام بن عبدالعزيز';
@@ -381,38 +381,39 @@ PSAU AI Portal`;
     }
 });
 
-app.post('/api/verify-email', (req, res) => {
+app.post('/api/verify-email', async (req, res) => {
     const { email, code } = req.body;
     if (!email || !code) return res.status(400).json({ err_ar: 'أكمل البيانات', err_en: 'Fill all fields' });
     const se = sanitize(email).trim().toLowerCase();
     const sc = sanitize(code).trim();
     if (!/^\d{6}$/.test(sc)) return res.status(400).json({ err_ar: 'الكود 6 أرقام', err_en: 'Code must be 6 digits' });
 
+    // Check in-memory OTP store (works for both modes)
     const otpKey = 'reg:' + se;
     const stored = otpStore[otpKey];
-    if (!stored) return res.status(400).json({ err_ar: 'لم يتم طلب رمز أو انتهت صلاحيته', err_en: 'No code requested or expired' });
-    if (stored.expires < Date.now()) {
-        delete otpStore[otpKey];
-        return res.status(400).json({ err_ar: 'انتهت صلاحية الرمز، اطلب واحداً جديداً', err_en: 'Code expired, request a new one' });
+    if (USE_FIRESTORE) {
+        const fsOtp = await dbHelper.verifyOtpCode(se, sc, 'register');
+        if (!fsOtp && !stored) return res.status(400).json({ err_ar: 'الكود خطأ أو منتهي الصلاحية', err_en: 'Wrong or expired code' });
+    } else {
+        if (!stored) return res.status(400).json({ err_ar: 'لم يتم طلب رمز أو انتهت صلاحيته', err_en: 'No code requested or expired' });
+        if (stored.expires < Date.now()) {
+            delete otpStore[otpKey];
+            return res.status(400).json({ err_ar: 'انتهت صلاحية الرمز، اطلب واحداً جديداً', err_en: 'Code expired, request a new one' });
+        }
+        if (stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
     }
-    if (stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
+    if (stored && stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
 
     // Valid OTP – create user with verified=true
-    delete otpStore[otpKey];
+    if (otpStore[otpKey]) delete otpStore[otpKey];
     const td = regTempStore[se];
     if (!td) return res.status(400).json({ err_ar: 'انتهت الجلسة، أعد التسجيل', err_en: 'Session expired, re-register' });
     delete regTempStore[se];
 
-    const db = readDB();
-    db.users.push({ username: td.username, password: td.password, email: se, age: td.age, gender: td.gender, college: td.college, phone: '', verified: true });
-    db.tasks[td.username] = [];
-    db.schedules[td.username] = [];
-    writeDB(db);
+    await dbHelper.createUser({ username: td.username, password: td.password, email: se, age: td.age, gender: td.gender, college: td.college, phone: '', verified: true });
 
     res.json({ msg_ar: '✅ تم إنشاء الحساب وتوثيقه بنجاح!', msg_en: '✅ Account created and verified!' });
 });
-
-const ADMIN_EMAIL = 'abdulazizsowaankau@gmail.com';
 
 // Admin send OTP code
 app.post('/api/admin/send-code', async (req, res) => {
@@ -493,22 +494,20 @@ app.post('/api/admin/verify-code', (req, res) => {
     res.json({ username: ADMIN_USER, role: 'admin' });
 });
 
-app.post('/api/login', (req, res) => {
+app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
-    const db = readDB();
-    const user = db.users.find(u => u.username === username && u.password === password);
-    if (!user) {
+    const user = await dbHelper.findUserByUsername(sanitize(username));
+    if (!user || user.password !== password) {
         return res.status(400).json({ err_ar: 'البيانات غير صحيحة', err_en: 'Invalid credentials' });
     }
-    res.json({ username, email: user.email, role: 'student', gender: user.gender, verified: !!user.verified });
+    res.json({ username: user.username, email: user.email || '', role: 'student', gender: user.gender || '', verified: !!user.verified });
 });
 
 app.post('/api/forgot-password', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ err_ar: 'البريد الإلكتروني مطلوب', err_en: 'Email required' });
     const se = sanitize(email).trim().toLowerCase();
-    const db = readDB();
-    const user = db.users.find(u => u.email && u.email.toLowerCase() === se);
+    const user = await dbHelper.findUserByEmail(se);
     if (!user) return res.status(404).json({ err_ar: 'لا يوجد حساب بهذا البريد', err_en: 'No account with this email' });
 
     if (!rateLimit('forgot:' + se, 1, 60000)) {
@@ -534,7 +533,7 @@ app.post('/api/forgot-password', async (req, res) => {
     res.json(response);
 });
 
-app.post('/api/reset-password', (req, res) => {
+app.post('/api/reset-password', async (req, res) => {
     const { email, code, newPassword } = req.body;
     if (!email || !code || !newPassword) return res.status(400).json({ err_ar: 'أكمل جميع البيانات', err_en: 'Fill all fields' });
     const se = sanitize(email).trim().toLowerCase();
@@ -552,92 +551,54 @@ app.post('/api/reset-password', (req, res) => {
     if (stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
 
     delete otpStore[otpKey];
-    const db = readDB();
-    const user = db.users.find(u => u.email && u.email.toLowerCase() === se);
-    if (user) user.password = newPassword;
-    writeDB(db);
+    await dbHelper.updateUser(se, { password: newPassword });
 
     res.json({ msg_ar: '✅ تم تغيير كلمة المرور بنجاح!', msg_en: '✅ Password reset successfully!' });
 });
 
-app.post('/api/forgot-verify-identity', (req, res) => {
+app.post('/api/forgot-verify-identity', async (req, res) => {
     const { username, college, age, gender } = req.body;
-    const db = readDB();
-    const user = db.users.find(u =>
-        u.username === sanitize(username) &&
-        u.college === sanitize(college) &&
-        parseInt(u.age) === parseInt(age) &&
-        u.gender === sanitize(gender)
-    );
-    if (user) {
+    const user = await dbHelper.findUserByUsername(sanitize(username));
+    if (user && user.college === sanitize(college) && parseInt(user.age) === parseInt(age) && user.gender === sanitize(gender)) {
         return res.json({ found: true, password: user.password });
     }
     res.json({ found: false });
 });
 
 // ====== FEEDBACK ======
-app.post('/api/feedback', (req, res) => {
+app.post('/api/feedback', async (req, res) => {
     const { username, rating, comment } = req.body;
-    const db = readDB();
-    if (!db.feedback) db.feedback = [];
-    db.feedback.push({ username: sanitize(username), rating: parseInt(rating), comment: sanitize(comment), date: new Date().toISOString() });
-    writeDB(db);
+    await dbHelper.createFeedback({ username: sanitize(username), rating: parseInt(rating), comment: sanitize(comment) });
     console.log('[Feedback] User: ' + username + ' | Rating: ' + rating + '/10 | Msg: ' + comment);
     res.json({ msg_ar: 'شكراً لك! تم استلام ملاحظاتك', msg_en: 'Thank you! Feedback received.' });
 });
 
-app.get('/api/feedback', (req, res) => {
+app.get('/api/feedback', async (req, res) => {
     if (!rateLimit('get-feedback', 30, 60000)) return res.status(429).json({ error: 'rate limit' });
     if (req.query.user !== ADMIN_USER) return res.status(403).json({ error: 'Forbidden' });
-    const db = readDB();
-    res.json(db.feedback || []);
+    const feedback = await dbHelper.findAllFeedback();
+    res.json(feedback);
 });
 
-app.get('/api/admin/feedback', (req, res) => {
+app.get('/api/admin/feedback', async (req, res) => {
     if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
     if (!rateLimit('get-feedback', 30, 60000)) return res.status(429).json({ error: 'rate limit' });
-    const db = readDB();
-    res.json(db.feedback || []);
+    const feedback = await dbHelper.findAllFeedback();
+    res.json(feedback);
 });
 
 // ====== ADMIN STATS ======
 function isAdmin(req) { return req.query.user === ADMIN_USER; }
 
-app.get('/api/admin/stats', (req, res) => {
+app.get('/api/admin/stats', async (req, res) => {
     if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
-    const db = readDB();
-    const users = db.users.length;
-    const tasks = Object.values(db.tasks || {}).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0);
-    const schedules = Object.values(db.schedules || {}).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0);
-    const feedback = (db.feedback || []).length;
-    const males = db.users.filter(u => u.gender === 'طالب' || u.gender === 'male').length;
-    const females = db.users.filter(u => u.gender === 'طالبة' || u.gender === 'female').length;
-    const activeUsers = Object.keys(db.tasks || {}).filter(k => db.tasks[k] && db.tasks[k].length > 0).length;
-    const usersWithSchedules = Object.keys(db.schedules || {}).filter(k => db.schedules[k] && db.schedules[k].length > 0).length;
-    res.json({ users, tasks, schedules, feedback, males, females, activeUsers, usersWithSchedules });
+    const stats = await dbHelper.getAdminStats();
+    res.json(stats);
 });
 
-app.get('/api/admin/users', (req, res) => {
+app.get('/api/admin/users', async (req, res) => {
     if (!isAdmin(req)) return res.status(403).json({ error: 'Forbidden' });
-    const db = readDB();
-    const list = db.users.map(u => {
-        const userTasks = db.tasks[u.username] || [];
-        const totalTasks = userTasks.length;
-        const completedTasks = userTasks.filter(t => t.completed).length;
-        const scheduleCount = (db.schedules[u.username] || []).length;
-        return {
-            username: u.username,
-            password: u.password,
-            email: u.email || '',
-            age: u.age,
-            gender: u.gender,
-            college: u.college,
-            scheduleCount,
-            taskCount: totalTasks,
-            completedCount: completedTasks,
-            completionPct: totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0
-        };
-    });
+    const list = await dbHelper.getAdminUsersList();
     res.json(list);
 });
 
@@ -645,226 +606,197 @@ app.get('/api/is-admin', (req, res) => {
     res.json({ admin: req.query.role === 'admin' });
 });
 
-app.get('/api/users/:username/gender', (req, res) => {
-    const db = readDB();
-    const user = db.users.find(u => u.username === req.params.username);
+app.get('/api/users/:username/gender', async (req, res) => {
+    const user = await dbHelper.findUserByUsername(req.params.username);
     if (user) return res.json({ gender: user.gender });
     res.json({ gender: null });
 });
 
 // ====== TASKS ======
-app.get('/api/tasks/:username', (req, res) => {
-    const db = readDB();
-    res.json(db.tasks[req.params.username] || []);
+app.get('/api/tasks/:username', async (req, res) => {
+    const tasks = await dbHelper.findTasks(req.params.username);
+    res.json(tasks);
 });
 
-app.post('/api/tasks/:username', (req, res) => {
+app.post('/api/tasks/:username', async (req, res) => {
     const { username } = req.params;
     const { text, description, course, type, priority } = req.body;
-    const db = readDB();
-    if (!db.tasks[username]) db.tasks[username] = [];
-    db.tasks[username].push({ text: sanitize(text), description: sanitize(description || ''), course: sanitize(course || ''), type: sanitize(type), priority: sanitize(priority), completed: false });
-    writeDB(db);
+    await dbHelper.createTask(username, { text: sanitize(text), description: sanitize(description || ''), course: sanitize(course || ''), type: sanitize(type), priority: sanitize(priority) });
     res.json({ success: true });
 });
 
-app.patch('/api/tasks/:username/:index/toggle', (req, res) => {
+app.patch('/api/tasks/:username/:index/toggle', async (req, res) => {
     const { username, index } = req.params;
-    const db = readDB();
-    if (db.tasks[username] && db.tasks[username][index]) {
-        db.tasks[username][index].completed = !db.tasks[username][index].completed;
-        writeDB(db);
-        res.json({ success: true, completed: db.tasks[username][index].completed });
+    const completed = await dbHelper.toggleTask(username, index);
+    if (completed !== null) {
+        res.json({ success: true, completed });
     } else {
         res.status(404).json({ error: 'Task not found' });
     }
 });
 
-app.delete('/api/tasks/:username/:index', (req, res) => {
+app.delete('/api/tasks/:username/:index', async (req, res) => {
     const { username, index } = req.params;
-    const db = readDB();
-    if (db.tasks[username]) db.tasks[username].splice(index, 1);
-    writeDB(db);
+    await dbHelper.deleteTask(username, index);
     res.json({ success: true });
 });
 
 // ====== SCHEDULE ======
-app.get('/api/schedule/:username', (req, res) => {
-    const db = readDB();
-    const list = db.schedules[req.params.username] || [];
-    let changed = false;
-    list.forEach(s => {
-        if (!s._id) { s._id = Date.now().toString(36) + Math.random().toString(36).slice(2,6); changed = true; }
-    });
-    if (changed) writeDB(db);
+app.get('/api/schedule/:username', async (req, res) => {
+    const list = await dbHelper.findSchedules(req.params.username);
     res.json(list);
 });
 
-app.post('/api/schedule/:username', (req, res) => {
+app.post('/api/schedule/:username', async (req, res) => {
     const { username } = req.params;
-    const db = readDB();
-    if (!db.schedules[username]) db.schedules[username] = [];
-    const entry = { ...req.body, _id: Date.now().toString(36) + Math.random().toString(36).slice(2,6) };
-    db.schedules[username].push(entry);
-    writeDB(db);
-    res.json({ success: true, _id: entry._id });
+    const entry = { ...req.body };
+    const id = await dbHelper.createSchedule(username, entry);
+    res.json({ success: true, _id: id });
 });
 
-app.delete('/api/schedule/:username/:_id', (req, res) => {
+app.delete('/api/schedule/:username/:_id', async (req, res) => {
     const { username, _id } = req.params;
-    const db = readDB();
-    if (db.schedules[username]) {
-        db.schedules[username] = db.schedules[username].filter(s => s._id !== _id);
-    }
-    writeDB(db);
+    await dbHelper.deleteSchedule(username, _id);
     res.json({ success: true });
 });
 
 // ====== GPA DATA ======
-app.get('/api/gpa-data/:username', (req, res) => {
-    const db = readDB();
-    if (!db.gpaData) db.gpaData = {};
-    res.json(db.gpaData[req.params.username] || []);
+app.get('/api/gpa-data/:username', async (req, res) => {
+    const data = await dbHelper.findGpaData(req.params.username);
+    res.json(data);
 });
 
-app.post('/api/gpa-data/:username', (req, res) => {
+app.post('/api/gpa-data/:username', async (req, res) => {
     const { username } = req.params;
     const { rows } = req.body;
-    const db = readDB();
-    if (!db.gpaData) db.gpaData = {};
-    db.gpaData[username] = (rows || []).map(r => ({
-        course: sanitize(r.course || ''),
-        hours: parseInt(r.hours) || 0,
-        grade: parseFloat(r.grade) || 0
-    }));
-    writeDB(db);
+    await dbHelper.saveGpaData(username, rows || []);
     res.json({ success: true });
 });
 
 // ====== SAVED SCHEDULES ======
-app.get('/api/saved-schedules/:username', (req, res) => {
-    const db = readDB();
-    if (!db.savedSchedules) db.savedSchedules = {};
-    res.json(db.savedSchedules[req.params.username] || []);
+app.get('/api/saved-schedules/:username', async (req, res) => {
+    const data = await dbHelper.findSavedSchedules(req.params.username);
+    res.json(data);
 });
 
-app.post('/api/saved-schedules/:username', (req, res) => {
+app.post('/api/saved-schedules/:username', async (req, res) => {
     const { username } = req.params;
     const { name, data } = req.body;
     if (!name || !data) return res.status(400).json({ err_ar: 'الاسم والبيانات مطلوبة', err_en: 'Name and data required' });
-    const db = readDB();
-    if (!db.savedSchedules) db.savedSchedules = {};
-    if (!db.savedSchedules[username]) db.savedSchedules[username] = [];
-    db.savedSchedules[username].push({ id: Date.now().toString(), name: sanitize(name), data, savedAt: new Date().toISOString() });
-    writeDB(db);
+    await dbHelper.createSavedSchedule(username, sanitize(name), data);
     res.json({ success: true });
 });
 
-app.delete('/api/saved-schedules/:username/:id', (req, res) => {
+app.delete('/api/saved-schedules/:username/:id', async (req, res) => {
     const { username, id } = req.params;
-    const db = readDB();
-    if (!db.savedSchedules) db.savedSchedules = {};
-    if (db.savedSchedules[username]) {
-        db.savedSchedules[username] = db.savedSchedules[username].filter(s => s.id !== id);
-    }
-    writeDB(db);
+    await dbHelper.deleteSavedSchedule(username, id);
     res.json({ success: true });
 });
 
 // ====== ABSENCE DATA ======
-app.get('/api/absence/:username', (req, res) => {
-    const db = readDB();
-    if (!db.absence) db.absence = {};
-    res.json(db.absence[req.params.username] || []);
+app.get('/api/absence/:username', async (req, res) => {
+    const data = await dbHelper.findAbsence(req.params.username);
+    res.json(data);
 });
 
-app.post('/api/absence/:username', (req, res) => {
+app.post('/api/absence/:username', async (req, res) => {
     const { username } = req.params;
     const { name, weekly, absent } = req.body;
     if (!name || weekly == null || absent == null) return res.status(400).json({ err_ar: 'أكمل البيانات', err_en: 'Complete data' });
-    const db = readDB();
-    if (!db.absence) db.absence = {};
-    if (!db.absence[username]) db.absence[username] = [];
-    db.absence[username].push({ id: Date.now().toString(), name: sanitize(name), weekly: parseFloat(weekly), absent: parseFloat(absent) });
-    writeDB(db);
+    await dbHelper.createAbsence(username, { name: sanitize(name), weekly: parseFloat(weekly), absent: parseFloat(absent) });
     res.json({ success: true });
 });
 
-app.patch('/api/absence/:username/:id', (req, res) => {
+app.patch('/api/absence/:username/:id', async (req, res) => {
     const { username, id } = req.params;
     const { absent } = req.body;
-    const db = readDB();
-    if (!db.absence) db.absence = {};
-    if (db.absence[username]) {
-        const idx = db.absence[username].findIndex(a => a.id === id);
-        if (idx !== -1) {
-            db.absence[username][idx].absent = parseFloat(absent);
-        }
-    }
-    writeDB(db);
+    await dbHelper.updateAbsence(username, id, { absent: parseFloat(absent) });
     res.json({ success: true });
 });
 
-app.delete('/api/absence/:username/:id', (req, res) => {
+app.delete('/api/absence/:username/:id', async (req, res) => {
     const { username, id } = req.params;
-    const db = readDB();
-    if (!db.absence) db.absence = {};
-    if (db.absence[username]) {
-        db.absence[username] = db.absence[username].filter(a => a.id !== id);
-    }
-    writeDB(db);
+    await dbHelper.deleteAbsence(username, id);
     res.json({ success: true });
 });
 
 // ====== HOURGLASS (COUNTDOWN) ======
-app.get('/api/hourglass/:username', (req, res) => {
-    const db = readDB();
-    if (!db.hourglass) db.hourglass = {};
-    res.json(db.hourglass[req.params.username] || []);
+app.get('/api/hourglass/:username', async (req, res) => {
+    const data = await dbHelper.findHourglass(req.params.username);
+    res.json(data);
 });
 
-app.post('/api/hourglass/:username', (req, res) => {
+app.post('/api/hourglass/:username', async (req, res) => {
     const { username } = req.params;
     const { name, targetDate } = req.body;
     if (!name || !targetDate) return res.status(400).json({ err_ar: 'الاسم والتاريخ مطلوبان', err_en: 'Name and date required' });
-    const db = readDB();
-    if (!db.hourglass) db.hourglass = {};
-    if (!db.hourglass[username]) db.hourglass[username] = [];
-    db.hourglass[username].push({ id: Date.now().toString(), name: sanitize(name), targetDate });
-    writeDB(db);
+    await dbHelper.createHourglass(username, sanitize(name), targetDate);
     res.json({ success: true });
 });
 
-app.delete('/api/hourglass/:username/:id', (req, res) => {
+app.delete('/api/hourglass/:username/:id', async (req, res) => {
     const { username, id } = req.params;
-    const db = readDB();
-    if (!db.hourglass) db.hourglass = {};
-    if (db.hourglass[username]) {
-        db.hourglass[username] = db.hourglass[username].filter(h => h.id !== id);
+    await dbHelper.deleteHourglass(username, id);
+    res.json({ success: true });
+});
+
+// ====== COURSES (new) ======
+app.get('/api/courses/:username', async (req, res) => {
+    const courses = await dbHelper.findCourses(req.params.username);
+    res.json(courses.map(c => c.name || c));
+});
+
+app.post('/api/courses/:username', async (req, res) => {
+    const { username } = req.params;
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ error: 'Name required' });
+    try {
+        await dbHelper.createCourse(username, sanitize(name));
+        res.json({ success: true });
+    } catch (e) {
+        res.status(400).json({ err_ar: 'المقرر مضاف', err_en: 'Course exists' });
     }
-    writeDB(db);
+});
+
+app.delete('/api/courses/:username/:index', async (req, res) => {
+    const { username, index } = req.params;
+    await dbHelper.deleteCourse(username, index);
     res.json({ success: true });
 });
 
 // ====== SETTINGS ======
-app.post('/api/settings/update', (req, res) => {
+app.post('/api/settings/update', async (req, res) => {
     const { currentUsername, newUsername, newPassword, newEmail } = req.body;
-    const db = readDB();
-    const userIndex = db.users.findIndex(u => u.username === currentUsername);
-    if (userIndex === -1) return res.status(404).json({ err_ar: 'خطأ', err_en: 'Error' });
+    const user = await dbHelper.findUserByUsername(currentUsername);
+    if (!user) return res.status(404).json({ err_ar: 'خطأ', err_en: 'Error' });
+
     if (newUsername && newUsername !== currentUsername) {
-        if (db.users.find(u => u.username === newUsername)) {
-            return res.status(400).json({ err_ar: 'مأخوذ', err_en: 'Taken' });
+        const existing = await dbHelper.findUserByUsername(newUsername);
+        if (existing) return res.status(400).json({ err_ar: 'مأخوذ', err_en: 'Taken' });
+        await dbHelper.renameUserTasks(currentUsername, newUsername);
+        await dbHelper.renameUserSchedules(currentUsername, newUsername);
+        await dbHelper.renameUserCourses(currentUsername, newUsername);
+        await dbHelper.updateUser(currentUsername, { username: newUsername });
+        if (USE_FIRESTORE) {
+            // Firestore: create new doc with new username, delete old
+            const userData = await dbHelper.findUserByUsername(currentUsername);
+            if (userData) {
+                await dbHelper.createUser({ ...userData, username: newUsername });
+                await dbHelper.deleteUser(currentUsername);
+            }
         }
-        db.tasks[newUsername] = db.tasks[currentUsername];
-        db.schedules[newUsername] = db.schedules[currentUsername];
-        delete db.tasks[currentUsername];
-        delete db.schedules[currentUsername];
-        db.users[userIndex].username = newUsername;
     }
-    if (newPassword) db.users[userIndex].password = newPassword;
-    writeDB(db);
-    res.json({ updatedUsername: db.users[userIndex].username });
+
+    const targetUsername = newUsername || currentUsername;
+    if (newPassword) await dbHelper.updateUser(targetUsername, { password: newPassword });
+    if (newEmail) {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+            return res.status(400).json({ err_ar: 'البريد غير صالح', err_en: 'Invalid email' });
+        }
+        await dbHelper.updateUser(targetUsername, { email: sanitize(newEmail).toLowerCase(), verified: false });
+    }
+
+    res.json({ updatedUsername: targetUsername });
 });
 
 // Send OTP to new email for email change
@@ -896,7 +828,7 @@ app.post('/api/settings/send-new-email-code', async (req, res) => {
 });
 
 // Verify OTP and update email
-app.post('/api/settings/verify-new-email', (req, res) => {
+app.post('/api/settings/verify-new-email', async (req, res) => {
     const { username, code } = req.body;
     if (!username || !code) return res.status(400).json({ err_ar: 'أكمل البيانات', err_en: 'Fill all fields' });
     const su = sanitize(username);
@@ -911,22 +843,18 @@ app.post('/api/settings/verify-new-email', (req, res) => {
     }
     if (stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
     delete otpStore[otpKey];
-    const db = readDB();
-    const user = db.users.find(u => u.username === su);
+    const user = await dbHelper.findUserByUsername(su);
     if (!user) return res.status(404).json({ err_ar: 'المستخدم غير موجود', err_en: 'User not found' });
-    user.email = stored.newEmail;
-    if (user.verified) user.verified = false;
-    writeDB(db);
+    await dbHelper.updateUser(su, { email: stored.newEmail, verified: false });
     res.json({ msg_ar: '✅ تم تحديث البريد بنجاح', msg_en: '✅ Email updated successfully' });
 });
 
-app.post('/api/settings/delete', (req, res) => {
+app.post('/api/settings/delete', async (req, res) => {
     const { username } = req.body;
-    let db = readDB();
-    db.users = db.users.filter(u => u.username !== username);
-    delete db.tasks[username];
-    delete db.schedules[username];
-    writeDB(db);
+    await dbHelper.deleteUserTasks(username);
+    await dbHelper.deleteUserSchedules(username);
+    await dbHelper.deleteUserCourses(username);
+    await dbHelper.deleteUser(username);
     res.json({ success: true });
 });
 
@@ -936,8 +864,7 @@ app.post('/api/settings/delete', (req, res) => {
 app.post('/api/verify-request', async (req, res) => {
     const { username } = req.body;
     if (!username) return res.status(400).json({ err_ar: 'اسم المستخدم مطلوب', err_en: 'Username required' });
-    const db = readDB();
-    const user = db.users.find(u => u.username === sanitize(username));
+    const user = await dbHelper.findUserByUsername(sanitize(username));
     if (!user) return res.status(404).json({ err_ar: 'المستخدم غير موجود', err_en: 'User not found' });
     if (!user.email) return res.status(400).json({ err_ar: 'لا يوجد بريد إلكتروني مسجل', err_en: 'No email registered' });
     if (user.verified) return res.json({ msg_ar: 'الحساب موثق مسبقاً', msg_en: 'Already verified', already: true });
@@ -966,7 +893,7 @@ app.post('/api/verify-request', async (req, res) => {
 });
 
 // Confirm OTP – verify the code
-app.post('/api/verify-confirm', (req, res) => {
+app.post('/api/verify-confirm', async (req, res) => {
     const { username, code } = req.body;
     if (!username || !code) return res.status(400).json({ err_ar: 'أكمل البيانات', err_en: 'Fill all fields' });
     const su = sanitize(username);
@@ -984,19 +911,13 @@ app.post('/api/verify-confirm', (req, res) => {
 
     // Success – mark user as verified
     delete otpStore[key];
-    const db = readDB();
-    const user = db.users.find(u => u.username === su);
-    if (user) {
-        user.verified = true;
-        writeDB(db);
-    }
+    await dbHelper.updateUser(su, { verified: true });
     res.json({ msg_ar: '✅ تم توثيق الحساب بنجاح!', msg_en: '✅ Account verified successfully!' });
 });
 
 // Check verification status
-app.get('/api/user/:username/verified', (req, res) => {
-    const db = readDB();
-    const user = db.users.find(u => u.username === sanitize(req.params.username));
+app.get('/api/user/:username/verified', async (req, res) => {
+    const user = await dbHelper.findUserByUsername(sanitize(req.params.username));
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json({ verified: !!user.verified, email: user.email || '' });
 });
@@ -1008,17 +929,17 @@ app.post('/api/chat', async (req, res) => {
     const kb = readKB();
     const reply = await askGemini(message, kb);
     if (username) {
-        if (!chatHistory[username]) chatHistory[username] = [];
-        if (chatHistory[username].length > 50) chatHistory[username] = chatHistory[username].slice(-50);
-        chatHistory[username].push({ role: 'user', message });
-        chatHistory[username].push({ role: 'assistant', message: reply });
+        await dbHelper.addChatMessage(username, 'user', message);
+        await dbHelper.addChatMessage(username, 'assistant', reply);
     }
     res.json({ reply_ar: reply, reply_en: reply, reply });
 });
 
-app.post('/api/chat/history', (req, res) => {
+app.post('/api/chat/history', async (req, res) => {
     const { username } = req.body;
-    res.json(username && chatHistory[username] ? chatHistory[username] : []);
+    if (!username) return res.json([]);
+    const history = await dbHelper.getChatHistory(username);
+    res.json(history);
 });
 
 app.listen(PORT, () => {
