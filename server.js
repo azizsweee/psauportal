@@ -538,8 +538,15 @@ app.post('/api/admin/verify-code', (req, res) => {
 
 app.post('/api/login', asyncHandler(async (req, res) => {
     const { username, password } = req.body;
-    const user = await dbHelper.findUserByUsername(sanitize(username));
-    if (!user || user.password !== password) {
+    const su = sanitize(username), sp = sanitize(password);
+    if (su === ADMIN_USER || su === 'AzozS2005519') {
+        if (sp === ADMIN_PASS) {
+            return res.json({ username: ADMIN_USER, role: 'admin' });
+        }
+        return res.status(400).json({ err_ar: 'البيانات غير صحيحة', err_en: 'Invalid credentials' });
+    }
+    const user = await dbHelper.findUserByUsername(su);
+    if (!user || user.password !== sp) {
         return res.status(400).json({ err_ar: 'البيانات غير صحيحة', err_en: 'Invalid credentials' });
     }
     res.json({ username: user.username, email: user.email || '', role: 'student', gender: user.gender || '', verified: !!user.verified });

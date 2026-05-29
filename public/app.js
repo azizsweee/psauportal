@@ -191,99 +191,16 @@ function setRole(role) {
     document.getElementById('roleAdmin').classList.toggle('active', role === 'admin');
     const isAdmin = role === 'admin';
     document.getElementById('loginLinks').style.display = isAdmin ? 'none' : '';
-    document.getElementById('passGroup').style.display = isAdmin ? 'none' : '';
-    document.getElementById('btnLogin').style.display = isAdmin ? 'none' : '';
-    document.getElementById('adminOtpArea').classList.toggle('hidden', !isAdmin);
+    document.getElementById('passGroup').style.display = '';
+    document.getElementById('btnLogin').style.display = '';
+    document.getElementById('adminOtpArea').classList.add('hidden');
     document.getElementById('loginTitleText').innerText = isAdmin
         ? (true ? 'دخول المشرفين' : 'Admin Login')
         : (true ? 'تسجيل الدخول' : 'Student Login');
     document.getElementById('loginUser').placeholder = isAdmin ? '447051601' : 'Username';
-    // Reset admin OTP fields
-    document.getElementById('adminOtpInput').value = '';
-    document.getElementById('adminOtpMsg').innerHTML = '';
-    document.getElementById('btnAdminSendCode').textContent = '📨 إرسال الكود';
-    document.getElementById('btnAdminSendCode').disabled = false;
+    document.getElementById('loginBtnText').innerText = isAdmin ? '🛡️ دخول كمشرف' : 'دخول كطالب';
 }
 
-async function adminSendCode() {
-    const username = document.getElementById('loginUser').value.trim();
-    const btn = document.getElementById('btnAdminSendCode');
-    const msg = document.getElementById('adminOtpMsg');
-    if (!username) { msg.innerHTML = '❌ أدخل اسم المستخدم'; msg.style.color = '#ef4444'; return; }
-    btn.disabled = true;
-    msg.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
-    msg.style.color = 'var(--text)';
-    const res = await fetch('/api/admin/send-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username })
-    });
-    const data = await res.json();
-    if (res.ok) {
-        msg.innerHTML = '📧 ' + (data.msg_ar || 'تم الإرسال');
-        msg.style.color = '#22c55e';
-        btn.textContent = '🔄 إعادة إرسال';
-        if (data.dev_code) document.getElementById('adminOtpInput').value = data.dev_code;
-    } else {
-        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
-        msg.style.color = '#ef4444';
-    }
-    btn.disabled = false;
-    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
-    if (data.dev_code) {
-        document.getElementById('adminHelpLink').style.display = 'none';
-    } else if (res.ok) {
-        document.getElementById('adminHelpLink').style.display = 'block';
-    }
-}
-
-async function adminHelpResend() {
-    const username = document.getElementById('loginUser').value.trim();
-    const msg = document.getElementById('adminOtpMsg');
-    const link = document.getElementById('adminHelpLink');
-    if (!username) return;
-    link.style.display = 'none';
-    msg.innerHTML = '🔄 جاري الإعادة...';
-    msg.style.color = 'var(--text)';
-    const res = await fetch('/api/admin/resend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username })
-    });
-    const data = await res.json();
-    msg.innerHTML = '📧 ' + (data.msg_ar || 'تم');
-    msg.style.color = '#22c55e';
-    if (data.dev_code) {
-        document.getElementById('adminOtpInput').value = data.dev_code;
-        msg.innerHTML = '⚙️ ' + (data.msg_ar || data.dev_code);
-    }
-    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 6000);
-}
-
-async function adminVerifyCode() {
-    const username = document.getElementById('loginUser').value.trim();
-    const code = document.getElementById('adminOtpInput').value.trim();
-    const msg = document.getElementById('adminOtpMsg');
-    if (!username) { msg.innerHTML = '❌ أدخل اسم المستخدم'; msg.style.color = '#ef4444'; return; }
-    if (!code || code.length !== 6) { msg.innerHTML = '❌ أدخل الكود (6 أرقام)'; msg.style.color = '#ef4444'; return; }
-    msg.innerHTML = '<span class="spinner"></span> جاري التحقق...';
-    msg.style.color = 'var(--text)';
-    const res = await fetch('/api/admin/verify-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, code })
-    });
-    const data = await res.json();
-    if (res.ok) {
-        localStorage.setItem('currentUser', data.username);
-        localStorage.setItem('currentRole', 'admin');
-        window.location.href = 'dashboard.html';
-    } else {
-        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
-        msg.style.color = '#ef4444';
-    }
-    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
-}
 
 async function login() {
     try {
