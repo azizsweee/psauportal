@@ -91,7 +91,7 @@ let mailFromAddr = null;
 
 function initTransporter() {
     const makeTransporter = (host, port, user, pass) => nodemailer.createTransport({
-        host, port: parseInt(port), secure: port === 465,
+        host, port: parseInt(port), secure: parseInt(port) === 465,
         auth: { user, pass },
         tls: { rejectUnauthorized: false },
         connectionTimeout: 8000,
