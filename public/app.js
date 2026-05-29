@@ -1,4 +1,5 @@
 console.log('PSAU app.js loaded');
+var currentRole = 'student';
 const translations = {
     ar: {
         logoText: "جامعة الأمير سطام بن عبدالعزيز",
