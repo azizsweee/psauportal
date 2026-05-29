@@ -91,12 +91,16 @@ async function registerStudent() {
     try {
     const username = document.getElementById('regUser').value.trim();
     const password = document.getElementById('regPass').value;
-    const email = document.getElementById('regEmail').value.trim();
+    const passConfirm = document.getElementById('regPassConfirm').value;
     const age = document.getElementById('regAge').value;
     const gender = document.getElementById('regGender').value;
     const college = document.getElementById('regCollege').value;
-    if (!username || !password || !email || !age || !gender || !college) {
+    if (!username || !password || !passConfirm || !age || !gender || !college) {
         alert(true ? 'أكمل جميع البيانات!' : 'Fill all fields!');
+        return;
+    }
+    if (password !== passConfirm) {
+        alert(true ? 'كلمة المرور غير متطابقة!' : 'Passwords do not match!');
         return;
     }
     if (username.length < 4 || !/^[a-zA-Z0-9]+$/.test(username)) {
@@ -110,80 +114,19 @@ async function registerStudent() {
     const res = await fetch('/api/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, email, age, gender, college })
+        body: JSON.stringify({ username, password, age, gender, college })
     });
     const data = await res.json();
     if (res.ok) {
-        document.getElementById('regOtpArea').classList.remove('hidden');
-        document.getElementById('regSubmitArea').classList.add('hidden');
-        document.getElementById('regOtpMsg').innerHTML = '📧 ' + (data.msg_ar || 'تم إرسال الرمز');
-        document.getElementById('regOtpEmail').value = email;
-        document.getElementById('regHelpLink').style.display = 'block';
-        if (data.dev_code) {
-            document.getElementById('regOtpInput').value = data.dev_code;
-        }
+        localStorage.setItem('currentUser', username);
+        localStorage.setItem('currentRole', 'student');
+        if (gender) localStorage.setItem('userGender', gender);
+        window.location.href = 'dashboard.html';
     } else {
         alert(true ? data.err_ar : data.err_en);
     }
     } catch(e) { alert('Register error: ' + e.message); }
 }
-
-async function regHelpResend() {
-    const email = document.getElementById('regOtpEmail').value;
-    const msg = document.getElementById('regOtpMsg');
-    const link = document.getElementById('regHelpLink');
-    if (!email) return;
-    link.style.display = 'none';
-    msg.innerHTML = '🔄 جاري إعادة الإرسال...';
-    const res = await fetch('/api/reg-resend', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email })
-    });
-    const data = await res.json();
-    msg.innerHTML = '📧 ' + (data.msg_ar || 'تم');
-    if (data.dev_code) {
-        document.getElementById('regOtpInput').value = data.dev_code;
-    }
-}
-
-function resendRegOtp() {
-    document.getElementById('regOtpMsg').innerHTML = '🔄 جاري إعادة الإرسال...';
-    registerStudent();
-}
-
-function editRegEmail() {
-    document.getElementById('regOtpArea').classList.add('hidden');
-    document.getElementById('regSubmitArea').classList.remove('hidden');
-    document.getElementById('regOtpMsg').innerHTML = '...';
-    document.getElementById('regOtpInput').value = '';
-    document.getElementById('regEmail').focus();
-}
-
-async function verifyEmailOtp() {
-    const email = document.getElementById('regOtpEmail').value;
-    const code = document.getElementById('regOtpInput').value.trim();
-    const msg = document.getElementById('regOtpMsg');
-    if (!code || code.length !== 6) {
-        msg.innerHTML = '❌ أدخل 6 أرقام';
-        return;
-    }
-    msg.innerHTML = '<span class="spinner"></span> جاري التحقق...';
-    const res = await fetch('/api/verify-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code })
-    });
-    const data = await res.json();
-    if (res.ok) {
-        msg.innerHTML = '✅ ' + (data.msg_ar || 'تم التوثيق!');
-        setTimeout(() => { toggleCard('loginCard'); }, 1500);
-    } else {
-        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
-    }
-}
-
-let currentRole = 'student';
 
 function setRole(role) {
     currentRole = role;

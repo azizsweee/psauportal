@@ -117,10 +117,10 @@
                 </div>
             </div>
             <div class="form-group">
-                <label id="lblRegEmail">البريد الإلكتروني (Gmail)</label>
+                <label>تأكيد كلمة المرور</label>
                 <div class="input-wrap">
-                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                    <input type="email" id="regEmail" placeholder="example@gmail.com" style="direction:ltr;text-align:left;">
+                    <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    <input type="password" id="regPassConfirm" placeholder="••••••••">
                 </div>
             </div>
                 <div style="display:flex;gap:10px;">
@@ -162,21 +162,6 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
                 إنشاء الحساب
             </button>
-            </div>
-            <div id="regOtpArea" class="hidden" style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
-                <input type="hidden" id="regOtpEmail">
-                <p style="font-size:13px;color:var(--text-muted);margin-bottom:10px;" id="regOtpMsg">...</p>
-                <div style="font-size:12px;color:var(--accent);margin-bottom:8px;cursor:pointer;display:none;" id="regHelpLink" onclick="regHelpResend()">🔑 لم يصلك الكود؟ اضغط هنا</div>
-                <div class="form-group">
-                    <label>رمز التحقق (6 أرقام)</label>
-                    <input type="text" id="regOtpInput" maxlength="6" placeholder="000000" style="text-align:center;letter-spacing:6px;font-size:18px;direction:ltr;background:var(--surface-2);color:white;border:1px solid var(--border);border-radius:10px;padding:12px;width:100%;">
-                </div>
-                <button class="btn btn-primary" onclick="verifyEmailOtp()" style="width:100%;">✅ توثيق</button>
-                <div style="display:flex;gap:8px;margin-top:10px;">
-                    <button class="btn btn-sm" onclick="resendRegOtp()" style="flex:1;">🔄 إعادة إرسال</button>
-                    <button class="btn btn-sm" onclick="editRegEmail()" style="flex:1;">✏️ تعديل البريد</button>
-                </div>
-            </div>
             </div>
             <div class="links">
                 <a href="#" id="linkBack" onclick="toggleCard('loginCard')">رجوع لتسجيل الدخول</a>

@@ -338,62 +338,20 @@ ${faqList}
 const regTempStore = {};
 
 app.post('/api/register', asyncHandler(async (req, res) => {
-    const { username, password, age, gender, college, email } = req.body;
+    const { username, password, age, gender, college } = req.body;
     const su = sanitize(username), sp = sanitize(password);
-    const se = email ? sanitize(email).trim().toLowerCase() : '';
     if (!su || !sp || !age || !gender || !college) {
         return res.status(400).json({ err_ar: 'أكمل جميع البيانات', err_en: 'Fill all fields' });
     }
     if (isNaN(age) || age < 15 || age > 80) {
         return res.status(400).json({ err_ar: 'العمر غير صالح', err_en: 'Invalid age' });
     }
-    if (!se || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(se)) {
-        return res.status(400).json({ err_ar: 'البريد الإلكتروني مطلوب', err_en: 'Email is required' });
-    }
     const existingUser = await dbHelper.findUserByUsername(su);
     if (existingUser) {
         return res.status(400).json({ err_ar: 'اسم المستخدم مكرر', err_en: 'Username taken' });
     }
-    const existingEmail = await dbHelper.findUserByEmail(se);
-    if (existingEmail) {
-        return res.status(400).json({ err_ar: 'البريد مسجل مسبقاً', err_en: 'Email already registered' });
-    }
-
-    // Rate limit: max 1 OTP per 60 seconds per email
-    if (!rateLimit('reg:' + se, 1, 60000)) {
-        return res.status(429).json({ err_ar: 'انتظر دقيقة قبل طلب رمز جديد', err_en: 'Wait 1 min before new code' });
-    }
-
-    // Generate OTP and store temp data
-    const code = generateOTP();
-    const expires = Date.now() + 10 * 60 * 1000; // 10 minutes
-    const otpKey = 'reg:' + se;
-    otpStore[otpKey] = { code, expires, email: se };
-    if (USE_FIRESTORE) {
-        await dbHelper.createOtpCode(se, code, 'register', new Date(Date.now() + 10 * 60 * 1000));
-    }
-    regTempStore[se] = { username: su, password: sp, age: parseInt(age), gender, college };
-
-    const subject = 'رمز التحقق - جامعة الأمير سطام بن عبدالعزيز';
-    const text = `مرحباً ${su},
-رمز التحقق للتسجيل في بوابة جامعة الأمير سطام بن عبدالعزيز هو:
-${code}
-صلاحية هذا الرمز 10 دقائق.
-إذا لم تطلب هذا، تجاهل الرسالة.
-
-PSAU AI Portal`;
-    const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;padding:20px;background:#f5f5f5"><div style="max-width:480px;margin:auto;background:white;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><div style="text-align:center;margin-bottom:20px"><h2 style="color:#1a237e;margin:0">جامعة الأمير سطام بن عبدالعزيز</h2><p style="color:#666">بوابة طلابية ذكية</p></div><hr style="border:none;border-top:1px solid #eee"><p style="font-size:16px;color:#333">مرحباً <b>${su}</b>،</p><p style="font-size:16px;color:#333">رمز التحقق الخاص بك هو:</p><div style="text-align:center;margin:25px 0;padding:15px;background:#e8eaf6;border-radius:8px;direction:ltr"><span style="font-size:36px;font-weight:bold;color:#1a237e;letter-spacing:8px">${code}</span></div><p style="font-size:14px;color:#999">صلاحية هذا الرمز <b>10 دقائق</b>. إذا لم تطلب هذا، تجاهل الرسالة.</p><hr style="border:none;border-top:1px solid #eee"><p style="font-size:12px;color:#aaa;text-align:center">PSAU AI Portal &bull; بوابة غير رسمية</p></div></body></html>`;
-
-    const emailSent = await sendOrLogEmail(se, subject, text, html);
-
-    const response = { msg_ar: 'تم إرسال الرمز إلى بريدك', msg_en: 'Code sent to your email', email: se.replace(/(.{3})(.*)(@.*)/, (_, a, b, c) => a + '*'.repeat(b.length) + c) };
-    if (!emailSent) {
-        response.msg_ar = '❌ فشل إرسال البريد الإلكتروني، حاول مرة أخرى';
-        response.msg_en = '❌ Failed to send email, try again';
-        response.dev_code = code;
-    }
-    if (process.env.DEV_MODE === 'true') response.dev_code = code;
-    res.json(response);
+    const user = await dbHelper.createUser({ username: su, password: sp, age: parseInt(age), gender, college });
+    res.json({ username: su, msg_ar: 'تم إنشاء الحساب بنجاح', msg_en: 'Account created' });
 }));
 
 // Resend OTP for registration (with rate limit bypass for help)
