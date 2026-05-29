@@ -724,55 +724,6 @@
 
                 <button class="btn btn-primary" onclick="updateSettings()">💾 حفظ التحديث</button>
             </div>
-            <div class="card tech-card">
-                <div class="card-glow"></div>
-                <h4>📧 توثيق البريد الإلكتروني</h4>
-                <p style="color:var(--text-muted);font-size:13px;margin-bottom:12px;">ربط حسابك ببريد Gmail وتوثيقه لزيادة الأمان</p>
-                <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
-                    <span id="verifyBadge" class="verify-badge not-verified">⚠️ <span id="lblNotVerified">غير موثق</span></span>
-                    <span style="font-size:13px;color:var(--text-muted);" id="verifyEmail"></span>
-                    <button class="btn btn-sm" onclick="toggleEmailChange()" style="font-size:12px;padding:4px 10px;">✏️ تغيير البريد</button>
-                </div>
-                <div id="emailChangeArea" class="hidden" style="margin-bottom:12px;padding:10px;background:var(--surface-2);border-radius:10px;">
-                    <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;">البريد الإلكتروني الجديد</label>
-                    <div style="display:flex;gap:8px;">
-                        <input type="email" id="newVerifyEmail" placeholder="newemail@gmail.com" style="flex:1;direction:ltr;text-align:left;background:var(--bg);color:white;border:1px solid var(--border);border-radius:8px;padding:10px;">
-                        <button class="btn btn-primary" id="saveEmailBtn" onclick="saveNewEmail()" style="white-space:nowrap;">📨 إرسال الرمز</button>
-                    </div>
-                    <div id="emailCodeArea" class="hidden" style="margin-top:10px;">
-                        <label style="font-size:12px;color:var(--text-muted);display:block;margin-bottom:6px;">أدخل الرمز المرسل إلى البريد الجديد</label>
-                        <div style="display:flex;gap:8px;">
-                            <input type="text" id="emailChangeCode" maxlength="6" placeholder="6 أرقام" style="flex:1;text-align:center;letter-spacing:6px;font-size:18px;direction:ltr;background:var(--bg);color:white;border:1px solid var(--border);border-radius:8px;padding:10px;">
-                            <button class="btn btn-primary" onclick="confirmNewEmail()" style="white-space:nowrap;">✅ توثيق</button>
-                            <button class="btn btn-sm" onclick="saveNewEmail()" style="white-space:nowrap;">🔄 إعادة إرسال</button>
-                        </div>
-                        <div id="emailChangeCodeMsg" style="font-size:12px;margin-top:6px;"></div>
-                    </div>
-                    <input type="hidden" id="pendingNewEmail">
-                    <div id="emailChangeMsg" style="font-size:12px;margin-top:6px;"></div>
-                </div>
-                <div id="verifySection">
-                    <div id="otpArea">
-                        <button class="btn btn-primary" id="btnSendCode" onclick="requestVerify()" style="margin-bottom:10px;">📨 إرسال رمز التوثيق</button>
-                        <div id="otpInputGroup" style="display:none;flex-direction:column;gap:10px;">
-                            <div class="input-wrap">
-                                <input type="text" id="otpInput" maxlength="6" placeholder="أدخل الرمز (6 أرقام)" style="text-align:center;letter-spacing:6px;font-size:18px;direction:ltr;">
-                            </div>
-                            <div style="display:flex;gap:8px;">
-                                <button class="btn btn-primary" onclick="confirmVerify()" style="flex:1;">✅ توثيق</button>
-                                <button class="btn btn-sm" onclick="requestVerify()" style="flex:0;">🔄 إعادة إرسال</button>
-                            </div>
-                        </div>
-                        <div id="verifyMsg" style="font-size:13px;margin-top:6px;"></div>
-                        <div id="verifyConfirmMsg" style="font-size:13px;margin-top:6px;"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="card danger-card">
-                <h4 style="color:#ef4444;">⚠️ منطقة الخطر</h4>
-                <p id="pDeleteDesc" style="color:var(--text-muted);font-size:13px;">حذف الحساب وجميع البيانات نهائياً</p>
-                <button class="btn btn-danger" onclick="deleteAccount()">🗑️ حذف الحساب</button>
-            </div>
         </section>
     </main>
     <script src="app.js?v=15"></script>

@@ -296,7 +296,7 @@ function switchTab(tabId) {
     if (tabId === 'adminFeedback') { loadAdminFeedback(); }
     if (tabId === 'adminStats') { loadAdminStatsPage(); }
     if (tabId === 'adminData') { loadAdminDataPage(); }
-    if (tabId === 'settings') { loadVerifyStatus(); }
+    if (tabId === 'settings') { }
     if (tabId === 'gpa') { loadGpaData(); populateGpaDatalist(); }
     if (tabId === 'schedule') { renderSchedGrid(); loadSavedSchedules(); }
     if (tabId === 'hourglass') { loadHourglass(); }
@@ -1035,7 +1035,6 @@ async function updateSettings() {
         document.getElementById('setNewEmail').value = '';
         alert(true ? 'تم التحديث!' : 'Updated!');
         initDash();
-        loadVerifyStatus();
     } else {
         alert(true ? data.err_ar : data.err_en);
     }
@@ -1050,157 +1049,6 @@ async function deleteAccount() {
         body: JSON.stringify({ username: user })
     });
     logout();
-}
-
-/* ===== EMAIL VERIFICATION ===== */
-function toggleEmailChange() {
-    const area = document.getElementById('emailChangeArea');
-    area.classList.toggle('hidden');
-    document.getElementById('emailChangeMsg').innerHTML = '';
-}
-
-async function saveNewEmail() {
-    const email = document.getElementById('newVerifyEmail').value.trim();
-    const msg = document.getElementById('emailChangeMsg');
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-        msg.innerHTML = '❌ البريد الإلكتروني غير صالح';
-        msg.style.color = '#ef4444';
-        return;
-    }
-    const current = localStorage.getItem('currentUser');
-    msg.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
-    msg.style.color = 'var(--text)';
-    const res = await fetch('/api/settings/send-new-email-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: current, newEmail: email })
-    });
-    const data = await res.json();
-    if (res.ok) {
-        msg.innerHTML = '✅ تم إرسال الرمز إلى البريد الجديد';
-        msg.style.color = '#22c55e';
-        document.getElementById('saveEmailBtn').classList.add('hidden');
-        document.getElementById('emailCodeArea').classList.remove('hidden');
-        document.getElementById('emailChangeCode').value = '';
-        document.getElementById('emailChangeCodeMsg').innerHTML = '';
-        document.getElementById('pendingNewEmail').value = email;
-    } else {
-        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
-        msg.style.color = '#ef4444';
-    }
-    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
-}
-
-async function confirmNewEmail() {
-    const code = document.getElementById('emailChangeCode').value.trim();
-    const msg = document.getElementById('emailChangeCodeMsg');
-    if (!code || code.length !== 6) {
-        msg.innerHTML = '❌ أدخل الرمز (6 أرقام)';
-        msg.style.color = '#ef4444';
-        return;
-    }
-    const current = localStorage.getItem('currentUser');
-    msg.innerHTML = '<span class="spinner"></span> جاري التحقق...';
-    msg.style.color = 'var(--text)';
-    const res = await fetch('/api/settings/verify-new-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: current, code })
-    });
-    const data = await res.json();
-    if (res.ok) {
-        msg.innerHTML = '✅ تم تحديث البريد بنجاح';
-        msg.style.color = '#22c55e';
-        document.getElementById('newVerifyEmail').value = '';
-        document.getElementById('emailChangeArea').classList.add('hidden');
-        document.getElementById('emailCodeArea').classList.add('hidden');
-        document.getElementById('saveEmailBtn').classList.remove('hidden');
-        document.getElementById('emailChangeCode').value = '';
-        document.getElementById('verifyMsg').innerHTML = '';
-        document.getElementById('verifyConfirmMsg').innerHTML = '';
-        loadVerifyStatus();
-    } else {
-        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
-        msg.style.color = '#ef4444';
-    }
-    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
-}
-
-async function loadVerifyStatus() {
-    const user = localStorage.getItem('currentUser');
-    if (!user) return;
-    const res = await fetch('/api/user/' + encodeURIComponent(user) + '/verified');
-    const data = await res.json();
-    const badge = document.getElementById('verifyBadge');
-    const section = document.getElementById('verifySection');
-    const otpArea = document.getElementById('otpArea');
-    const emailDisplay = document.getElementById('verifyEmail');
-    if (!badge || !section) return;
-    if (data.verified) {
-        badge.innerHTML = '✅ <span id="lblVerified">موثق</span>';
-        badge.className = 'verify-badge verified';
-        if (otpArea) otpArea.style.display = 'none';
-        if (data.email) emailDisplay.textContent = data.email;
-    } else {
-        badge.innerHTML = '⚠️ <span id="lblNotVerified">غير موثق</span>';
-        badge.className = 'verify-badge not-verified';
-        if (otpArea) otpArea.style.display = '';
-        if (data.email) emailDisplay.textContent = data.email;
-    }
-}
-
-async function requestVerify() {
-    const user = localStorage.getItem('currentUser');
-    const btn = document.getElementById('btnSendCode');
-    const msg = document.getElementById('verifyMsg');
-    btn.disabled = true;
-    msg.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
-    const res = await fetch('/api/verify-request', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: user })
-    });
-    const data = await res.json();
-    if (res.ok) {
-        if (data.already) {
-            msg.innerHTML = '✅ ' + (data.msg_ar || 'موثق مسبقاً');
-            loadVerifyStatus();
-        } else {
-            msg.innerHTML = '📧 ' + (data.msg_ar || 'تم الإرسال');
-            document.getElementById('otpInputGroup').style.display = 'flex';
-            document.getElementById('btnSendCode').textContent = '🔄 إعادة إرسال';
-        }
-    } else {
-        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
-    }
-    btn.disabled = false;
-    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
-}
-
-async function confirmVerify() {
-    const user = localStorage.getItem('currentUser');
-    const code = document.getElementById('otpInput').value.trim();
-    const msg = document.getElementById('verifyConfirmMsg');
-    if (!code || code.length !== 6) {
-        msg.innerHTML = '❌ أدخل 6 أرقام';
-        return;
-    }
-    const res = await fetch('/api/verify-confirm', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: user, code })
-    });
-    const data = await res.json();
-    if (res.ok) {
-        msg.innerHTML = '✅ ' + (data.msg_ar || 'تم التوثيق!');
-        document.getElementById('otpInput').value = '';
-        document.getElementById('otpInputGroup').style.display = 'none';
-        loadVerifyStatus();
-    } else {
-        msg.innerHTML = '❌ ' + (data.err_ar || 'خطأ');
-        document.getElementById('otpInput').value = '';
-    }
-    setTimeout(() => { if (msg) msg.innerHTML = ''; }, 5000);
 }
 
 document.addEventListener('click', function(e) {
@@ -1342,10 +1190,16 @@ function switchStatsSubTab(tab) {
 }
 
 async function loadAdminDataPage() {
+    try {
     const usersRes = await fetch('/api/admin/users?user=' + encodeURIComponent(localStorage.getItem('currentUser')));
+    if (!usersRes.ok) throw new Error((await usersRes.json()).error || 'Failed');
     const users = await usersRes.json();
     const list = document.getElementById('adminDataList');
     if (!list) return;
+    if (!users.length) {
+        list.innerHTML = '<p style="text-align:center;color:var(--text-muted);padding:30px;">لا يوجد مستخدمين</p>';
+        return;
+    }
     let html = '<div class="user-cards-grid">';
     users.forEach(u => {
         const barW = u.completionPct || 0;
@@ -1388,6 +1242,10 @@ async function loadAdminDataPage() {
     list.innerHTML = html;
     const countEl = document.getElementById('adminDataCount');
     if (countEl) countEl.textContent = '(' + users.length + ') مستخدم';
+    } catch(e) {
+        const list = document.getElementById('adminDataList');
+        if (list) list.innerHTML = '<p style="text-align:center;color:#ef4444;padding:30px;">❌ فشل التحميل: ' + e.message + '</p>';
+    }
 }
 
 /* ===== AI CHAT ===== */
