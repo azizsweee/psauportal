@@ -73,8 +73,10 @@ function initTransporter() {
         const port = process.env[prefix + '_PORT'] || '587';
         const user = process.env[prefix + '_USER'];
         const pass = process.env[prefix + '_PASS'];
+        const from = process.env[prefix + '_FROM'];
         if (host && user && pass) {
             transporter = makeTransporter(host, port, user, pass);
+            if (from) mailFromAddr = from;
             return { label: prefix + ' env', user };
         }
         return null;
