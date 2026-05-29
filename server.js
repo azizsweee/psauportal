@@ -978,6 +978,28 @@ app.post('/api/chat/history', async (req, res) => {
     res.json(history);
 });
 
+// Diagnostic routes
+app.post('/api/debug', (req, res) => {
+    const body = req.body;
+    res.json({ exists: !!body, keys: body ? Object.keys(body) : [], type: typeof body, contentType: req.headers['content-type'] });
+});
+app.get('/api/debug/db', (req, res) => {
+    try {
+        const fs = require('fs');
+        const p = require('path');
+        const dbPath = p.join(__dirname, 'database.json');
+        const exists = fs.existsSync(dbPath);
+        if (exists) {
+            const content = fs.readFileSync(dbPath, 'utf8');
+            res.json({ exists, length: content.length, preview: content.substring(0, 200) });
+        } else {
+            res.json({ exists: false });
+        }
+    } catch(e) {
+        res.json({ error: e.message });
+    }
+});
+
 // Global error handler
 app.use((err, req, res, next) => {
     console.error('⚠️', err?.message || err);
