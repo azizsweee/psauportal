@@ -114,12 +114,14 @@ async function registerStudent() {
     });
     const data = await res.json();
     if (res.ok) {
-        // Show OTP verification
         document.getElementById('regOtpArea').classList.remove('hidden');
         document.getElementById('regSubmitArea').classList.add('hidden');
         document.getElementById('regOtpMsg').innerHTML = '📧 ' + (data.msg_ar || 'تم إرسال الرمز');
         document.getElementById('regOtpEmail').value = email;
         document.getElementById('regHelpLink').style.display = 'block';
+        if (data.dev_code) {
+            document.getElementById('regOtpInput').value = data.dev_code;
+        }
     } else {
         alert(true ? data.err_ar : data.err_en);
     }
@@ -140,6 +142,9 @@ async function regHelpResend() {
     });
     const data = await res.json();
     msg.innerHTML = '📧 ' + (data.msg_ar || 'تم');
+    if (data.dev_code) {
+        document.getElementById('regOtpInput').value = data.dev_code;
+    }
 }
 
 function resendRegOtp() {
