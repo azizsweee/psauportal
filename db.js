@@ -19,11 +19,11 @@ function writeJsonDB(data) {
 // ====== FIRESTORE HELPERS ======
 async function firestoreGetDoc(collection, docId) {
     const snap = await firestoreDb.collection(collection).doc(docId).get();
-    return snap.exists ? { id: snap.id, ...snap.data() } : null;
+    return snap.exists ? { ...snap.data(), id: snap.id } : null;
 }
 async function firestoreQuery(collection, field, operator, value) {
     const snap = await firestoreDb.collection(collection).where(field, operator, value).get();
-    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    return snap.docs.map(d => ({ ...d.data(), id: d.id }));
 }
 async function firestoreSetDoc(collection, docId, data) {
     await firestoreDb.collection(collection).doc(docId).set(data, { merge: true });
@@ -130,10 +130,11 @@ async function createTask(username, taskData) {
 }
 async function toggleTask(username, taskId) {
     if (USE_FIRESTORE) {
-        const doc = await firestoreGetDoc('tasks', taskId);
-        if (doc && doc.username === username) {
-            await firestoreUpdateDoc('tasks', taskId, { completed: !doc.completed });
-            return !doc.completed;
+        const tasks = await firestoreQuery('tasks', 'username', '==', username);
+        const task = tasks[parseInt(taskId)];
+        if (task) {
+            await firestoreUpdateDoc('tasks', task.id, { completed: !task.completed });
+            return !task.completed;
         }
         return null;
     }
@@ -148,9 +149,10 @@ async function toggleTask(username, taskId) {
 }
 async function deleteTask(username, taskId) {
     if (USE_FIRESTORE) {
-        const doc = await firestoreGetDoc('tasks', taskId);
-        if (doc && doc.username === username) {
-            await firestoreDeleteDoc('tasks', taskId);
+        const tasks = await firestoreQuery('tasks', 'username', '==', username);
+        const task = tasks[parseInt(taskId)];
+        if (task) {
+            await firestoreDeleteDoc('tasks', task.id);
         }
         return;
     }
@@ -240,9 +242,13 @@ async function createSchedule(username, scheduleData) {
 }
 async function deleteSchedule(username, scheduleId) {
     if (USE_FIRESTORE) {
-        const doc = await firestoreGetDoc('schedules', scheduleId);
-        if (doc && doc.username === username) {
-            await firestoreDeleteDoc('schedules', scheduleId);
+        const snap = await firestoreDb.collection('schedules')
+            .where('username', '==', username)
+            .where('_id', '==', scheduleId)
+            .limit(1)
+            .get();
+        if (!snap.empty) {
+            await firestoreDeleteDoc('schedules', snap.docs[0].id);
         }
         return;
     }
@@ -467,7 +473,7 @@ async function deleteHourglass(username, entryId) {
 async function findAllFeedback() {
     if (USE_FIRESTORE) {
         const snap = await firestoreDb.collection('feedback').orderBy('date', 'desc').get();
-        return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        return snap.docs.map(d => ({ ...d.data(), id: d.id }));
     }
     const db = readJsonDB();
     return db.feedback || [];

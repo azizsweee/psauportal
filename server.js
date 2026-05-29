@@ -558,8 +558,9 @@ app.post('/api/reset-password', async (req, res) => {
     }
     if (stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
 
+    const username = stored.username;
     delete otpStore[otpKey];
-    await dbHelper.updateUser(se, { password: newPassword });
+    await dbHelper.updateUser(username, { password: newPassword });
 
     res.json({ msg_ar: '✅ تم تغيير كلمة المرور بنجاح!', msg_en: '✅ Password reset successfully!' });
 });
