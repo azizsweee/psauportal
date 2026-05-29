@@ -394,7 +394,7 @@ PSAU AI Portal`;
     }
     if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
-});
+}));
 
 // Resend OTP for registration (with rate limit bypass for help)
 app.post('/api/reg-resend', asyncHandler(async (req, res) => {
