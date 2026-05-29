@@ -93,7 +93,10 @@ function initTransporter() {
     const makeTransporter = (host, port, user, pass) => nodemailer.createTransport({
         host, port: parseInt(port), secure: port === 465,
         auth: { user, pass },
-        tls: { rejectUnauthorized: false }
+        tls: { rejectUnauthorized: false },
+        connectionTimeout: 8000,
+        greetingTimeout: 5000,
+        socketTimeout: 15000
     });
 
     const tryEnv = (prefix) => {
@@ -387,10 +390,11 @@ PSAU AI Portal`;
     if (!emailSent) {
         response.msg_ar = '❌ فشل إرسال البريد الإلكتروني، حاول مرة أخرى';
         response.msg_en = '❌ Failed to send email, try again';
+        response.dev_code = code;
     }
     if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
-}));
+});
 
 // Resend OTP for registration (with rate limit bypass for help)
 app.post('/api/reg-resend', asyncHandler(async (req, res) => {
@@ -417,8 +421,7 @@ PSAU AI Portal`;
         if (process.env.DEV_MODE === 'true') r.dev_code = stored.code;
         res.json(r);
     } else {
-        const r = { msg_ar: '❌ فشل إعادة الإرسال، حاول مرة أخرى', msg_en: '❌ Resend failed, try again' };
-        if (process.env.DEV_MODE === 'true') r.dev_code = stored.code;
+        const r = { msg_ar: '❌ فشل إعادة الإرسال، حاول مرة أخرى', msg_en: '❌ Resend failed, try again', dev_code: stored.code };
         res.json(r);
     }
 }));
@@ -478,8 +481,9 @@ app.post('/api/admin/send-code', asyncHandler(async (req, res) => {
 
     const response = { msg_ar: 'تم إرسال الرمز إلى بريد المشرف', msg_en: 'Code sent to admin email' };
     if (!emailSent) {
-        response.msg_ar = '❌ فشل إرسال البريد، تحقق من إعدادات SMTP';
-        response.msg_en = '❌ Failed to send email, check SMTP settings';
+        response.msg_ar = '❌ فشل إرسال البريد، استخدم الكود الظاهر في الشاشة';
+        response.msg_en = '❌ Failed to send email, use the code shown below';
+        response.dev_code = code;
     }
     if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
@@ -500,7 +504,7 @@ app.post('/api/admin/resend', asyncHandler(async (req, res) => {
     if (sent) {
         res.json({ msg_ar: 'تم إعادة الإرسال', msg_en: 'Resent' });
     } else {
-        res.json({ msg_ar: '❌ فشل إعادة الإرسال، حاول مرة أخرى', msg_en: '❌ Resend failed, try again' });
+        res.json({ msg_ar: '❌ فشل إعادة الإرسال، استخدم الكود الظاهر', msg_en: '❌ Resend failed', dev_code: stored.code });
     }
 }));
 
@@ -566,6 +570,7 @@ app.post('/api/forgot-password', asyncHandler(async (req, res) => {
     if (!emailSent) {
         response.msg_ar = '❌ فشل إرسال الرمز، حاول مرة أخرى';
         response.msg_en = '❌ Failed to send code, try again';
+        response.dev_code = code;
     }
     if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
@@ -872,6 +877,7 @@ app.post('/api/settings/send-new-email-code', async (req, res) => {
     if (!emailSent) {
         response.msg_ar = '❌ فشل إرسال الرمز، حاول مرة أخرى';
         response.msg_en = '❌ Failed to send code, try again';
+        response.dev_code = code;
     }
     if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
@@ -937,6 +943,7 @@ app.post('/api/verify-request', async (req, res) => {
     if (!emailSent) {
         response.msg_ar = '❌ فشل إرسال الرمز لبريدك الإلكتروني، حاول مرة أخرى أو تواصل مع الدعم';
         response.msg_en = '❌ Failed to send code to your email, try again or contact support';
+        response.dev_code = code;
     }
     if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
