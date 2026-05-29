@@ -19,5 +19,4 @@ services:
         value: dY2tVIw1zh3kFDRE
       - key: BREVO_FROM
         value: PSAU Portal <abdulazizsowaankau@gmail.com>
-      - key: FIREBASE_SERVICE_ACCOUNT_BASE64
-        sync: false
+

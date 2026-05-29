@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('express-async-errors');
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
@@ -16,6 +17,19 @@ const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'abdulazizsowaankau@gmail.com';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'AIzaSyDmQrbecOdkcdRL4sfwmhqqk1US869ZnbU';
 const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+
+// Prevent crash on unhandled promise rejections (e.g. Firestore auth failure)
+process.on('unhandledRejection', (reason) => {
+    console.error('⚠️ Unhandled Rejection:', reason?.message || reason);
+});
+
+// Wrap async route handlers to catch errors
+function asyncHandler(fn) {
+    return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(err => {
+        console.error('Route error:', err?.message || err);
+        res.status(500).json({ err_ar: 'حدث خطأ في الخادم', err_en: 'Internal server error' });
+    });
+}
 
 // Database layer (Firestore or JSON file)
 const dbHelper = require('./db');
@@ -306,7 +320,7 @@ ${faqList}
 // Temp storage for registration before email verification
 const regTempStore = {};
 
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', asyncHandler(async (req, res) => {
     const { username, password, age, gender, college, email } = req.body;
     const su = sanitize(username), sp = sanitize(password);
     const se = email ? sanitize(email).trim().toLowerCase() : '';
@@ -362,10 +376,10 @@ PSAU AI Portal`;
     }
     if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
-});
+}));
 
 // Resend OTP for registration (with rate limit bypass for help)
-app.post('/api/reg-resend', async (req, res) => {
+app.post('/api/reg-resend', asyncHandler(async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ err_ar: 'البريد مطلوب', err_en: 'Email required' });
     const se = sanitize(email).trim().toLowerCase();
@@ -393,9 +407,9 @@ PSAU AI Portal`;
         if (process.env.DEV_MODE === 'true') r.dev_code = stored.code;
         res.json(r);
     }
-});
+}));
 
-app.post('/api/verify-email', async (req, res) => {
+app.post('/api/verify-email', asyncHandler(async (req, res) => {
     const { email, code } = req.body;
     if (!email || !code) return res.status(400).json({ err_ar: 'أكمل البيانات', err_en: 'Fill all fields' });
     const se = sanitize(email).trim().toLowerCase();
@@ -426,10 +440,10 @@ app.post('/api/verify-email', async (req, res) => {
     await dbHelper.createUser({ username: td.username, password: td.password, email: se, age: td.age, gender: td.gender, college: td.college, phone: '', verified: true });
 
     res.json({ msg_ar: '✅ تم إنشاء الحساب وتوثيقه بنجاح!', msg_en: '✅ Account created and verified!' });
-});
+}));
 
 // Admin send OTP code
-app.post('/api/admin/send-code', async (req, res) => {
+app.post('/api/admin/send-code', asyncHandler(async (req, res) => {
     const { username } = req.body;
     if (sanitize(username) !== ADMIN_USER) {
         return res.status(400).json({ err_ar: 'اسم المستخدم غير صحيح', err_en: 'Invalid admin username' });
@@ -455,10 +469,10 @@ app.post('/api/admin/send-code', async (req, res) => {
     }
     if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
-});
+}));
 
 // Admin resend OTP
-app.post('/api/admin/resend', async (req, res) => {
+app.post('/api/admin/resend', asyncHandler(async (req, res) => {
     const { username } = req.body;
     if (sanitize(username) !== ADMIN_USER) return res.status(400).json({ err_ar: 'اسم المستخدم غير صحيح', err_en: 'Invalid admin' });
     const stored = otpStore['admin:login'];
@@ -474,7 +488,7 @@ app.post('/api/admin/resend', async (req, res) => {
     } else {
         res.json({ msg_ar: '❌ فشل إعادة الإرسال، حاول مرة أخرى', msg_en: '❌ Resend failed, try again' });
     }
-});
+}));
 
 // Admin verify OTP code
 app.post('/api/admin/verify-code', (req, res) => {
@@ -504,16 +518,16 @@ app.post('/api/admin/verify-code', (req, res) => {
     res.json({ username: ADMIN_USER, role: 'admin' });
 });
 
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', asyncHandler(async (req, res) => {
     const { username, password } = req.body;
     const user = await dbHelper.findUserByUsername(sanitize(username));
     if (!user || user.password !== password) {
         return res.status(400).json({ err_ar: 'البيانات غير صحيحة', err_en: 'Invalid credentials' });
     }
     res.json({ username: user.username, email: user.email || '', role: 'student', gender: user.gender || '', verified: !!user.verified });
-});
+}));
 
-app.post('/api/forgot-password', async (req, res) => {
+app.post('/api/forgot-password', asyncHandler(async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ err_ar: 'البريد الإلكتروني مطلوب', err_en: 'Email required' });
     const se = sanitize(email).trim().toLowerCase();
@@ -541,9 +555,9 @@ app.post('/api/forgot-password', async (req, res) => {
     }
     if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
-});
+}));
 
-app.post('/api/reset-password', async (req, res) => {
+app.post('/api/reset-password', asyncHandler(async (req, res) => {
     const { email, code, newPassword } = req.body;
     if (!email || !code || !newPassword) return res.status(400).json({ err_ar: 'أكمل جميع البيانات', err_en: 'Fill all fields' });
     const se = sanitize(email).trim().toLowerCase();
@@ -565,24 +579,23 @@ app.post('/api/reset-password', async (req, res) => {
     await dbHelper.updateUser(username, { password: newPassword });
 
     res.json({ msg_ar: '✅ تم تغيير كلمة المرور بنجاح!', msg_en: '✅ Password reset successfully!' });
-});
+}));
 
-app.post('/api/forgot-verify-identity', async (req, res) => {
+app.post('/api/forgot-verify-identity', asyncHandler(async (req, res) => {
     const { username, college, age, gender } = req.body;
     const user = await dbHelper.findUserByUsername(sanitize(username));
     if (user && user.college === sanitize(college) && parseInt(user.age) === parseInt(age) && user.gender === sanitize(gender)) {
         return res.json({ found: true, password: user.password });
     }
     res.json({ found: false });
-});
+}));
 
-// ====== FEEDBACK ======
-app.post('/api/feedback', async (req, res) => {
+app.post('/api/feedback', asyncHandler(async (req, res) => {
     const { username, rating, comment } = req.body;
     await dbHelper.createFeedback({ username: sanitize(username), rating: parseInt(rating), comment: sanitize(comment) });
     console.log('[Feedback] User: ' + username + ' | Rating: ' + rating + '/10 | Msg: ' + comment);
     res.json({ msg_ar: 'شكراً لك! تم استلام ملاحظاتك', msg_en: 'Thank you! Feedback received.' });
-});
+}));
 
 app.get('/api/feedback', async (req, res) => {
     if (!rateLimit('get-feedback', 30, 60000)) return res.status(429).json({ error: 'rate limit' });
@@ -963,6 +976,12 @@ app.post('/api/chat/history', async (req, res) => {
     if (!username) return res.json([]);
     const history = await dbHelper.getChatHistory(username);
     res.json(history);
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('⚠️', err?.message || err);
+    res.status(500).json({ err_ar: 'حدث خطأ في الخادم', err_en: 'Internal server error' });
 });
 
 app.listen(PORT, () => {
