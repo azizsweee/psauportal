@@ -51,7 +51,21 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(express.json({ limit: '1mb' }));
+// Custom body parser (express.json has a bug with this project — parse manually)
+app.use((req, res, next) => {
+    if (req.method === 'GET' || req.method === 'HEAD') return next();
+    const chunks = [];
+    req.on('data', chunk => chunks.push(chunk));
+    req.on('end', () => {
+        const raw = Buffer.concat(chunks).toString('utf8');
+        try {
+            req.body = raw ? JSON.parse(raw) : {};
+        } catch (e) {
+            req.body = {};
+        }
+        next();
+    });
+});
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: 0, etag: false, lastModified: false }));
 
 // Simple in-memory rate limiter
@@ -978,32 +992,10 @@ app.post('/api/chat/history', async (req, res) => {
     res.json(history);
 });
 
-// Diagnostic routes
-app.post('/api/debug', (req, res) => {
-    const body = req.body;
-    res.json({ exists: !!body, keys: body ? Object.keys(body) : [], type: typeof body, contentType: req.headers['content-type'] });
-});
-app.get('/api/debug/db', (req, res) => {
-    try {
-        const fs = require('fs');
-        const p = require('path');
-        const dbPath = p.join(__dirname, 'database.json');
-        const exists = fs.existsSync(dbPath);
-        if (exists) {
-            const content = fs.readFileSync(dbPath, 'utf8');
-            res.json({ exists, length: content.length, preview: content.substring(0, 200) });
-        } else {
-            res.json({ exists: false });
-        }
-    } catch(e) {
-        res.json({ error: e.message });
-    }
-});
-
 // Global error handler
 app.use((err, req, res, next) => {
     console.error('⚠️', err?.message || err);
-    res.status(500).json({ err_ar: 'حدث خطأ في الخادم', err_en: 'Internal server error', detail: err?.message || String(err) });
+    res.status(500).json({ err_ar: 'حدث خطأ في الخادم', err_en: 'Internal server error' });
 });
 
 app.listen(PORT, () => {
