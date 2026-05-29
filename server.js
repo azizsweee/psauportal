@@ -497,12 +497,6 @@ app.post('/api/admin/verify-code', (req, res) => {
 app.post('/api/login', asyncHandler(async (req, res) => {
     const { username, password } = req.body;
     const su = sanitize(username), sp = sanitize(password);
-    if (su === 'AzozS2005519') {
-        if (sp === ADMIN_PASS) {
-            return res.json({ username: 'AzozS2005519', role: 'admin' });
-        }
-        return res.status(400).json({ err_ar: 'البيانات غير صحيحة', err_en: 'Invalid credentials' });
-    }
     if (su === ADMIN_USER) {
         if (sp === ADMIN_PASS) {
             return res.json({ username: ADMIN_USER, role: 'admin' });
