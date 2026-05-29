@@ -120,11 +120,6 @@ async function registerStudent() {
         document.getElementById('regOtpMsg').innerHTML = '📧 ' + (data.msg_ar || 'تم إرسال الرمز');
         document.getElementById('regOtpEmail').value = email;
         document.getElementById('regHelpLink').style.display = 'block';
-        if (data.dev_code) {
-            document.getElementById('regOtpInput').value = data.dev_code;
-            document.getElementById('regOtpMsg').innerHTML = '⚙️ ' + (data.msg_ar || 'Code: ' + data.dev_code);
-            document.getElementById('regHelpLink').style.display = 'none';
-        }
     } else {
         alert(true ? data.err_ar : data.err_en);
     }
@@ -145,10 +140,6 @@ async function regHelpResend() {
     });
     const data = await res.json();
     msg.innerHTML = '📧 ' + (data.msg_ar || 'تم');
-    if (data.dev_code) {
-        document.getElementById('regOtpInput').value = data.dev_code;
-        msg.innerHTML = '⚙️ ' + (data.msg_ar || 'الكود: ' + data.dev_code);
-    }
 }
 
 function resendRegOtp() {

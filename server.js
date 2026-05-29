@@ -59,6 +59,8 @@ function sanitize(str) {
 
 let transporter = null;
 
+let mailFromAddr = null;
+
 function initTransporter() {
     const makeTransporter = (host, port, user, pass) => nodemailer.createTransport({
         host, port: parseInt(port), secure: port === 465,
@@ -87,12 +89,17 @@ function initTransporter() {
             const cfg = JSON.parse(fs.readFileSync(cfgPath, 'utf8'));
             if (cfg.host && cfg.user && cfg.pass) {
                 transporter = makeTransporter(cfg.host, cfg.port || 587, cfg.user, cfg.pass);
+                mailFromAddr = cfg.from_email || ('"PSAU Portal" <' + cfg.user + '>');
                 src = { label: 'mail-config.json', user: cfg.user };
             }
         }
     } catch (e) { /* ignore */ }
 
     if (!src) src = tryEnv('BREVO') || tryEnv('SMTP');
+
+    if (transporter && !mailFromAddr) {
+        mailFromAddr = '"PSAU Portal" <' + src.user + '>';
+    }
 
     if (transporter) {
         console.log('✅ SMTP configured via ' + src.label + ': ' + src.user);
@@ -123,8 +130,7 @@ async function sendMailWithRetry(to, subject, text, html, retries) {
     retries = retries || 3;
     for (let attempt = 1; attempt <= retries; attempt++) {
         try {
-            const user = transporter.options?.auth?.user || 'noreply@psau-portal.com';
-            await transporter.sendMail({ from: '"PSAU Portal" <' + user + '>', to, subject, text, html });
+            await transporter.sendMail({ from: mailFromAddr, to, subject, text, html });
             console.log('[EMAIL sent] to ' + to + ' (attempt ' + attempt + ')');
             return true;
         } catch (e) {
@@ -352,6 +358,7 @@ PSAU AI Portal`;
         response.msg_ar = '❌ فشل إرسال البريد الإلكتروني، حاول مرة أخرى';
         response.msg_en = '❌ Failed to send email, try again';
     }
+    if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
 });
 
@@ -376,9 +383,13 @@ PSAU AI Portal`;
     const html = `<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"></head><body style="font-family:Arial,sans-serif;padding:20px;background:#f5f5f5"><div style="max-width:480px;margin:auto;background:white;border-radius:12px;padding:30px;box-shadow:0 2px 8px rgba(0,0,0,0.1)"><div style="text-align:center;margin-bottom:20px"><h2 style="color:#1a237e;margin:0">جامعة الأمير سطام بن عبدالعزيز</h2><p style="color:#666">بوابة طلابية ذكية</p></div><hr style="border:none;border-top:1px solid #eee"><p style="font-size:16px;color:#333">رمز التحقق الخاص بك هو:</p><div style="text-align:center;margin:25px 0;padding:15px;background:#e8eaf6;border-radius:8px;direction:ltr"><span style="font-size:36px;font-weight:bold;color:#1a237e;letter-spacing:8px">${stored.code}</span></div><p style="font-size:14px;color:#999">صلاحية هذا الرمز: <b>${Math.round((stored.expires - Date.now()) / 60000)} دقائق</b></p><hr style="border:none;border-top:1px solid #eee"><p style="font-size:12px;color:#aaa;text-align:center">PSAU AI Portal &bull; بوابة غير رسمية</p></div></body></html>`;
     const sent = await sendOrLogEmail(se, 'رمز التحقق - جامعة الأمير سطام بن عبدالعزيز', text, html);
     if (sent) {
-        res.json({ msg_ar: 'تم إعادة إرسال الرمز', msg_en: 'Code resent' });
+        const r = { msg_ar: 'تم إعادة إرسال الرمز', msg_en: 'Code resent' };
+        if (process.env.DEV_MODE === 'true') r.dev_code = stored.code;
+        res.json(r);
     } else {
-        res.json({ msg_ar: '❌ فشل إعادة الإرسال، حاول مرة أخرى', msg_en: '❌ Resend failed, try again' });
+        const r = { msg_ar: '❌ فشل إعادة الإرسال، حاول مرة أخرى', msg_en: '❌ Resend failed, try again' };
+        if (process.env.DEV_MODE === 'true') r.dev_code = stored.code;
+        res.json(r);
     }
 });
 
@@ -389,24 +400,23 @@ app.post('/api/verify-email', async (req, res) => {
     const sc = sanitize(code).trim();
     if (!/^\d{6}$/.test(sc)) return res.status(400).json({ err_ar: 'الكود 6 أرقام', err_en: 'Code must be 6 digits' });
 
-    // Check in-memory OTP store (works for both modes)
+    // Check OTP (in-memory store — always populated during /api/register)
     const otpKey = 'reg:' + se;
     const stored = otpStore[otpKey];
-    if (USE_FIRESTORE) {
-        const fsOtp = await dbHelper.verifyOtpCode(se, sc, 'register');
-        if (!fsOtp && !stored) return res.status(400).json({ err_ar: 'الكود خطأ أو منتهي الصلاحية', err_en: 'Wrong or expired code' });
-    } else {
-        if (!stored) return res.status(400).json({ err_ar: 'لم يتم طلب رمز أو انتهت صلاحيته', err_en: 'No code requested or expired' });
-        if (stored.expires < Date.now()) {
-            delete otpStore[otpKey];
-            return res.status(400).json({ err_ar: 'انتهت صلاحية الرمز، اطلب واحداً جديداً', err_en: 'Code expired, request a new one' });
-        }
-        if (stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
+    if (!stored) return res.status(400).json({ err_ar: 'لم يتم طلب رمز أو انتهت صلاحيته', err_en: 'No code requested or expired' });
+    if (stored.expires < Date.now()) {
+        delete otpStore[otpKey];
+        return res.status(400).json({ err_ar: 'انتهت صلاحية الرمز، اطلب واحداً جديداً', err_en: 'Code expired, request a new one' });
     }
-    if (stored && stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
+    if (stored.code !== sc) return res.status(400).json({ err_ar: 'الكود خطأ!', err_en: 'Wrong code!' });
+
+    // Best-effort Firestore verify (mark OTP as used, ignore errors)
+    if (USE_FIRESTORE) {
+        try { await dbHelper.verifyOtpCode(se, sc, 'register'); } catch (e) { console.error('Firestore OTP verify err:', e.message); }
+    }
 
     // Valid OTP – create user with verified=true
-    if (otpStore[otpKey]) delete otpStore[otpKey];
+    delete otpStore[otpKey];
     const td = regTempStore[se];
     if (!td) return res.status(400).json({ err_ar: 'انتهت الجلسة، أعد التسجيل', err_en: 'Session expired, re-register' });
     delete regTempStore[se];
@@ -441,6 +451,7 @@ app.post('/api/admin/send-code', async (req, res) => {
         response.msg_ar = '❌ فشل إرسال البريد، تحقق من إعدادات SMTP';
         response.msg_en = '❌ Failed to send email, check SMTP settings';
     }
+    if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
 });
 
@@ -526,6 +537,7 @@ app.post('/api/forgot-password', async (req, res) => {
         response.msg_ar = '❌ فشل إرسال الرمز، حاول مرة أخرى';
         response.msg_en = '❌ Failed to send code, try again';
     }
+    if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
 });
 
@@ -831,6 +843,7 @@ app.post('/api/settings/send-new-email-code', async (req, res) => {
         response.msg_ar = '❌ فشل إرسال الرمز، حاول مرة أخرى';
         response.msg_en = '❌ Failed to send code, try again';
     }
+    if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
 });
 
@@ -895,6 +908,7 @@ app.post('/api/verify-request', async (req, res) => {
         response.msg_ar = '❌ فشل إرسال الرمز لبريدك الإلكتروني، حاول مرة أخرى أو تواصل مع الدعم';
         response.msg_en = '❌ Failed to send code to your email, try again or contact support';
     }
+    if (process.env.DEV_MODE === 'true') response.dev_code = code;
     res.json(response);
 });
 

@@ -4,3 +4,5 @@ database.json
 __pycache__/
 database.db
 *.pyc
+firebase-key.json
+firebase-b64.txt

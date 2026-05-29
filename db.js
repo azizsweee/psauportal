@@ -501,18 +501,24 @@ async function createOtpCode(email, code, purpose, expiresAt) {
 async function verifyOtpCode(email, code, purpose) {
     if (USE_FIRESTORE) {
         const now = new Date().toISOString();
-        const snap = await firestoreDb.collection('otpCodes')
-            .where('email', '==', email)
-            .where('code', '==', code)
-            .where('purpose', '==', purpose)
-            .where('used', '==', false)
-            .where('expiresAt', '>', now)
-            .limit(1)
-            .get();
-        if (!snap.empty) {
-            const doc = snap.docs[0];
-            await doc.ref.update({ used: true });
-            return doc.data();
+        try {
+            const snap = await firestoreDb.collection('otpCodes')
+                .where('email', '==', email)
+                .where('expiresAt', '>', now)
+                .orderBy('expiresAt', 'desc')
+                .limit(5)
+                .get();
+            if (!snap.empty) {
+                for (const doc of snap.docs) {
+                    const d = doc.data();
+                    if (d.code === code && d.purpose === purpose && !d.used) {
+                        await doc.ref.update({ used: true });
+                        return d;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Firestore verifyOtpCode error:', e.message);
         }
         return null;
     }
