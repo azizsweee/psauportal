@@ -166,14 +166,41 @@ async function login() {
     } catch(e) { alert('Login error: ' + e.message); }
 }
 
-async function forgotSendCode() {
-    const email = document.getElementById('forgotEmail').value.trim();
-    const msg = document.getElementById('forgotMsg');
-    if (!email) {
-        msg.innerHTML = '❌ أدخل بريدك الإلكتروني';
-        msg.style.color = '#ef4444';
+async function forgotVerifyIdentity() {
+    const username = document.getElementById('forgotUser').value.trim();
+    const age = document.getElementById('forgotAge').value;
+    const gender = document.getElementById('forgotGender').value;
+    const college = document.getElementById('forgotCollege').value;
+    const result = document.getElementById('forgotResult');
+    if (!username || !age || !gender || !college) {
+        result.innerHTML = '❌ أكمل جميع البيانات';
+        result.style.color = '#ef4444';
         return;
     }
+    result.innerHTML = '<span class="spinner"></span> جاري التحقق...';
+    result.style.color = 'var(--text)';
+    const res = await fetch('/api/forgot-verify-identity', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, age, gender, college })
+    });
+    const data = await res.json();
+    if (data.found) {
+        result.innerHTML = '✅ تم التحقق! كلمة المرور الخاصة بك هي:<br><div style="direction:ltr;font-size:22px;font-weight:bold;letter-spacing:2px;padding:12px;margin:10px auto;background:var(--surface-2);border-radius:8px;max-width:200px;text-align:center;color:#22c55e;">' + data.password + '</div><button class="btn btn-sm" onclick="copyToClipboard(\'' + data.password + '\')" style="margin-top:6px;">📋 نسخ</button>';
+        result.style.color = '#22c55e';
+    } else {
+        result.innerHTML = '❌ البيانات غير صحيحة أو لا يوجد حساب بهذه البيانات';
+        result.style.color = '#ef4444';
+    }
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        document.getElementById('forgotResult').innerHTML += '<br><span style="color:#22c55e;">✅ تم النسخ</span>';
+    }).catch(() => {
+        document.getElementById('forgotResult').innerHTML += '<br><span style="color:#ef4444;">❌ فشل النسخ</span>';
+    });
+}
     msg.innerHTML = '<span class="spinner"></span> جاري الإرسال...';
     msg.style.color = 'var(--text)';
     const res = await fetch('/api/forgot-password', {

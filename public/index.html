@@ -175,29 +175,49 @@
                 نسيت كلمة المرور
             </h3>
             <div id="forgotStep1">
-                <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">أدخل بريدك الإلكتروني المسجل وسنرسل لك رمزاً</p>
+                <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">أدخل بيانات حسابك لاستعادة كلمة المرور</p>
                 <div class="form-group">
-                    <label id="lblForgotEmail">البريد الإلكتروني (Gmail)</label>
+                    <label>اسم المستخدم</label>
                     <div class="input-wrap">
-                        <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                        <input type="email" id="forgotEmail" placeholder="example@gmail.com" style="direction:ltr;text-align:left;">
+                        <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                        <input type="text" id="forgotUser" placeholder="Username">
                     </div>
                 </div>
-                <button class="btn btn-primary" onclick="forgotSendCode()">📨 إرسال رمز التحقق</button>
-                <div id="forgotMsg" style="margin-top:10px;font-size:13px;"></div>
-            </div>
-            <div id="forgotStep2" class="hidden" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
-                <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">أدخل الرمز الذي وصل إلى بريدك وكلمة المرور الجديدة:</p>
-                <div class="form-group">
-                    <label id="lblEnterCode">رمز التحقق (6 أرقام)</label>
-                    <input type="text" id="forgotCode" maxlength="6" placeholder="000000" style="text-align:center;letter-spacing:6px;font-size:18px;direction:ltr;background:var(--surface-2);color:white;border:1px solid var(--border);border-radius:10px;padding:12px;width:100%;">
+                <div style="display:flex;gap:10px;">
+                    <div class="form-group" style="flex:1;">
+                        <label>العمر</label>
+                        <div class="input-wrap">
+                            <svg class="input-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            <input type="number" id="forgotAge" min="15" max="80" placeholder="18" style="padding:10px 38px 10px 14px;">
+                        </div>
+                    </div>
+                    <div class="form-group" style="flex:1;">
+                        <label>طالب/طالبة</label>
+                        <select id="forgotGender">
+                            <option value="طالب">طالب</option>
+                            <option value="طالبة">طالبة</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label id="lblNewPassword">كلمة المرور الجديدة</label>
-                    <input type="password" id="forgotNewPass" placeholder="••••••••" style="background:var(--surface-2);color:white;border:1px solid var(--border);border-radius:10px;padding:12px;width:100%;">
+                    <label>الكلية</label>
+                    <select id="forgotCollege" class="login-select">
+                        <option value="كلية هندسة وعلوم الحاسب">كلية هندسة وعلوم الحاسب</option>
+                        <option value="كلية الهندسة">كلية الهندسة</option>
+                        <option value="كلية إدارة الأعمال">كلية إدارة الأعمال</option>
+                        <option value="كلية الطب البشري">كلية الطب البشري</option>
+                        <option value="كلية طب الأسنان">كلية طب الأسنان</option>
+                        <option value="كلية الصيدلة">كلية الصيدلة</option>
+                        <option value="كلية العلوم الطبية التطبيقية">كلية العلوم الطبية التطبيقية</option>
+                        <option value="كلية العلوم والدراسات الإنسانية">كلية العلوم والدراسات الإنسانية</option>
+                        <option value="كلية التربية">كلية التربية</option>
+                        <option value="كلية الآداب والعلوم">كلية الآداب والعلوم</option>
+                        <option value="الكلية التطبيقية">الكلية التطبيقية</option>
+                        <option value="أخرى">أخرى</option>
+                    </select>
                 </div>
-                <button class="btn btn-primary" onclick="forgotResetPass()">🔑 تغيير كلمة المرور</button>
-                <div id="forgotResetMsg" style="margin-top:10px;font-size:13px;"></div>
+                <button class="btn btn-primary" onclick="forgotVerifyIdentity()">🔍 تحقق</button>
+                <div id="forgotResult" style="margin-top:12px;font-size:14px;"></div>
             </div>
             <div class="links" style="margin-top:14px;">
                 <a href="#" id="linkBackLogin" onclick="toggleCard('loginCard')">رجوع</a>
