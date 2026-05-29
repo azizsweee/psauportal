@@ -27,7 +27,7 @@ process.on('unhandledRejection', (reason) => {
 function asyncHandler(fn) {
     return (req, res, next) => Promise.resolve(fn(req, res, next)).catch(err => {
         console.error('Route error:', err?.message || err);
-        res.status(500).json({ err_ar: 'حدث خطأ في الخادم', err_en: 'Internal server error' });
+        res.status(500).json({ err_ar: 'حدث خطأ في الخادم', err_en: 'Internal server error', detail: err?.message || String(err) });
     });
 }
 
@@ -981,7 +981,7 @@ app.post('/api/chat/history', async (req, res) => {
 // Global error handler
 app.use((err, req, res, next) => {
     console.error('⚠️', err?.message || err);
-    res.status(500).json({ err_ar: 'حدث خطأ في الخادم', err_en: 'Internal server error' });
+    res.status(500).json({ err_ar: 'حدث خطأ في الخادم', err_en: 'Internal server error', detail: err?.message || String(err) });
 });
 
 app.listen(PORT, () => {
