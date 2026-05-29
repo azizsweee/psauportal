@@ -970,7 +970,17 @@ app.use((err, req, res, next) => {
     res.status(500).json({ err_ar: 'حدث خطأ في الخادم', err_en: 'Internal server error' });
 });
 
+const http = require('http');
+
 app.listen(PORT, () => {
     console.log('PSAU AI Portal running: http://localhost:' + PORT);
     console.log('AI مزود بـ Google Gemini');
+    const BASE = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+    setInterval(() => {
+        http.get(`${BASE}/`, (res) => {
+            console.log(`[keep-alive] ping ${BASE} → ${res.statusCode}`);
+        }).on('error', (e) => {
+            console.error('[keep-alive] ping failed:', e.message);
+        });
+    }, 280000);
 });
