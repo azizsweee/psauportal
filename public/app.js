@@ -140,7 +140,7 @@ function setRole(role) {
     document.getElementById('loginTitleText').innerText = isAdmin
         ? (true ? 'دخول المشرفين' : 'Admin Login')
         : (true ? 'تسجيل الدخول' : 'Student Login');
-    document.getElementById('loginUser').placeholder = isAdmin ? '447051601' : 'Username';
+    document.getElementById('loginUser').placeholder = isAdmin ? 'AzozS2005519' : 'Username';
     document.getElementById('loginBtnText').innerText = isAdmin ? '🛡️ دخول كمشرف' : 'دخول كطالب';
 }
 
