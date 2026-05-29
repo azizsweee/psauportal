@@ -2,8 +2,21 @@ const fs = require('fs');
 const path = require('path');
 
 const DB_FILE = path.join(__dirname, 'database.json');
-const { db: firestoreDb } = require('./firebase-config');
-const USE_FIRESTORE = !!(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64 || process.env.GOOGLE_APPLICATION_CREDENTIALS);
+let firestoreDb;
+try {
+    firestoreDb = require('./firebase-config').db;
+} catch (e) {
+    console.error('Firebase init failed:', e.message);
+}
+let USE_FIRESTORE = !!(process.env.FIREBASE_SERVICE_ACCOUNT_BASE64 || process.env.GOOGLE_APPLICATION_CREDENTIALS) && !!firestoreDb;
+
+// Startup health check - fall back to JSON if Firestore unavailable
+if (USE_FIRESTORE) {
+    firestoreDb.collection('_healthcheck').limit(1).get().catch(() => {
+        console.warn('Firestore unavailable, falling back to JSON file');
+        USE_FIRESTORE = false;
+    });
+}
 
 // ====== JSON FILE HELPERS ======
 function readJsonDB() {
